@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:userfoodcatering/screens/RegisterPage.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
-import 'package:userfoodcatering/screens/HomePage.dart';
+import 'package:userfoodcatering/screens/NavigationPage.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -50,10 +50,10 @@ class _LoginPageState extends State<LoginPage> {
                 onPressed: () {
                   invalidCredentials = false;
                   FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: emailController.text,
-                      password: passwordController.text
+                      email: "devuslee1@yahoo.com",
+                      password: "123123"
                   ).then((value) {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationPage()));
                   }).onError((error, stackTrace) {
                     print("Error: $error");
                     setState(() {

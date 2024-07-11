@@ -41,3 +41,53 @@ class _ReusableTextFieldState extends State<ReusableTextField> {
     );
   }
 }
+
+class ReusableContainer extends StatefulWidget {
+  final String text;
+  final String textvalue;
+
+  const ReusableContainer({
+    Key? key,
+    required this.text,
+    required this.textvalue,
+  }) : super(key: key);
+
+  @override
+  State<ReusableContainer> createState() => _ReusableContainerState();
+}
+
+class _ReusableContainerState extends State<ReusableContainer> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 75, // Adjust height as needed
+      width: MediaQuery.of(context).size.width * 0.3, // Adjust width as needed
+      margin: EdgeInsets.all(8.0), // Adjust margin as needed
+      padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // Adjust padding as needed
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey), // Add border
+        borderRadius: BorderRadius.circular(8.0), // Add border radius for rounded corners
+      ),
+      child: Column(
+        children: [
+          Text(
+            widget.text,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16.0, // Adjust font size
+              fontWeight: FontWeight.bold, // Adjust font weight
+            ),
+          ),
+          Text(
+            widget.textvalue,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 16.0, // Adjust font size
+              fontWeight: FontWeight.bold, // Adjust font weight
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -10,6 +10,7 @@ void main() async {
       appId: '1:831398945187:android:a3290e4a59ea933d9b3a16',
       messagingSenderId: '831398945187',
       projectId: 'foodcatering-6bb02',
+      storageBucket: 'foodcatering-6bb02.appspot.com',
     ),
   );
   runApp(const MyApp());
