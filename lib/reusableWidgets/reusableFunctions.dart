@@ -70,15 +70,18 @@ Future<List<MenuClass>> getMenuData() async {
     QuerySnapshot querySnapshot = await menuCollection.get();
     List<MenuClass> menuList = [];
 
+
+
     await Future.wait(querySnapshot.docs.map((doc) async {
       String imageURL = doc['imageURL'].toString();
       String downloadURL = await _storage.ref('menu/$imageURL.jpeg').getDownloadURL();
+      double price = doc['price'].toDouble();
 
       menuList.add(MenuClass(
         name: doc['name'].toString(),
         description: doc['description'].toString(),
         imageURL: downloadURL,
-        price: doc['price'],
+        price: price,
         rating: doc['rating'].toString(),
       ));
     }));
@@ -90,5 +93,61 @@ Future<List<MenuClass>> getMenuData() async {
   }
 }
 
+
+void addToCart(String foodName, double price, int quantity, double total) async {
+
+  final foodDocumentRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('cart')
+      .doc(foodName);
+
+  await foodDocumentRef.set({
+    'name': foodName,
+    'price': price,
+    'quantity': quantity,
+    'total': total,
+  });
+}
+
+
+Future<int> getFoodQuantity(String foodName) async {
+  final foodDocumentRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .collection('cart')
+      .doc(foodName);
+
+  try {
+    final foodDocumentSnapshot = await foodDocumentRef.get();
+    if (foodDocumentSnapshot.exists) {
+      return foodDocumentSnapshot.get('quantity');
+    } else {
+      return 1;
+    }
+  } catch (error) {
+    return 1;
+  }
+}
+
+Future<int> getCartQuantity() async {
+  final cartCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('cart');
+
+  int counter = 0;
+
+  try {
+    final cartCollectionSnapshot = await cartCollectionRef.get();
+    cartCollectionSnapshot.docs.forEach((doc) {
+      counter++;
+    });
+    return counter;
+  } catch (error) {
+    print('Error fetching cart quantity: $error');
+    return 0;
+  }
+}
 
 

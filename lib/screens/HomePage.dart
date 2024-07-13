@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(height: 20.0),
           Container(
-              margin: EdgeInsets.all(8.0), // Adjust margin as needed
+              margin: EdgeInsets.all(8.0),
               padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // Adjust padding as needed
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey), // Add border

@@ -61,7 +61,7 @@ class _ReusableContainerState extends State<ReusableContainer> {
   Widget build(BuildContext context) {
     return Container(
       height: 75, // Adjust height as needed
-      width: MediaQuery.of(context).size.width * 0.3, // Adjust width as needed
+      width: MediaQuery.of(context).size.width * 0.25, // Adjust width as needed
       margin: EdgeInsets.all(8.0), // Adjust margin as needed
       padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // Adjust padding as needed
       decoration: BoxDecoration(

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/screens/ProfilePage.dart';
 import 'package:userfoodcatering/screens/HomePage.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:userfoodcatering/screens/AddOrderPage.dart';
+import 'package:userfoodcatering/screens/CartPage.dart';
+import 'package:icon_badge/icon_badge.dart';
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
@@ -13,12 +16,30 @@ class NavigationPage extends StatefulWidget {
 
 class _NavigationPageState extends State<NavigationPage> {
   int currentPageIndex = 0;
+  int cartCount = 0;
+
+
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  void fetchData() async {
+    try {
+      cartCount = await getCartQuantity();
+      // Fetch points and rank similarly
+      setState(() {}); // Update the UI after fetching data
+    } catch (error) {
+      print('Error fetching data: $error');
+    }
+  }
 
   final List<Widget> _pages = [
     HomePage(),
-    Placeholder(),
+    CartPage(),
     Placeholder(),
     ProfilePage(),
+    AddOrderPage(),
   ];
 
   final IconList = [
@@ -38,19 +59,21 @@ class _NavigationPageState extends State<NavigationPage> {
         width: 65,
         child: FloatingActionButton(
           onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => AddOrderPage()));
+            setState(() {
+              currentPageIndex = 4;
+            });
           },
           shape: const CircleBorder(),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.add),
+              Icon(Icons.add, color: currentPageIndex == 4 ? Colors.blue : Colors.grey),
               const SizedBox(height: 1),
               Text(
                   "Order",
                   maxLines: 1,
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(color: currentPageIndex == 4 ? Colors.blue : Colors.grey),
                 ),
             ],
           ),
@@ -58,24 +81,41 @@ class _NavigationPageState extends State<NavigationPage> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: AnimatedBottomNavigationBar.builder(
+        height: 80,
         itemCount: IconList.length,
         tabBuilder: (index, isActive) {
           final color = isActive ? Colors.blue : Colors.grey;
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(IconList[index], size: 24, color: color),
-              const SizedBox(height: 4),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  index == 0 ? 'Home' : index == 1 ? 'Orders' : index == 2 ? 'Notifications' : index == 3 ? 'Profile' : '',
-                  maxLines: 1,
-                  style: TextStyle(color: color),
+          return Container(
+            height: 80,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconBadge(
+                      icon: Icon(IconList[index], color: color, size: 30,),
+                      itemCount: index == 1 ? cartCount : 0,
+                      badgeColor: Colors.red,
+                      right: 6,
+                      top: 0,
+                      hideZero: true,
+                      itemColor: Colors.white,
+                    ),
+                    const SizedBox(height: 4),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        index == 0 ? 'Home' : index == 1 ? 'Cart' : index == 2 ? 'Notifications' : index == 3 ? 'Profile' : '',
+                        maxLines: 1,
+                        style: TextStyle(color: color),
+                      ),
+                    ),
+                  ],
                 ),
-              )
-            ],
+              ],
+            ),
           );
         },
         activeIndex: currentPageIndex,

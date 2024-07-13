@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/class/menuClass.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:userfoodcatering/screens/ViewOrderPage.dart';
 
 class AddOrderPage extends StatefulWidget {
   const AddOrderPage({super.key});
@@ -37,8 +38,9 @@ class _AddOrderPageState extends State<AddOrderPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const SizedBox(height: 50),
             const Text('Menu', style: TextStyle(fontSize: 24)),
-            const SizedBox(height: 20),
+            const SizedBox(height: 5),
             Expanded(
               child: GridView.count(
                 primary: false,
@@ -46,17 +48,17 @@ class _AddOrderPageState extends State<AddOrderPage> {
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
                 crossAxisCount: 3,
-                childAspectRatio: 2,
+                childAspectRatio: 1,
                 children: <Widget>[
                   for (var menu in MenuList)
                     Container(
-                    width: 500,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.black,
-                        width: 1.0,
+                      width: MediaQuery.of(context).size.width * 0.3,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.black,
+                          width: 2.0,
+                        ),
                       ),
-                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -68,6 +70,13 @@ class _AddOrderPageState extends State<AddOrderPage> {
                           ),
                         ),
                         Expanded(
+                          child: InkWell(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(
+                              builder: (context) => ViewOrderPage(menuData: menu),
+                            ),
+                            );
+                          },
                           child: CachedNetworkImage(
                             imageUrl: menu.imageURL,
                             imageBuilder: (context, imageProvider) => Container(
@@ -80,7 +89,8 @@ class _AddOrderPageState extends State<AddOrderPage> {
                             ),
                             placeholder: (context, url) => Center(child: CircularProgressIndicator()),
                             errorWidget: (context, url, error) => Text('Error: $error'),
-                          ),
+                            ),
+                          )
                         ),
                       ],
                     ),
