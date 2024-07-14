@@ -6,6 +6,7 @@ import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.da
 import 'package:userfoodcatering/screens/AddOrderPage.dart';
 import 'package:userfoodcatering/screens/CartPage.dart';
 import 'package:icon_badge/icon_badge.dart';
+import 'package:userfoodcatering/screens/HistoryPage.dart';
 
 class NavigationPage extends StatefulWidget {
   final int currentIndex;
@@ -40,7 +41,7 @@ class _NavigationPageState extends State<NavigationPage> {
   final List<Widget> _pages = [
     HomePage(),
     CartPage(),
-    Placeholder(),
+    HistoryPage(),
     ProfilePage(),
     AddOrderPage(),
   ];

@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -239,7 +240,7 @@ void deleteWholeCart() async {
   }
 }
 
-void sendOrder(List cartItems, String specialRemarks) {
+void sendOrder(List cartItems, String specialRemarks, String desiredPickupTime, double total) {
   final orderCollectionRef = FirebaseFirestore.instance
       .collection('admin')
       .doc('orders')
@@ -256,7 +257,62 @@ void sendOrder(List cartItems, String specialRemarks) {
       'customer': currentUser,
       'createdAt': DateTime.now().toString(),
       'specialRemarks': specialRemarks,
+      'desiredPickupTime': desiredPickupTime,
+      'total': total,
     });
   });
 }
 
+void createOrderHistory(List cartItems, String specialRemarks, String desiredPickupTime, double total) {
+  final orderCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('history')
+      .doc(DateTime.now().toString());
+
+  List<Map<String, dynamic>> orderHistory = cartItems.map((item) => {
+    'name': item.name,
+    'quantity': item.quantity,
+  }).toList();
+
+  orderCollectionRef.set({
+    'orderHistory': orderHistory,
+    'status': 'Pending',
+    'createdAt': DateTime.now().toString(),
+    'specialRemarks': specialRemarks,
+    'desiredPickupTime': desiredPickupTime,
+    'total': total,
+  });
+
+}
+
+
+Future<List> returnAllOrderHistory() async{
+  final orderCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('history');
+
+  try {
+    final orderCollectionSnapshot = await orderCollectionRef.get();
+    List orderList = [];
+    orderCollectionSnapshot.docs.forEach((doc) {
+      orderList.add((
+        orderHistory: doc.get('orderHistory'),
+        status: doc.get('status'),
+        createdAt: doc.get('createdAt'),
+        specialRemarks: doc.get('specialRemarks'),
+        desiredPickupTime: doc.get('desiredPickupTime'),
+        total: doc.get('total'),
+      ));
+    });
+
+    print(orderList);
+
+    return orderList;
+  } catch (error) {
+    print('Error fetching order history: $error');
+    return [];
+  }
+
+}

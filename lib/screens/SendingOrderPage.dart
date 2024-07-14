@@ -45,7 +45,8 @@ class _SendingOrderPageState extends State<SendingOrderPage> {
     await Future.delayed(Duration(seconds: 2));
 
     setState(() {
-      sendOrder(widget.cartList, widget.specialRemark);
+      sendOrder(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal);
+      createOrderHistory(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal);
       deleteWholeCart();
       Navigator.pop(context);
     });
