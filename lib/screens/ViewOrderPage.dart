@@ -269,7 +269,7 @@ class _ViewOrderPageState extends State<ViewOrderPage> {
                   SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                   ElevatedButton(
                     onPressed: () {
-                      addToCart(widget.menuData.name, widget.menuData.price, counter, total);
+                      addToCart(widget.menuData.name, widget.menuData.price, counter, total, widget.menuData.imageURL);
                       Navigator.pop(context);
 
                       floatingSnackBar(

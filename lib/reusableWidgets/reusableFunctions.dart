@@ -94,7 +94,7 @@ Future<List<MenuClass>> getMenuData() async {
 }
 
 
-void addToCart(String foodName, double price, int quantity, double total) async {
+void addToCart(String foodName, double price, int quantity, double total, String imageURL) async {
 
   final foodDocumentRef = FirebaseFirestore.instance
       .collection('users')
@@ -107,6 +107,7 @@ void addToCart(String foodName, double price, int quantity, double total) async 
     'price': price,
     'quantity': quantity,
     'total': total,
+    'imageURL': imageURL,
   });
 }
 
@@ -150,4 +151,112 @@ Future<int> getCartQuantity() async {
   }
 }
 
+Future<List> getUserCart() async{
+  final cartCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('cart');
+
+  try {
+    final cartCollectionSnapshot = await cartCollectionRef.get();
+    List cartList = [];
+    cartCollectionSnapshot.docs.forEach((doc) {
+      cartList.add((
+      name: doc.get('name'),
+      price: doc.get('price'),
+      quantity: doc.get('quantity'),
+      total: doc.get('total'),
+      imageURL: doc.get('imageURL'),
+      ));
+    });
+    return cartList;
+  } catch (error) {
+    print('Error fetching cart data: $error');
+    return [];
+  }
+}
+
+
+Future<List<MenuClass>> getSpecificMenuData(String foodname) async {
+  CollectionReference menuCollection = FirebaseFirestore.instance.collection('menu');
+  FirebaseStorage _storage = FirebaseStorage.instance;
+
+  try {
+    QuerySnapshot querySnapshot = await menuCollection.get();
+    List<MenuClass> menuList = [];
+
+    await Future.wait(querySnapshot.docs.map((doc) async {
+      String imageURL = doc['imageURL'].toString();
+      String downloadURL = await _storage.ref('menu/$imageURL.jpeg').getDownloadURL();
+      double price = doc['price'].toDouble();
+
+      if (doc['name'].toString().toLowerCase().contains(foodname.toLowerCase())) {
+      menuList.add(MenuClass(
+        name: doc['name'].toString(),
+        description: doc['description'].toString(),
+        imageURL: downloadURL,
+        price: price,
+        rating: doc['rating'].toString(),
+        ));
+      }}
+    ));
+
+    return menuList;
+  } catch (error) {
+    print('Error fetching menu data: $error');
+    return [];
+  }
+}
+
+void deleteSpecificCart(String foodname) async {
+  final cartCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('cart')
+      .doc(foodname);
+
+  try {
+    final cartCollectionSnapshot = await cartCollectionRef.get();
+    cartCollectionSnapshot.reference.delete();
+  } catch (error) {
+    print('Error fetching cart data: $error');
+  }
+}
+
+void deleteWholeCart() async {
+  final cartCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('cart');
+
+  try {
+    final cartCollectionSnapshot = await cartCollectionRef.get();
+    cartCollectionSnapshot.docs.forEach((doc) {
+      doc.reference.delete();
+    });
+  } catch (error) {
+    print('Error fetching cart data: $error');
+  }
+}
+
+void sendOrder(List cartItems, String specialRemarks) {
+  final orderCollectionRef = FirebaseFirestore.instance
+      .collection('admin')
+      .doc('orders')
+      .collection(DateTime.timestamp().toString());
+
+  cartItems.forEach((item) async {
+    await orderCollectionRef.doc(item.name).set({
+      'name': item.name,
+      'price': item.price,
+      'quantity': item.quantity,
+      'total': item.total,
+      'imageURL': item.imageURL,
+      'status': 'Pending',
+      'customer': currentUser,
+      'createdAt': DateTime.now().toString(),
+      'specialRemarks': specialRemarks,
+    });
+  });
+}
 

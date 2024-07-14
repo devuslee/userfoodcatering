@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
                       email: "devuslee1@yahoo.com",
                       password: "123123"
                   ).then((value) {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationPage()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationPage(currentIndex: 0,)));
                   }).onError((error, stackTrace) {
                     print("Error: $error");
                     setState(() {

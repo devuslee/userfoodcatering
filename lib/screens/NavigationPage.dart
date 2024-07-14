@@ -8,7 +8,9 @@ import 'package:userfoodcatering/screens/CartPage.dart';
 import 'package:icon_badge/icon_badge.dart';
 
 class NavigationPage extends StatefulWidget {
-  const NavigationPage({super.key});
+  final int currentIndex;
+
+  const NavigationPage({Key? key, required this.currentIndex}) : super(key: key);
 
   @override
   State<NavigationPage> createState() => _NavigationPageState();
@@ -21,6 +23,7 @@ class _NavigationPageState extends State<NavigationPage> {
 
   void initState() {
     super.initState();
+    currentPageIndex = widget.currentIndex == null ? 0 : widget.currentIndex;
     fetchData();
   }
 
