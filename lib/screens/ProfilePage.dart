@@ -1,9 +1,11 @@
-import 'dart:io';
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/screens/TopupPage.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'EditProfilePage.dart';
+import 'LoginPage.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -14,9 +16,13 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
 
-  String balance = 'Loading...';
-  String points = 'Loading...';
-  String rank = 'Loading...';
+  Map<String, String> userDetails = {};
+  String balance = "Loading...";
+  String points = "Loading...";
+  String rank = "Loading...";
+  String username = "Loading...";
+  String profileURL = "Loading...";
+
 
   @override
   void initState() {
@@ -30,15 +36,16 @@ class _ProfilePageState extends State<ProfilePage> {
       await Future.delayed(Duration(milliseconds: 100));
 
 
-      String userBalance = await getUserBalance();
-      String userPoints = await getUserPoints();
-      String userRank = await getUserRank();
+      Map<String, String> tempuserDetails = await getUserDetails();
 
       if (mounted) {
         setState(() {
-          balance = userBalance;
-          points = userPoints;
-          rank = userRank;
+          userDetails = tempuserDetails;
+          balance = userDetails['balance']!;
+          points = userDetails['points']!;
+          rank = userDetails['rank']!;
+          username = userDetails['username']!;
+          profileURL = userDetails['profileURL']!;
         });
       }
     } catch (error) {
@@ -59,10 +66,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: [
                     CircleAvatar(
                       radius: 50,
-                      backgroundImage: AssetImage('blank_profile.jpeg'),
+                      backgroundImage: CachedNetworkImageProvider(profileURL),
                     ),
                     SizedBox(height: MediaQuery.of(context).size.height * 0.05),
-                    Text('John Doe', style: TextStyle(
+                    Text(username, style: TextStyle(
                         fontSize: 20, fontWeight: FontWeight.bold)),
                     SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                     Container(
@@ -96,7 +103,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    Text(balance),
+                                    Text(
+                                        balance,
+                                    ),
                                     ElevatedButton(
                                         onPressed: () async {
                                           bool shouldRefresh = await Navigator.push(
@@ -185,10 +194,22 @@ class _ProfilePageState extends State<ProfilePage> {
                       color: Colors.grey.withOpacity(0.5),
                       thickness: 2.0,
                     ),
-                    ReuseableSettingContainer(title: "Logout", icon: Icons.logout, onTap: () {print('Logout');}),
-                    ReuseableSettingContainer(title: "Edit Profile", icon: Icons.edit, onTap: () {print('Edit Profile');}),
+                    ReuseableSettingContainer(
+                        title: "Edit Profile",
+                        icon: Icons.edit,
+                        onTap: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfilePage()));
+                        }),
                     ReuseableSettingContainer(title: "Change Password", icon: Icons.lock, onTap: () {}),
                     ReuseableSettingContainer(title: "Delete Account", icon: Icons.delete, onTap: () {}),
+                    ReuseableSettingContainer(
+                        title: "Logout",
+                        icon: Icons.logout,
+                        onTap: () {
+                          FirebaseAuth.instance.signOut();
+                          //dont allow user's to back button into the account
+                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
+                        }),
                   ]
               ),
             )

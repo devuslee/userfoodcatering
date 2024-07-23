@@ -17,9 +17,11 @@ class _HomePageState extends State<HomePage> {
   final List<int> _items = [1, 2, 3, 4, 5];
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  String balance = 'Loading...';
-  String points = 'Loading...';
-  String rank = 'Loading...';
+  Map<String, String> userDetails = {};
+
+  String balance = "Loading...";
+  String points = "Loading...";
+  String rank = "Loading...";
 
   @override
   void initState() {
@@ -29,15 +31,15 @@ class _HomePageState extends State<HomePage> {
 
   void fetchData() async {
     try {
-      String userBalance = await getUserBalance();
-      String userPoints = await getUserPoints();
-      String userRank = await getUserRank();
+
+      Map<String, String> tempuserDetails = await getUserDetails();
 
       if (mounted) {
         setState(() {
-          balance = userBalance;
-          points = userPoints;
-          rank = userRank;
+          userDetails = tempuserDetails;
+          balance = userDetails['balance']!;
+          points = userDetails['points']!;
+          rank = userDetails['rank']!;
         });
       }
     } catch (error) {

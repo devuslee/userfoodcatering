@@ -60,6 +60,7 @@ dev_dependencies:
   simple_animation_progress_bar: ^1.8.2
   simple_circular_progress_bar: ^1.0.2
   intl: ^0.19.0
+  file_picker: ^8.0.5
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

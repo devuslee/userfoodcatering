@@ -4,11 +4,13 @@ class ReusableTextField extends StatefulWidget {
   final String labelText;
   final TextEditingController controller;
   final bool isPassword;
+  final bool isReadOnly;
 
   const ReusableTextField({
     Key? key,
     required this.labelText,
     required this.controller,
+    this.isReadOnly = false,
     this.isPassword = false,
   }) : super(key: key);
 
@@ -23,7 +25,11 @@ class _ReusableTextFieldState extends State<ReusableTextField> {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: widget.controller,
+      style: TextStyle(
+        color: widget.isReadOnly ? Colors.grey : Colors.black,
+      ),
       obscureText: widget.isPassword && !showPassword,
+      readOnly: widget.isReadOnly,
       decoration: InputDecoration(
         labelText: widget.labelText,
         border: OutlineInputBorder(),
@@ -35,8 +41,9 @@ class _ReusableTextFieldState extends State<ReusableTextField> {
             });
           },
           icon: Icon(showPassword ? Icons.visibility : Icons.visibility_off),
-        )
-            : null,
+        ) : null,
+        filled: widget.isReadOnly,
+        fillColor: widget.isReadOnly ? Colors.grey[200] : null,
       ),
     );
   }

@@ -153,6 +153,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         'userid': FirebaseAuth.instance.currentUser!.uid,
                         'username': usernameController.text,
                         'email': emailController.text,
+                        'balance': 0,
+                        'points': 0,
+                        'rank': 'Beginner',
+                        'profileImage': 'blank_profile.jpeg'
                       }).then((value) {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
                       }).onError((error, stackTrace) {

@@ -10,60 +10,60 @@ import 'dart:math';
 final currentUser = FirebaseAuth.instance.currentUser!.uid;
 final FirebaseStorage _storage = FirebaseStorage.instance;
 
-Future<String> getUserBalance() async {
-  DocumentReference userBalance =
-  FirebaseFirestore.instance.collection('users').doc(currentUser);
-  String balance = "";
+// Future<String> getUserBalance() async {
+//   DocumentReference userBalance =
+//   FirebaseFirestore.instance.collection('users').doc(currentUser);
+//   String balance = "";
+//
+//   try {
+//     DocumentSnapshot documentSnapshot = await userBalance.get();
+//     if (documentSnapshot.exists) {
+//       balance = documentSnapshot.get('balance').toString();
+//       balance = "RM $balance";
+//       return balance;
+//     } else {
+//       return 'No data';
+//     }
+//   } catch (error) {
+//     return 'Error: $error';
+//   }
+// }
 
-  try {
-    DocumentSnapshot documentSnapshot = await userBalance.get();
-    if (documentSnapshot.exists) {
-      balance = documentSnapshot.get('balance').toString();
-      balance = "RM $balance";
-      return balance;
-    } else {
-      return 'No data';
-    }
-  } catch (error) {
-    return 'Error: $error';
-  }
-}
 
+// Future<String> getUserPoints() async {
+//   DocumentReference userPoints =
+//   FirebaseFirestore.instance.collection('users').doc(currentUser);
+//   String points = "";
+//
+//   try {
+//     DocumentSnapshot documentSnapshot = await userPoints.get();
+//     if (documentSnapshot.exists) {
+//       points = documentSnapshot.get('points').toString();
+//       points = "$points pts";
+//       return points;
+//     } else {
+//       return 'No data';
+//     }
+//   } catch (error) {
+//     return 'Error: $error';
+//   }
+// }
 
-Future<String> getUserPoints() async {
-  DocumentReference userPoints =
-  FirebaseFirestore.instance.collection('users').doc(currentUser);
-  String points = "";
-
-  try {
-    DocumentSnapshot documentSnapshot = await userPoints.get();
-    if (documentSnapshot.exists) {
-      points = documentSnapshot.get('points').toString();
-      points = "$points pts";
-      return points;
-    } else {
-      return 'No data';
-    }
-  } catch (error) {
-    return 'Error: $error';
-  }
-}
-
-Future<String> getUserRank() async{
-  DocumentReference userRank =
-  FirebaseFirestore.instance.collection('users').doc(currentUser);
-
-  try {
-    DocumentSnapshot documentSnapshot = await userRank.get();
-    if (documentSnapshot.exists) {
-      return documentSnapshot.get('rank').toString();
-    } else {
-      return 'No data';
-    }
-  } catch (error) {
-    return 'Error: $error';
-  }
-}
+// Future<String> getUserRank() async{
+//   DocumentReference userRank =
+//   FirebaseFirestore.instance.collection('users').doc(currentUser);
+//
+//   try {
+//     DocumentSnapshot documentSnapshot = await userRank.get();
+//     if (documentSnapshot.exists) {
+//       return documentSnapshot.get('rank').toString();
+//     } else {
+//       return 'No data';
+//     }
+//   } catch (error) {
+//     return 'Error: $error';
+//   }
+// }
 
 Future<List<MenuClass>> getMenuData() async {
   CollectionReference menuCollection = FirebaseFirestore.instance.collection('menu');
@@ -409,6 +409,44 @@ void deductWalletBalance(double amount) {
     userDocumentRef.update({'balance': newBalance});
   });
 }
+
+Future<Map<String, String>> getUserDetails() async {
+  final userDocumentRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+
+  Map<String, String> userDetails = {};
+
+  try {
+    DocumentSnapshot value = await userDocumentRef.get();
+    userDetails['balance'] = value.get('balance').toString();
+    userDetails['username'] = value.get('username');
+    userDetails['email'] = value.get('email');
+    userDetails['userid'] = value.get('userid');
+    userDetails['rank'] = value.get('rank');
+    userDetails['points'] = value.get('points').toString();
+    userDetails['profileImage'] = value.get('profileImage');
+    String tempProfile = value.get('profileImage');
+    String downloadURL = await _storage.ref('users/$tempProfile.jpeg').getDownloadURL();
+    userDetails['profileURL'] = downloadURL;
+  } catch (e) {
+    print('Error fetching user details: $e');
+  }
+
+  return userDetails;
+}
+
+Future<void> updateProfile(String username, String profileImage) async {
+  final userDocumentRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+
+  try {
+    userDocumentRef.update({
+      'username': username,
+      'profileImage': profileImage,
+    });
+  } catch (e) {
+    print('Error updating profile: $e');
+  }
+}
+
 
 String TimestampFormatter(String timestamp) {
   DateTime dateTime = DateTime.parse(timestamp);
