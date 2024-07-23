@@ -4,6 +4,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:userfoodcatering/class/menuClass.dart';
+import 'package:intl/intl.dart';
+import 'dart:math';
 
 final currentUser = FirebaseAuth.instance.currentUser!.uid;
 final FirebaseStorage _storage = FirebaseStorage.instance;
@@ -17,7 +19,7 @@ Future<String> getUserBalance() async {
     DocumentSnapshot documentSnapshot = await userBalance.get();
     if (documentSnapshot.exists) {
       balance = documentSnapshot.get('balance').toString();
-      balance = "RM$balance";
+      balance = "RM $balance";
       return balance;
     } else {
       return 'No data';
@@ -240,14 +242,15 @@ void deleteWholeCart() async {
   }
 }
 
-void sendOrder(List cartItems, String specialRemarks, String desiredPickupTime, double total) {
+void sendOrder(List cartItems, String specialRemarks, String desiredPickupTime, double total, int uniqueID, String paymentMethod) {
   final orderCollectionRef = FirebaseFirestore.instance
       .collection('admin')
       .doc('orders')
-      .collection(DateTime.timestamp().toString());
+      .collection(DateTime.now().toString());
 
   cartItems.forEach((item) async {
     await orderCollectionRef.doc(item.name).set({
+      'id': uniqueID,
       'name': item.name,
       'price': item.price,
       'quantity': item.quantity,
@@ -259,11 +262,12 @@ void sendOrder(List cartItems, String specialRemarks, String desiredPickupTime, 
       'specialRemarks': specialRemarks,
       'desiredPickupTime': desiredPickupTime,
       'total': total,
+      'paymentMethod': paymentMethod,
     });
   });
 }
 
-void createOrderHistory(List cartItems, String specialRemarks, String desiredPickupTime, double total) {
+void createOrderHistory(List cartItems, String specialRemarks, String desiredPickupTime, double total, int uniqueID, String paymentMethod) {
   final orderCollectionRef = FirebaseFirestore.instance
       .collection('users')
       .doc(currentUser)
@@ -276,12 +280,14 @@ void createOrderHistory(List cartItems, String specialRemarks, String desiredPic
   }).toList();
 
   orderCollectionRef.set({
+    'id': uniqueID,
     'orderHistory': orderHistory,
     'status': 'Pending',
     'createdAt': DateTime.now().toString(),
     'specialRemarks': specialRemarks,
     'desiredPickupTime': desiredPickupTime,
     'total': total,
+    'paymentMethod': paymentMethod,
   });
 
 }
@@ -298,21 +304,125 @@ Future<List> returnAllOrderHistory() async{
     List orderList = [];
     orderCollectionSnapshot.docs.forEach((doc) {
       orderList.add((
+        id: doc.get('id'),
         orderHistory: doc.get('orderHistory'),
         status: doc.get('status'),
         createdAt: doc.get('createdAt'),
         specialRemarks: doc.get('specialRemarks'),
         desiredPickupTime: doc.get('desiredPickupTime'),
         total: doc.get('total'),
+        paymentMethod: doc.get('paymentMethod'),
       ));
     });
 
-    print(orderList);
 
-    return orderList;
+    return orderList.reversed.toList();
   } catch (error) {
     print('Error fetching order history: $error');
     return [];
   }
-
 }
+
+Future<List> returnActiveOrderHistory() async{
+  final orderCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('history');
+
+  try {
+    final orderCollectionSnapshot = await orderCollectionRef.get();
+    List orderList = [];
+    orderCollectionSnapshot.docs.forEach((doc) {
+      if (doc.get('status') == 'Pending') {
+        orderList.add((
+          id: doc.get('id'),
+          orderHistory: doc.get('orderHistory'),
+          status: doc.get('status'),
+          createdAt: doc.get('createdAt'),
+          specialRemarks: doc.get('specialRemarks'),
+          desiredPickupTime: doc.get('desiredPickupTime'),
+          total: doc.get('total'),
+          paymentMethod: doc.get('paymentMethod'),
+        ));
+      }
+    });
+
+
+    return orderList.reversed.toList();
+  } catch (error) {
+    print('Error fetching order history: $error');
+    return [];
+  }
+}
+
+Future<List> returnPastOrderHistory() async{
+  final orderCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('history');
+
+  try {
+    final orderCollectionSnapshot = await orderCollectionRef.get();
+    List orderList = [];
+    orderCollectionSnapshot.docs.forEach((doc) {
+      if (doc.get('status') == 'Completed') {
+        orderList.add((
+        id: doc.get('id'),
+        orderHistory: doc.get('orderHistory'),
+        status: doc.get('status'),
+        createdAt: doc.get('createdAt'),
+        specialRemarks: doc.get('specialRemarks'),
+        desiredPickupTime: doc.get('desiredPickupTime'),
+        total: doc.get('total'),
+        paymentMethod: doc.get('paymentMethod'),
+        ));
+      }
+    });
+
+    return orderList.reversed.toList();
+  } catch (error) {
+    print('Error fetching order history: $error');
+    return [];
+  }
+}
+
+void TopupUserWallet(double amount) {
+  final userDocumentRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser);
+
+  userDocumentRef.get().then((value) {
+    double currentBalance = value.get('balance');
+    double newBalance = currentBalance + amount;
+    userDocumentRef.update({'balance': newBalance});
+  });
+}
+
+void deductWalletBalance(double amount) {
+  final userDocumentRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser);
+
+  userDocumentRef.get().then((value) {
+    double currentBalance = value.get('balance');
+    double newBalance = currentBalance - amount;
+    userDocumentRef.update({'balance': newBalance});
+  });
+}
+
+String TimestampFormatter(String timestamp) {
+  DateTime dateTime = DateTime.parse(timestamp);
+  String formattedDate = DateFormat('dd MMMM yyyy HH:mm').format(dateTime);
+  return formattedDate;
+}
+
+String PickupTimestampFormatter(String timestamp, String desiredPickupTime) {
+  DateTime dateTime = DateTime.parse(timestamp);
+  String strippedTime = desiredPickupTime.split(' ')[0];
+  int strippedHour = int.parse(strippedTime.split(':')[0]);
+  int strippedMinute =int.parse(strippedTime.split(':')[1]);
+  dateTime = DateTime(dateTime.year, dateTime.month, dateTime.day + 1, strippedHour, strippedMinute);
+  String formattedDate = DateFormat('dd MMMM yyyy HH:mm').format(dateTime);
+  return formattedDate;
+}
+

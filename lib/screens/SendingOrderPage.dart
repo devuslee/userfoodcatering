@@ -2,19 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
+import 'dart:math';
 
 class SendingOrderPage extends StatefulWidget {
   final List cartList;
   final String specialRemark;
   final String desiredPickupTime;
   final double cartTotal;
+  final String paymentMethod;
 
   const SendingOrderPage({
     Key? key,
     required this.cartList,
     required this.specialRemark,
     required this.desiredPickupTime,
-    required this.cartTotal
+    required this.cartTotal,
+    required this.paymentMethod,
   }) : super(key: key);
 
   @override
@@ -24,32 +27,45 @@ class SendingOrderPage extends StatefulWidget {
 class _SendingOrderPageState extends State<SendingOrderPage> {
   bool _processing = false;
 
+  @override
   void initState() {
     super.initState();
     processOrder();
   }
 
   void processOrder() async {
-    setState(() {
-      _processing = true;
-    });
+    if (mounted) {
+      setState(() {
+        _processing = true;
+      });
+    }
 
-    //5 seconds for the icon to turn green
+    // 5 seconds for the icon to turn green
     await Future.delayed(Duration(seconds: 5));
 
-    setState(() {
-      _processing = false;
-    });
+    if (mounted) {
+      setState(() {
+        _processing = false;
+      });
+    }
 
-    //buffer time for customers to still cancel order
+    // Buffer time for customers to still cancel order
     await Future.delayed(Duration(seconds: 2));
+    Random random = Random();
+    int randomNumber = random.nextInt(1000000000) + 1;
 
-    setState(() {
-      sendOrder(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal);
-      createOrderHistory(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal);
-      deleteWholeCart();
-      Navigator.pop(context);
-    });
+    if (mounted) {
+      setState(() {
+        if (widget.paymentMethod == "E-Wallet") {
+          deductWalletBalance(widget.cartTotal);
+        }
+
+        sendOrder(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal, randomNumber, widget.paymentMethod);
+        createOrderHistory(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal, randomNumber, widget.paymentMethod);
+        deleteWholeCart();
+        Navigator.pop(context);
+      });
+    }
   }
 
   @override
@@ -221,6 +237,22 @@ class _SendingOrderPageState extends State<SendingOrderPage> {
                               ),
                             ),
                             Text(widget.specialRemark == "" ? "None" : widget.specialRemark,
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Divider(
+                              color: Colors.grey,
+                              thickness: 1,
+                            ),
+                            Text("Payment Method:",
+                              style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Text(widget.paymentMethod,
                               style: TextStyle(
                                 fontSize: 20,
                                 color: Colors.black,

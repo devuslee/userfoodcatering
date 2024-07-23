@@ -49,7 +49,7 @@ class _NavigationPageState extends State<NavigationPage> {
   final IconList = [
     Icons.home,
     Icons.shopping_cart,
-    Icons.notifications,
+    Icons.history,
     Icons.person,
   ];
 
@@ -111,7 +111,7 @@ class _NavigationPageState extends State<NavigationPage> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: Text(
-                        index == 0 ? 'Home' : index == 1 ? 'Cart' : index == 2 ? 'Notifications' : index == 3 ? 'Profile' : '',
+                        index == 0 ? 'Home' : index == 1 ? 'Cart' : index == 2 ? 'History' : index == 3 ? 'Profile' : '',
                         maxLines: 1,
                         style: TextStyle(color: color),
                       ),

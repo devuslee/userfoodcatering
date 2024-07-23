@@ -91,3 +91,97 @@ class _ReusableContainerState extends State<ReusableContainer> {
     );
   }
 }
+
+class ReusableAppBar extends StatelessWidget {
+  final String title;
+  final bool backButton;
+
+  const ReusableAppBar({
+    Key? key,
+    required this.title,
+    required this.backButton,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          Stack(
+            children: [
+              if (backButton)
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(Icons.arrow_back_ios),
+                  ),
+                ),
+              Center(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 24.0, // Adjust font size
+                    fontWeight: FontWeight.bold, // Adjust font weight
+                  ),
+                  textAlign: TextAlign.center, // Ensure text is centered
+                ),
+              ),
+            ],
+          ),
+          Divider(
+            color: Colors.grey.withOpacity(0.5),
+            thickness: 2.0,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ReuseableSettingContainer extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Function() onTap;
+
+  const ReuseableSettingContainer({
+    Key? key,
+    required this.title,
+    required this.icon,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Icon(icon),
+                SizedBox(width: 10.0),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16.0, // Adjust font size
+                    fontWeight: FontWeight.bold, // Adjust font weight
+                  ),
+                ),
+                Spacer(),
+                IconButton(
+                    onPressed: onTap,
+                    icon: Icon(Icons.arrow_forward_ios)
+                ),
+              ],
+            ),
+            Divider(
+              color: Colors.grey.withOpacity(0.5),
+              thickness: 2.0,
+            ),
+          ],
+        ),
+    );
+  }
+}

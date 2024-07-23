@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
+import 'package:intl/intl.dart';
+import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -12,6 +14,10 @@ class _HistoryPageState extends State<HistoryPage> {
   int currentButtonIndex = 0;
 
   List allHistory = [];
+  List activeHistory = [];
+  List pastHistory = [];
+
+  bool isLoading = true;
 
   void initState() {
     super.initState();
@@ -21,31 +27,34 @@ class _HistoryPageState extends State<HistoryPage> {
   void fetchData() async {
     try {
       allHistory = await returnAllOrderHistory();
-      print(allHistory[0]);
+      activeHistory = await returnActiveOrderHistory();
+      pastHistory = await returnPastOrderHistory();
       setState(() {}); // Update the UI after fetching data
     } catch (error) {
       print('Error fetching data: $error');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
+      body: isLoading
+      ? Center(child: Column(
+        children: [
+          ReusableAppBar(title: "History",  backButton: false),
+          CircularProgressIndicator(),
+        ],
+      ))
+      : SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 20),
-            const Center(
-              child: Text(
-                'History',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
+            ReusableAppBar(title: "History",  backButton: false),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -112,38 +121,290 @@ class _HistoryPageState extends State<HistoryPage> {
             ),
             if (currentButtonIndex == 0)
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  for (var order in allHistory)
-                    ListTile(
-                      title: Text(order.orderHistory[0]['name'].toString()),
-                      subtitle: Text(order.total.toString()),
-                      trailing: Icon(Icons.arrow_forward_ios),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  for (var history in allHistory)
+                    Column(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                    width: MediaQuery.of(context).size.width * 0.81,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[200],
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        topRight: Radius.circular(10),
+                                      )
+
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            history.status == 'Pending' ? 'Order is on the way' : 'Order has been delivered',
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text('ID: ${history.id}'),
+                                              Text('Total:      '),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text('Created at: ${TimestampFormatter(history.createdAt)}'),
+                                              Text('RM${NumberFormat('##0.00').format(history.total)}'),
+                                            ],
+                                          ),
+                                          Text('Picked up at: ${PickupTimestampFormatter(
+                                              history.createdAt,
+                                              history.desiredPickupTime)
+                                            }'
+                                          ),
+                                          Text(history.specialRemarks == "" ? 'Special Remarks: None' : 'Special Remarks: ${history.specialRemarks}'),
+                                          Text('Payment Method: ${history.paymentMethod}'),
+                                          Divider(
+                                            color: Colors.grey[300],
+                                          ),
+                                          for (var order in history.orderHistory)
+                                            Column(
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Text(order['name']),
+                                                    Text(order['quantity'].toString()),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                        ],
+                                      )
+                                  ),
+                                ),
+                              ],
+                            ),
+                        ),
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                      ],
                     ),
                 ],
               ),
             if (currentButtonIndex == 1)
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  ListTile(
-                    title: Text('Order 1'),
-                    subtitle: Text('Order 1 details'),
-                    trailing: Icon(Icons.arrow_forward_ios),
-                  ),
-                  ListTile(
-                    title: Text('Order 2'),
-                    subtitle: Text('Order 2 details'),
-                    trailing: Icon(Icons.arrow_forward_ios),
-                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  for (var history in activeHistory)
+                    Column(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                  width: MediaQuery.of(context).size.width * 0.81,
+                                  decoration: BoxDecoration(
+                                      color: Colors.grey[200],
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        topRight: Radius.circular(10),
+                                      )
+
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          history.status == 'Pending' ? 'Order is on the way' : 'Order has been delivered',
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text('ID: ${history.id}'),
+                                            Text('Total:      '),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text('Created at: ${TimestampFormatter(history.createdAt)}'),
+                                            Text('RM${NumberFormat('##0.00').format(history.total)}'),
+                                          ],
+                                        ),
+                                        Text('Picked up at: ${PickupTimestampFormatter(
+                                            history.createdAt,
+                                            history.desiredPickupTime)
+                                        }'
+                                        ),
+                                        Text(history.specialRemarks == "" ? 'Special Remarks: None' : 'Special Remarks: ${history.specialRemarks}'),
+                                        Text('Payment Method: ${history.paymentMethod}'),
+                                        Divider(
+                                          color: Colors.grey[300],
+                                        ),
+                                        for (var order in history.orderHistory)
+                                          Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(order['name']),
+                                                  Text(order['quantity'].toString()),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                      ],
+                                    )
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                      ],
+                    ),
                 ],
               ),
             if (currentButtonIndex == 2)
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  ListTile(
-                    title: Text('Order 3'),
-                    subtitle: Text('Order 3 details'),
-                    trailing: Icon(Icons.arrow_forward_ios),
-                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  for (var history in pastHistory)
+                    Column(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                  width: MediaQuery.of(context).size.width * 0.81,
+                                  decoration: BoxDecoration(
+                                      color: Colors.grey[200],
+                                      borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(10),
+                                        topRight: Radius.circular(10),
+                                      )
+
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          history.status == 'Pending' ? 'Order is on the way' : 'Order has been delivered',
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text('ID: ${history.id}'),
+                                            Text('Total:      '),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text('Created at: ${TimestampFormatter(history.createdAt)}'),
+                                            Text('RM${NumberFormat('##0.00').format(history.total)}'),
+                                          ],
+                                        ),
+                                        Text('Picked up at: ${PickupTimestampFormatter(
+                                            history.createdAt,
+                                            history.desiredPickupTime)
+                                        }'
+                                        ),
+                                        Text(history.specialRemarks == "" ? 'Special Remarks: None' : 'Special Remarks: ${history.specialRemarks}'),
+                                        Text('Payment Method: ${history.paymentMethod}'),
+                                        Divider(
+                                          color: Colors.grey[300],
+                                        ),
+                                        for (var order in history.orderHistory)
+                                          Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Text(order['name']),
+                                                  Text(order['quantity'].toString()),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                      ],
+                                    )
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                      ],
+                    ),
                 ],
               ),
           ],

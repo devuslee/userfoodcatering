@@ -3,6 +3,7 @@ import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/class/menuClass.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:userfoodcatering/screens/ViewOrderPage.dart';
+import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 
 class AddOrderPage extends StatefulWidget {
   const AddOrderPage({super.key});
@@ -38,8 +39,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 50),
-            const Text('Menu', style: TextStyle(fontSize: 24)),
+            ReusableAppBar(title: "Menu", backButton: false),
             const SizedBox(height: 5),
             Expanded(
               child: GridView.count(

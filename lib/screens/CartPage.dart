@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
+import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:userfoodcatering/screens/AddOrderPage.dart';
 import 'package:userfoodcatering/screens/NavigationPage.dart';
 import 'package:userfoodcatering/screens/ViewOrderPage.dart';
@@ -23,6 +24,13 @@ class _CartPageState extends State<CartPage> {
     '2:00 PM',
     '3:00 PM',
   ];
+
+  List paymentMethods = [
+    'Cash',
+    'E-Wallet',
+  ];
+
+  String _selectedPaymentMethod = 'Cash';
 
   String _selectedTime = '10:00 AM';
   List _cartItems = [];
@@ -63,33 +71,7 @@ class _CartPageState extends State<CartPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                  height: MediaQuery.of(context).size.height * 0.08,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                      border: Border(
-                          top: BorderSide(
-                              color: Colors.grey,
-                              width: 1
-                          )
-                      )
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 10),
-                      Flexible(
-                        child: Text(
-                          'Cart',
-                          style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold
-                          ),
-                        ),
-                      )
-                    ],
-                  )
-              ),
+              ReusableAppBar(title: "Cart",  backButton: false),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Container(
@@ -198,7 +180,6 @@ class _CartPageState extends State<CartPage> {
                               onChanged: (value) {
                                 setState(() {
                                   _selectedTime = value.toString();
-                                  print('Selected time: $_selectedTime');
                                 });
                               },
                               decoration: InputDecoration(
@@ -429,7 +410,6 @@ class _CartPageState extends State<CartPage> {
                       },
                     ),
                     Container(
-                      height: MediaQuery.of(context).size.height * 0.18,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -464,6 +444,54 @@ class _CartPageState extends State<CartPage> {
                             ),
                             controller: specialRequestController,
                           ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border(
+                          top: BorderSide(
+                            color: Colors.grey,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                          Text(
+                            "Select Payment Method",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                          DropdownButtonFormField(
+                            value: _selectedPaymentMethod,
+                            items: paymentMethods.map((payment) {
+                              return DropdownMenuItem(
+                                value: payment,
+                                child: Text(payment),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedPaymentMethod = value.toString();
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Select Payment Method',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                         ],
                       ),
                     ),
@@ -514,6 +542,7 @@ class _CartPageState extends State<CartPage> {
                                       specialRemark: specialRequestController.text,
                                       desiredPickupTime: _selectedTime,
                                       cartTotal: cartTotal,
+                                      paymentMethod: _selectedPaymentMethod,
                                       ),
                                     ),
                                   ).then((value) => fetchData());

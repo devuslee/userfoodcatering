@@ -29,11 +29,17 @@ class _HomePageState extends State<HomePage> {
 
   void fetchData() async {
     try {
-      balance = await getUserBalance();
-      points = await getUserPoints();
-      rank = await getUserRank();
-      // Fetch points and rank similarly
-      setState(() {}); // Update the UI after fetching data
+      String userBalance = await getUserBalance();
+      String userPoints = await getUserPoints();
+      String userRank = await getUserRank();
+
+      if (mounted) {
+        setState(() {
+          balance = userBalance;
+          points = userPoints;
+          rank = userRank;
+        });
+      }
     } catch (error) {
       print('Error fetching data: $error');
     }
@@ -56,6 +62,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Column(
         children: [
+          ReusableAppBar(title: 'Home',  backButton: false),
           FutureBuilder<List<String>>(
             future: _getImageUrls(),
             builder: (context, snapshot) {
