@@ -3,7 +3,8 @@ class MenuClass {
   final String description;
   final String imageURL;
   final double price;
-  final String rating;
+  final double rating;
+  final String category;
 
   MenuClass({
     required this.name,
@@ -11,5 +12,6 @@ class MenuClass {
     required this.imageURL,
     required this.price,
     required this.rating,
+    required this.category,
   });
 }

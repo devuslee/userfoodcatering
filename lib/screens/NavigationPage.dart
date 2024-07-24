@@ -3,7 +3,7 @@ import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/screens/ProfilePage.dart';
 import 'package:userfoodcatering/screens/HomePage.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
-import 'package:userfoodcatering/screens/AddOrderPage.dart';
+import 'package:userfoodcatering/screens/MenuPage.dart';
 import 'package:userfoodcatering/screens/CartPage.dart';
 import 'package:icon_badge/icon_badge.dart';
 import 'package:userfoodcatering/screens/HistoryPage.dart';

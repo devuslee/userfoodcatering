@@ -1,4 +1,6 @@
 
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -85,8 +87,29 @@ Future<List<MenuClass>> getMenuData() async {
         description: doc['description'].toString(),
         imageURL: downloadURL,
         price: price,
-        rating: doc['rating'].toString(),
+        rating: doc['rating'].toDouble(),
+        category: doc['category'].toString(),
       ));
+    }));
+
+    print(menuList[0].category);
+
+    return menuList;
+  } catch (error) {
+    print('Error fetching menu data: $error');
+    return [];
+  }
+}
+
+Future<List> getAllCategories() async {
+  CollectionReference categoryCollection = FirebaseFirestore.instance.collection('category');
+
+  try {
+    QuerySnapshot querySnapshot = await categoryCollection.get();
+    List menuList = [];
+
+    await Future.wait(querySnapshot.docs.map((doc) async {
+      menuList.add(doc['type']);
     }));
 
     return menuList;
@@ -199,7 +222,8 @@ Future<List<MenuClass>> getSpecificMenuData(String foodname) async {
         description: doc['description'].toString(),
         imageURL: downloadURL,
         price: price,
-        rating: doc['rating'].toString(),
+        rating: doc['rating'].toDouble(),
+        category: doc['category'].toString(),
         ));
       }}
     ));
@@ -446,6 +470,30 @@ Future<void> updateProfile(String username, String profileImage) async {
     print('Error updating profile: $e');
   }
 }
+
+void TempCreateMenu() {
+  final menuRef = FirebaseFirestore.instance.collection('menu').doc('Menu').collection('food_1');
+
+  menuRef.add({
+    'name': 'Nasi Lemak',
+    'description': 'Nasi lemak is a Malay fragrant rice dish cooked in coconut milk and pandan leaf. It is commonly found in Malaysia, where it is considered the national dish.',
+    'price': 5.00,
+    'rating': 4.5,
+    'imageURL': 'food_1',
+    'category': 'Vegetables'
+  });
+}
+
+void TempCreateCategory() {
+  final categoryRef = FirebaseFirestore.instance.collection('admin').doc('categories');
+
+  categoryRef.set({
+    'categories': ['Vegetables', 'Meat', 'Seafood', 'Dessert', 'Drinks']
+  });
+
+}
+
+
 
 
 String TimestampFormatter(String timestamp) {

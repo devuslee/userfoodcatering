@@ -98,7 +98,7 @@ class _ViewOrderPageState extends State<ViewOrderPage> {
                                   IgnorePointer(
                                     ignoring: true,
                                       child: RatingBar.builder(
-                                        initialRating: double.parse(widget.menuData.rating),
+                                        initialRating: widget.menuData.rating,
                                         direction: Axis.horizontal,
                                         allowHalfRating: true,
                                         itemCount: 5,

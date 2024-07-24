@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
-import 'package:userfoodcatering/screens/AddOrderPage.dart';
+import 'package:userfoodcatering/screens/MenuPage.dart';
 import 'package:userfoodcatering/screens/NavigationPage.dart';
 import 'package:userfoodcatering/screens/ViewOrderPage.dart';
 import 'package:userfoodcatering/class/menuClass.dart';
@@ -104,7 +104,7 @@ class _CartPageState extends State<CartPage> {
                                 fontWeight: FontWeight.bold
                             ),
                           ),
-                          SizedBox(width: 10),
+                          SizedBox(width: MediaQuery.of(context).size.width * 0.02),
                           Tooltip(
                             message: 'Currently there are no delivery options available',
                             child: Icon(
@@ -115,101 +115,6 @@ class _CartPageState extends State<CartPage> {
                         ],
                       ),
                     )
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        'assets/self_pickup.jpeg',
-                        width: MediaQuery.of(context).size.height * 0.25,
-                        height: MediaQuery.of(context).size.height * 0.25,
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Restaurant',
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.60,
-                              height: MediaQuery.of(context).size.height * 0.10,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: Icon(
-                                      Icons.location_on,
-                                      size: 20,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      '5-G-1,Promenade, Jalan Mahsuri, 11900 Bayan Baru, Pulau Pinang',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            DropdownButtonFormField(
-                              value: _selectedTime,
-                              items: pickupTimes.map((time) {
-                                return DropdownMenuItem(
-                                  value: time,
-                                  child: Text(time),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedTime = value.toString();
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Select Pickup Time',
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  child: Row(
-                      children: [
-                        Text(
-                            'Desired Pickup Time:  $_selectedTime',
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey
-                            ),
-                          ),
-                      ],
-                    ),
                 ),
               ),
               Padding(
@@ -303,110 +208,179 @@ class _CartPageState extends State<CartPage> {
                         var item = _cartItems[index];
                         return Padding(
                           padding: const EdgeInsets.all(2.0),
-                          child: Card(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Image.network(
-                                  item.imageURL,
-                                  width: MediaQuery.of(context).size.width * 0.25,
-                                  height: MediaQuery.of(context).size.height * 0.25,
-                                  fit: BoxFit.cover,
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
+                          child: Column(
+                            children: [
+                              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                              Card(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.grey,
+                                      width: 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              item.name,
-                                              style: TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            bottomLeft: Radius.circular(10),
                                           ),
-                                          TextButton(
-                                            onPressed: () async {
-                                              var _menuData = await getSpecificMenuData(item.name);
-                                              await Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => ViewOrderPage(menuData: _menuData[0]),
-                                                ),
-                                              ).then((value) => fetchData());
-                                            },
-                                            child: Text('EDIT'),
+                                          child: Image.network(
+                                            item.imageURL,
+                                            width: MediaQuery.of(context).size.width * 0.25,
+                                            height: MediaQuery.of(context).size.height * 0.25,
+                                            fit: BoxFit.cover,
                                           ),
-                                        ],
-                                      ),
-                                      Text(
-                                        'RM ${item.total}',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green,
                                         ),
-                                      ),
-                                      SizedBox(
-                                        height: MediaQuery.of(context).size.height * 0.12,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Text(
-                                              'Portions: ${item.quantity}',
+
+                                      SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    item.name,
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () async {
+                                                    var _menuData = await getSpecificMenuData(item.name);
+                                                    await Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) => ViewOrderPage(menuData: _menuData[0]),
+                                                      ),
+                                                    ).then((value) => fetchData());
+                                                  },
+                                                  child: Text('EDIT'),
+                                                ),
+                                              ],
+                                            ),
+                                            Text(
+                                              'RM ${item.total}',
                                               style: TextStyle(
                                                 fontSize: 16,
-                                                color: Colors.grey,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.green,
                                               ),
                                             ),
-                                          ),
-                                          IconButton(
-                                            onPressed: () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (BuildContext context) {
-                                                  return AlertDialog(
-                                                    title: Text('Confirm Deletion'),
-                                                    content: Text('Are you sure you want to delete this item?'),
-                                                    actions: <Widget>[
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          Navigator.of(context).pop(); // Dismiss the dialog
-                                                        },
-                                                        child: Text('Cancel'),
-                                                      ),
-                                                      TextButton(
-                                                        onPressed: () {
-                                                          deleteSpecificCart(item.name);
-                                                          setState(() {
-                                                            fetchData();
-                                                          });
-                                                          Navigator.of(context).pop(); // Dismiss the dialog after deleting
-                                                        },
-                                                        child: Text('Delete'),
-                                                      ),
-                                                    ],
-                                                  );
-                                                },
-                                              );
-                                            },
-                                            icon: Icon(Icons.delete),
-                                          ),
-                                        ],
+                                            SizedBox(
+                                              height: MediaQuery.of(context).size.height * 0.11,
+                                            ),
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    'Portions: ${item.quantity}',
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  onPressed: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (BuildContext context) {
+                                                        return AlertDialog(
+                                                          title: Text('Confirm Deletion'),
+                                                          content: Text('Are you sure you want to delete this item?'),
+                                                          actions: <Widget>[
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(context).pop(); // Dismiss the dialog
+                                                              },
+                                                              child: Text('Cancel'),
+                                                            ),
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                deleteSpecificCart(item.name);
+                                                                setState(() {
+                                                                  fetchData();
+                                                                });
+                                                                Navigator.of(context).pop(); // Dismiss the dialog after deleting
+                                                              },
+                                                              child: Text('Delete'),
+                                                            ),
+                                                          ],
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                  icon: Icon(Icons.delete),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                              SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                            ],
                           ),
                         );
                       },
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border(
+                          top: BorderSide(
+                            color: Colors.grey,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                          Text(
+                            "Pickup Time",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                          DropdownButtonFormField(
+                            value: _selectedTime,
+                            items: pickupTimes.map((time) {
+                              return DropdownMenuItem(
+                                value: time,
+                                child: Text(time),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                _selectedTime = value.toString();
+                              });
+                            },
+                            decoration: InputDecoration(
+                              labelText: 'Select Pickup Time',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                        ],
+                      ),
                     ),
                     Container(
                       width: MediaQuery.of(context).size.width,
@@ -498,7 +472,6 @@ class _CartPageState extends State<CartPage> {
                         alignment: Alignment.bottomCenter,
                         child: Container(
                           width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height * 0.18,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border(
@@ -515,6 +488,7 @@ class _CartPageState extends State<CartPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
+                                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                                   Text(
                                     "Total Portions: ${cartQuantity.toString()}",
                                     style: TextStyle(
@@ -529,6 +503,33 @@ class _CartPageState extends State<CartPage> {
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.green,
+                                    ),
+                                  ),
+                                  Container(
+                                    width: MediaQuery.of(context).size.width * 0.60,
+                                    height: MediaQuery.of(context).size.height * 0.10,
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(4.0),
+                                          child: Icon(
+                                            Icons.location_on,
+                                            size: 20,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                        SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            '5-G-1,Promenade, Jalan Mahsuri, 11900 Bayan Baru, Pulau Pinang',
+                                            style: TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
