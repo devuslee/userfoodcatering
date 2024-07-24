@@ -111,38 +111,40 @@ class ReusableAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              if (backButton)
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: Icon(Icons.arrow_back_ios),
+    return SafeArea(
+      child: Container(
+        child: Column(
+          children: [
+            Stack(
+              children: [
+                if (backButton)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(Icons.arrow_back_ios),
+                    ),
+                  ),
+                Center(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 24.0, // Adjust font size
+                      fontWeight: FontWeight.bold, // Adjust font weight
+                    ),
+                    textAlign: TextAlign.center, // Ensure text is centered
                   ),
                 ),
-              Center(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 24.0, // Adjust font size
-                    fontWeight: FontWeight.bold, // Adjust font weight
-                  ),
-                  textAlign: TextAlign.center, // Ensure text is centered
-                ),
-              ),
-            ],
-          ),
-          Divider(
-            color: Colors.grey.withOpacity(0.5),
-            thickness: 2.0,
-          ),
-        ],
+              ],
+            ),
+            Divider(
+              color: Colors.grey.withOpacity(0.5),
+              thickness: 2.0,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -178,7 +180,7 @@ class ReuseableSettingContainer extends StatelessWidget {
                 ),
                 Spacer(),
                 IconButton(
-                    onPressed: onTap,
+                    onPressed: () async {onTap();},
                     icon: Icon(Icons.arrow_forward_ios)
                 ),
               ],

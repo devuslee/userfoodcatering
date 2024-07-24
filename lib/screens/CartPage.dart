@@ -265,7 +265,7 @@ class _CartPageState extends State<CartPage> {
                                   ),
                                 ),
                               Container(
-                                width: MediaQuery.of(context).size.width * 0.25,
+                                width: MediaQuery.of(context).size.width * 0.75,
                                 child: ElevatedButton(
                                   onPressed: () {
                                     Navigator.push(context, MaterialPageRoute(
@@ -273,14 +273,13 @@ class _CartPageState extends State<CartPage> {
                                     ));
                                   },
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
                                       Icon(Icons.restaurant_menu, color: Colors.white),
-                                      SizedBox(width: MediaQuery.of(context).size.width * 0.005),
                                       Text(
                                           'Browse the menu',
                                           style: TextStyle(
-                                            fontSize: 20,
+                                            fontSize: 16,
                                             color: Colors.white,
                                           ),
                                         ),

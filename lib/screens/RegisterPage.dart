@@ -156,7 +156,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         'balance': 0,
                         'points': 0,
                         'rank': 'Beginner',
-                        'profileImage': 'blank_profile.jpeg'
+                        'profileImage': 'blank_profile'
                       }).then((value) {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
                       }).onError((error, stackTrace) {

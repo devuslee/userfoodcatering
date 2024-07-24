@@ -1,8 +1,13 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../reusableWidgets/reusableFunctions.dart';
-import 'EditProfileImagePage.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+
+final currentUser = FirebaseAuth.instance.currentUser!.uid;
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -12,11 +17,8 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-
   TextEditingController usernameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
-
-
 
   Map<String, String> userDetails = {};
   String balance = "Loading...";
@@ -27,6 +29,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   String profileImage = "Loading...";
   String profileURL = "Loading...";
 
+  PlatformFile? _selectedFile;
+  UploadTask? uploadTask;
 
   @override
   void initState() {
@@ -34,11 +38,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
     fetchData();
   }
 
+  @override
+  void dispose() {
+    usernameController.dispose();
+    emailController.dispose();
+    super.dispose();
+  }
+
   void fetchData() async {
     try {
-      //firebase updates slow, have to delay the setstate
-      await Future.delayed(Duration(milliseconds: 100));
-
+      // Firebase updates slow, have to delay the setState
+      await Future.delayed(const Duration(milliseconds: 100));
 
       Map<String, String> tempuserDetails = await getUserDetails();
 
@@ -57,11 +67,41 @@ class _EditProfilePageState extends State<EditProfilePage> {
           emailController.text = email;
         });
       }
-
-
     } catch (error) {
       print('Error fetching data: $error');
+      // You can also show an error message to the user
     }
+  }
+
+  Future selectFile() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result == null) return;
+
+    setState(() {
+      _selectedFile = result.files.first;
+      profileURL = result.files.first.path!;
+    });
+  }
+
+  Future<void> uploadFile() async {
+    if (_selectedFile == null) return;
+
+    final path = 'users/$currentUser.jpeg';
+    final file = File(_selectedFile!.path!);
+
+    final ref = FirebaseStorage.instance.ref().child(path);
+    uploadTask = ref.putFile(file);
+
+    final snapshot = await uploadTask!.whenComplete(() {});
+
+    final url = await snapshot.ref.getDownloadURL();
+    print('Download-Link: $url');
+
+    setState(() {
+      profileURL = url;
+    });
+
+    await updateProfile(usernameController.text, currentUser);
   }
 
   @override
@@ -73,27 +113,43 @@ class _EditProfilePageState extends State<EditProfilePage> {
           const SizedBox(height: 10),
           Stack(
             children: [
-              CircleAvatar(
-                radius: 50,
-                backgroundImage: CachedNetworkImageProvider(profileURL),
+              Container(
+                width: 200,
+                height: 200,
+                child: _selectedFile != null
+                    ? Image.file(
+                  File(_selectedFile!.path!),
+                  fit: BoxFit.cover,
+                )
+                    : CachedNetworkImage(
+                  imageUrl: profileURL,
+                  imageBuilder: (context, imageProvider) => Container(
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: imageProvider,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  placeholder: (context, url) =>
+                  const Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) =>
+                      Text('Error: $error'),
+                ),
               ),
               Positioned(
                 bottom: 0,
                 right: 0,
                 child: InkWell(
-                  onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const EditProfileImagePage()));
-                  },
+                  onTap: selectFile,
                   child: Container(
-                    padding: EdgeInsets.all(5),
+                    padding: const EdgeInsets.all(5),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-                      border: Border.all(
-                          color: Colors.black
-                      ),
+                      border: Border.all(color: Colors.black),
                     ),
-                    child: Icon(
+                    child: const Icon(
                       Icons.edit,
                       color: Colors.black,
                       size: 20,
@@ -106,22 +162,30 @@ class _EditProfilePageState extends State<EditProfilePage> {
           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ReusableTextField(labelText: "Username", controller: usernameController,),
+            child: ReusableTextField(
+              labelText: "Username",
+              controller: usernameController,
+            ),
           ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ReusableTextField(labelText: "Email", controller: emailController, isReadOnly: true,),
+            child: ReusableTextField(
+              labelText: "Email",
+              controller: emailController,
+              isReadOnly: true,
+            ),
           ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           ElevatedButton(
-              onPressed: () {
-                updateProfile(usernameController.text, profileImage);
+            onPressed: () {
+              uploadFile();
+              Navigator.pop(context,true);
               },
-              child: const Text("Save Changes"),
+            child: const Text("Save Changes"),
           ),
         ],
-      )
+      ),
     );
   }
 }

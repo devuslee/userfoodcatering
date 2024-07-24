@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
+import 'package:userfoodcatering/screens/ChangePasswordPage.dart';
 import 'package:userfoodcatering/screens/TopupPage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'EditProfilePage.dart';
@@ -33,7 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
   void fetchData() async {
     try {
       //firebase updates slow, have to delay the setstate
-      await Future.delayed(Duration(milliseconds: 100));
+      await Future.delayed(Duration(milliseconds: 500));
 
 
       Map<String, String> tempuserDetails = await getUserDetails();
@@ -197,10 +198,37 @@ class _ProfilePageState extends State<ProfilePage> {
                     ReuseableSettingContainer(
                         title: "Edit Profile",
                         icon: Icons.edit,
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => EditProfilePage()));
-                        }),
-                    ReuseableSettingContainer(title: "Change Password", icon: Icons.lock, onTap: () {}),
+                        onTap: () async {
+                          bool shouldRefresh = await Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => EditProfilePage()
+                              )
+                          );
+
+                          if (shouldRefresh) {
+                            setState(() {
+                              fetchData();
+                            });
+                          }
+                        },
+                    ),
+                    ReuseableSettingContainer(
+                        title: "Change Password",
+                        icon: Icons.lock,
+                        onTap: () async {
+                          bool shouldRefresh = await Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ChangePasswordPage()
+                              )
+                          );
+
+                          if (shouldRefresh) {
+                            setState(() {
+                              fetchData();
+                            });
+                          }
+                        },
+                    ),
                     ReuseableSettingContainer(title: "Delete Account", icon: Icons.delete, onTap: () {}),
                     ReuseableSettingContainer(
                         title: "Logout",
@@ -209,7 +237,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           FirebaseAuth.instance.signOut();
                           //dont allow user's to back button into the account
                           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
-                        }),
+                        }
+                        ),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+
                   ]
               ),
             )
