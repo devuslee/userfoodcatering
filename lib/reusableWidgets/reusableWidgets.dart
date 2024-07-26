@@ -112,8 +112,8 @@ class ReusableAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Container(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Stack(
               children: [
@@ -139,13 +139,18 @@ class ReusableAppBar extends StatelessWidget {
                 ),
               ],
             ),
-            Divider(
-              color: Colors.grey.withOpacity(0.5),
-              thickness: 2.0,
-            ),
+            Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey.withOpacity(0.5),
+                    width: 2.0,
+                  ),
+                ),
+              )
+            )
           ],
         ),
-      ),
     );
   }
 }

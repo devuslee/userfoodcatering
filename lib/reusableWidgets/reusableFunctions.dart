@@ -92,7 +92,6 @@ Future<List<MenuClass>> getMenuData() async {
       ));
     }));
 
-    print(menuList[0].category);
 
     return menuList;
   } catch (error) {
@@ -291,7 +290,7 @@ void sendOrder(List cartItems, String specialRemarks, String desiredPickupTime, 
   });
 }
 
-void createOrderHistory(List cartItems, String specialRemarks, String desiredPickupTime, double total, int uniqueID, String paymentMethod) {
+void createOrderHistory(List cartItems, String specialRemarks, String desiredPickupTime, double total, int uniqueID, String paymentMethod, String type) {
   final orderCollectionRef = FirebaseFirestore.instance
       .collection('users')
       .doc(currentUser)
@@ -312,6 +311,7 @@ void createOrderHistory(List cartItems, String specialRemarks, String desiredPic
     'desiredPickupTime': desiredPickupTime,
     'total': total,
     'paymentMethod': paymentMethod,
+    'type': type,
   });
 
 }
@@ -336,6 +336,7 @@ Future<List> returnAllOrderHistory() async{
         desiredPickupTime: doc.get('desiredPickupTime'),
         total: doc.get('total'),
         paymentMethod: doc.get('paymentMethod'),
+        type: doc.get('type'),
       ));
     });
 
@@ -367,6 +368,7 @@ Future<List> returnActiveOrderHistory() async{
           desiredPickupTime: doc.get('desiredPickupTime'),
           total: doc.get('total'),
           paymentMethod: doc.get('paymentMethod'),
+          type: doc.get('type'),
         ));
       }
     });
@@ -399,6 +401,7 @@ Future<List> returnPastOrderHistory() async{
         desiredPickupTime: doc.get('desiredPickupTime'),
         total: doc.get('total'),
         paymentMethod: doc.get('paymentMethod'),
+        type: doc.get('type'),
         ));
       }
     });
@@ -420,6 +423,13 @@ void TopupUserWallet(double amount) {
     double newBalance = currentBalance + amount;
     userDocumentRef.update({'balance': newBalance});
   });
+
+  Random random = Random();
+  int randomNumber = random.nextInt(1000000000) + 1;
+
+  //creates income history
+  createOrderHistory([], "", "", amount, randomNumber, "", "Topup");
+
 }
 
 void deductWalletBalance(double amount) {
@@ -500,6 +510,24 @@ String TimestampFormatter(String timestamp) {
   DateTime dateTime = DateTime.parse(timestamp);
   String formattedDate = DateFormat('dd MMMM yyyy HH:mm').format(dateTime);
   return formattedDate;
+}
+
+
+String DaysFromTimeStamp(String timestamp) {
+  DateTime dateTime = DateTime.parse(timestamp);
+  DateTime now = DateTime.now();
+  int difference = now.difference(dateTime).inDays;
+
+  if (difference == 0) {
+    return 'Today';
+  } else if (difference == 1) {
+    return 'Yesterday';
+  } else if (difference > 30) {
+    return ((difference/30).round()).toString() + ' months ago';
+  } else {
+    return difference.toString() + ' days ago';
+  }
+
 }
 
 String PickupTimestampFormatter(String timestamp, String desiredPickupTime) {

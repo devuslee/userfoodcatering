@@ -13,6 +13,9 @@ class TopupPage extends StatefulWidget {
 
 class _TopupPageState extends State<TopupPage> {
   TextEditingController amountController = TextEditingController();
+  bool amountEmpty = false;
+  bool containsAlphabets = false;
+  final RegExp _amountRegExp = RegExp(r'^[0-9.]+$');
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +32,50 @@ class _TopupPageState extends State<TopupPage> {
               controller: amountController,
             ),
           ),
+
+          if (amountEmpty)
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Visibility(
+                visible: amountEmpty,
+                child: const Text('Please enter an amount.',
+                    style: TextStyle(color: Colors.red)),
+              ),
+            ),
+          ),
+
+          if (containsAlphabets)
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Visibility(
+                visible: containsAlphabets,
+                child: const Text('Please enter a valid amount.',
+                    style: TextStyle(color: Colors.red)),
+              ),
+            ),
+          ),
           ElevatedButton(
             onPressed: () {
+              if (amountController.text.isEmpty) {
+                setState(() {
+                  amountEmpty = true;
+                  containsAlphabets = false;
+                });
+                return;
+              }
+
+              if (!_amountRegExp.hasMatch(amountController.text)) {
+                setState(() {
+                  containsAlphabets = true;
+                  amountEmpty = false;
+                });
+                return;
+              }
+
               TopupUserWallet(double.parse(amountController.text));
               Navigator.pop(context, true);
             },

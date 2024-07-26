@@ -46,6 +46,7 @@ class _HistoryPageState extends State<HistoryPage> {
       ? Center(child: Column(
         children: [
           ReusableAppBar(title: "History",  backButton: false),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.3),
           CircularProgressIndicator(),
         ],
       ))
@@ -55,6 +56,7 @@ class _HistoryPageState extends State<HistoryPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ReusableAppBar(title: "History",  backButton: false),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.02),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -126,6 +128,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 children: [
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   for (var history in allHistory)
+                    if (history.type == 'Expense')
                     Column(
                       children: [
                         Container(
@@ -222,6 +225,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 children: [
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   for (var history in activeHistory)
+                    if (history.type == 'Expense')
                     Column(
                       children: [
                         Container(
@@ -318,6 +322,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 children: [
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   for (var history in pastHistory)
+                    if (history.type == 'Expense')
                     Column(
                       children: [
                         Container(

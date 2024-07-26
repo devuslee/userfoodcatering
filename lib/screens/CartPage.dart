@@ -25,10 +25,6 @@ class _CartPageState extends State<CartPage> {
     '3:00 PM',
   ];
 
-  List paymentMethods = [
-    'Cash',
-    'E-Wallet',
-  ];
 
   String _selectedPaymentMethod = 'Cash';
 
@@ -36,6 +32,14 @@ class _CartPageState extends State<CartPage> {
   List _cartItems = [];
   double cartQuantity = 0;
   double cartTotal = 0;
+
+  Map<String, String> userDetails = {};
+  String balance = "Loading...";
+
+  List paymentMethods = [
+    'Cash',
+    'E-Wallet',
+  ];
 
   @override
   void initState() {
@@ -45,6 +49,7 @@ class _CartPageState extends State<CartPage> {
 
   void fetchData() async {
     try {
+      Map<String, String> tempuserDetails = await getUserDetails();
       _cartItems = await getUserCart();
       cartQuantity = 0;
       cartTotal = 0;
@@ -53,7 +58,12 @@ class _CartPageState extends State<CartPage> {
         cartTotal = cartTotal + item.total;
       }
       setState(() {
-
+        userDetails = tempuserDetails;
+        balance = userDetails['balance']!;
+        paymentMethods = [
+          'Cash',
+          'E-Wallet (RM $balance)',
+        ];
       });
     } catch (error) {
       print('Error fetching data: $error');
@@ -450,7 +460,7 @@ class _CartPageState extends State<CartPage> {
                             value: _selectedPaymentMethod,
                             items: paymentMethods.map((payment) {
                               return DropdownMenuItem(
-                                value: payment,
+                                value: payment.toString().split(' ')[0],
                                 child: Text(payment),
                               );
                             }).toList(),
@@ -536,6 +546,49 @@ class _CartPageState extends State<CartPage> {
                               ),
                               ElevatedButton(
                                 onPressed: () async {
+                                  if (_cartItems.isEmpty) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Error'),
+                                          content: Text('No items in cart'),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(); // Dismiss the dialog
+                                              },
+                                              child: Text('OK'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                    return;
+                                  }
+
+                                  if (cartTotal > double.parse(balance) && _selectedPaymentMethod == 'E-Wallet') {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Error'),
+                                          content: Text('Insufficient balance in E-Wallet'),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(); // Dismiss the dialog
+                                              },
+                                              child: Text('OK'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                    return;
+                                  }
+
+
                                   await Navigator.push(context, MaterialPageRoute(
                                     builder: (context) => SendingOrderPage(
                                       cartList: _cartItems,

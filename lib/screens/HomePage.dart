@@ -1,9 +1,13 @@
+import 'dart:js_interop';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
+
+import '../class/menuClass.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,6 +26,7 @@ class _HomePageState extends State<HomePage> {
   String balance = "Loading...";
   String points = "Loading...";
   String rank = "Loading...";
+  List<MenuClass> allMenuItems = [];
 
   @override
   void initState() {
@@ -31,15 +36,16 @@ class _HomePageState extends State<HomePage> {
 
   void fetchData() async {
     try {
-
-      Map<String, String> tempuserDetails = await getUserDetails();
+      Map<String, String> tempUserDetails = await getUserDetails();
+      List<MenuClass> tempAllMenuItems = await getMenuData();
 
       if (mounted) {
         setState(() {
-          userDetails = tempuserDetails;
+          userDetails = tempUserDetails;
           balance = userDetails['balance']!;
           points = userDetails['points']!;
           rank = userDetails['rank']!;
+          allMenuItems = tempAllMenuItems;
         });
       }
     } catch (error) {
@@ -47,13 +53,12 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<List<String>> _getImageUrls() async {
-    List<String> imageUrls = [];
-    final ListResult result = await _storage.ref('menu').listAll();
+  Future<Map<String, String>> _getImageUrls() async {
+    Map<String, String> imageUrls = {};
 
-    for (var item in result.items) {
-      String downloadURL = await item.getDownloadURL();
-      imageUrls.add(downloadURL);
+
+    for (var i = 0; i < allMenuItems.length; i++) {
+      imageUrls[allMenuItems[i].name] = allMenuItems[i].imageURL;
     }
 
     return imageUrls;
@@ -65,7 +70,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           ReusableAppBar(title: 'Home',  backButton: false),
-          FutureBuilder<List<String>>(
+          FutureBuilder<Map<String,String>>(
             future: _getImageUrls(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
@@ -73,9 +78,9 @@ class _HomePageState extends State<HomePage> {
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text('No images found'));
+                return CircularProgressIndicator();
               } else {
-                List<String> imageUrls = snapshot.data!;
+                Map<String, String> imageUrls = snapshot.data!;
                 return FlutterCarousel(
                   options: CarouselOptions(
                     height: 400.0,
@@ -85,8 +90,8 @@ class _HomePageState extends State<HomePage> {
                     scrollDirection: Axis.horizontal,
                     autoPlay: true,
                   ),
-                  items: imageUrls.asMap().entries.map((entry) {
-                    int index = entry.key;
+                  items: imageUrls.entries.map((entry) {
+                    String name = entry.key;
                     String url = entry.value;
                     return Builder(
                       builder: (BuildContext context) {
@@ -96,7 +101,7 @@ class _HomePageState extends State<HomePage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                'food_${index + 1}',
+                                name,
                                 style: TextStyle(
                                   fontSize: 20.0,
                                   fontWeight: FontWeight.bold,

@@ -5,6 +5,7 @@ import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/screens/ChangePasswordPage.dart';
 import 'package:userfoodcatering/screens/TopupPage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:userfoodcatering/screens/WalletPage.dart';
 import 'EditProfilePage.dart';
 import 'LoginPage.dart';
 
@@ -105,13 +106,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                       ),
                                     ),
                                     Text(
-                                        balance,
+                                        'RM ${balance}',
                                     ),
                                     ElevatedButton(
                                         onPressed: () async {
                                           bool shouldRefresh = await Navigator.push(
                                               context,
-                                              MaterialPageRoute(builder: (context) => TopupPage()
+                                              MaterialPageRoute(builder: (context) => WalletPage()
                                               )
                                           );
                                           if (shouldRefresh) {
@@ -120,7 +121,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             });
                                           }
                                         },
-                                        child: Text(" + Top Up")
+                                        child: Text("View Wallet")
                                     )
                                   ],
                                 ),

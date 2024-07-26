@@ -91,6 +91,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           ReusableAppBar(title: "Menu", backButton: false),
           Expanded(
@@ -176,6 +177,16 @@ class _AddOrderPageState extends State<AddOrderPage> {
                                 ),
                               ),
                             ),
+                            if (menuData[category]!.isEmpty)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                child: Text(
+                                  'No items available',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
                             GridView.builder(
                               shrinkWrap: true,
                               physics: NeverScrollableScrollPhysics(),
@@ -189,6 +200,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
                               itemCount: menuData[category]?.length ?? 0,
                               itemBuilder: (context, index) {
                                 var menuItem = menuData[category]?[index];
+
                                 return Container(
                                   decoration: BoxDecoration(
                                     border: Border.all(

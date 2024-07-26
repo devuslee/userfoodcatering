@@ -101,7 +101,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       profileURL = url;
     });
 
-    await updateProfile(usernameController.text, currentUser);
+    updateProfile(usernameController.text, currentUser);
   }
 
   @override
