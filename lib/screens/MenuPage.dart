@@ -93,7 +93,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ReusableAppBar(title: "Menu", backButton: false),
+          ReusableAppBar(title: "Menu", backButton: false, cartButton: true),
           Expanded(
             child: Row(
               children: [

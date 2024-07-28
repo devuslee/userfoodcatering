@@ -155,6 +155,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         'email': emailController.text,
                         'balance': 0,
                         'points': 0,
+                        'pointstoNextRank': 50,
                         'rank': 'Beginner',
                         'profileImage': 'blank_profile'
                       }).then((value) {

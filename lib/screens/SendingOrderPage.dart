@@ -62,6 +62,7 @@ class _SendingOrderPageState extends State<SendingOrderPage> {
 
         sendOrder(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal, randomNumber, widget.paymentMethod);
         createOrderHistory(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal, randomNumber, widget.paymentMethod, "Expense");
+        createPointHistory(widget.cartTotal, randomNumber);
         deleteWholeCart();
         Navigator.pop(context);
       });

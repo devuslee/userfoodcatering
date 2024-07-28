@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/screens/ChangePasswordPage.dart';
+import 'package:userfoodcatering/screens/PointPage.dart';
 import 'package:userfoodcatering/screens/TopupPage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:userfoodcatering/screens/WalletPage.dart';
@@ -151,6 +152,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                       fontWeight: FontWeight.bold,
                                       )
                                     ),
+                                    ElevatedButton(
+                                        onPressed: () async {
+                                          bool shouldRefresh = await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => PointPage()
+                                              )
+                                          );
+                                          if (shouldRefresh) {
+                                            setState(() {
+                                              fetchData();
+                                            });
+                                          }
+                                        },
+                                        child: Text("View Points")
+                                    )
                                   ],
                                 ),
                                 //vertical divider

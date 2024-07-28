@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../screens/CartPage.dart';
+
 class ReusableTextField extends StatefulWidget {
   final String labelText;
   final TextEditingController controller;
@@ -102,11 +104,13 @@ class _ReusableContainerState extends State<ReusableContainer> {
 class ReusableAppBar extends StatelessWidget {
   final String title;
   final bool backButton;
+  final bool cartButton;
 
   const ReusableAppBar({
     Key? key,
     required this.title,
     required this.backButton,
+    this.cartButton = false,
   }) : super(key: key);
 
   @override
@@ -137,6 +141,16 @@ class ReusableAppBar extends StatelessWidget {
                     textAlign: TextAlign.center, // Ensure text is centered
                   ),
                 ),
+                if (cartButton)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
+                      },
+                      icon: Icon(Icons.shopping_cart),
+                    ),
+                  ),
               ],
             ),
             Container(

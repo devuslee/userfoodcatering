@@ -313,7 +313,132 @@ void createOrderHistory(List cartItems, String specialRemarks, String desiredPic
     'paymentMethod': paymentMethod,
     'type': type,
   });
+}
 
+Future<void> createPointHistory(double total, int uniqueID) async {
+  final pointCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('points')
+      .doc(DateTime.now().toString());
+
+  double points = 0;
+
+  final userRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+  await userRef.get().then((value) {
+    String currentRank = value.get('rank');
+
+    if (currentRank == 'Beginner') {
+      points = total * 1;
+    } else if (currentRank == 'Intermediate') {
+      points = total * 1.5;
+    } else if (currentRank == 'Advanced') {
+      points = total * 2;
+    } else if (currentRank == 'Expert') {
+      points = total * 3;
+    }
+  });
+
+  //THIS POINT SYSTEM CURRENTLY DOES NOT AWARD PLAYER EXCESS POINTS REGARDLESS OF THE RANK UP
+  //FUTURE NOTE: MAYBE ADD A FUNCTION TO AWARD EXCESS POINTS TO THE USER
+  updateUserPoints(points);
+  updateRank(points);
+
+
+  pointCollectionRef.set({
+    'id': uniqueID,
+    'createdAt': DateTime.now().toString(),
+    'points': points,
+    'type' : 'Income',
+  });
+}
+
+void updateUserPoints(double points) {
+  final userRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+  userRef.get().then((value) {
+    double currentPoints = value.get('points');
+    double newPoints = currentPoints + points;
+    userRef.update({'points': newPoints});
+  });
+}
+
+Future<void> updateRank(double points) async {
+  final userRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+
+  try {
+    final userSnapshot = await userRef.get();
+    double pointstoNextRank = userSnapshot.get('pointstoNextRank');
+    double newPointstoNextRank = pointstoNextRank - points;
+
+    if (newPointstoNextRank <= 0) {
+      await rankUpUser(userSnapshot, newPointstoNextRank.abs());
+    } else {
+      await userRef.update({'pointstoNextRank': newPointstoNextRank});
+    }
+  } catch (e) {
+    print("Error updating rank: $e");
+  }
+}
+
+Future<void> rankUpUser(DocumentSnapshot userSnapshot, double excessPoints) async {
+  final userRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+  String currentRank = userSnapshot.get('rank');
+  String newRank;
+  double newPointstoNextRank;
+
+  switch (currentRank) {
+    case 'Beginner':
+      newRank = 'Intermediate';
+      newPointstoNextRank = 100;
+      excessPoints = excessPoints * 1.5;
+      break;
+    case 'Intermediate':
+      newRank = 'Advanced';
+      newPointstoNextRank = 250;
+      excessPoints = excessPoints * 2;
+      break;
+    case 'Advanced':
+      newRank = 'Expert';
+      newPointstoNextRank = 500;
+      excessPoints = excessPoints * 3;
+      break;
+    default:
+      return; // If rank is already 'Expert' or unrecognized, do nothing.
+  }
+
+  await userRef.update({'rank': newRank, 'pointstoNextRank': newPointstoNextRank});
+
+  if (excessPoints > 0) {
+    await updateRank(excessPoints);
+
+
+  }
+}
+
+Future<List> returnAllPointHistory() async{
+  final pointCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('points');
+
+  try {
+    final orderCollectionSnapshot = await pointCollectionRef.get();
+    List pointList = [];
+    orderCollectionSnapshot.docs.forEach((doc) {
+      pointList.add((
+      id: doc.get('id'),
+      createdAt: doc.get('createdAt'),
+      points: doc.get('points'),
+      type: doc.get('type'),
+      ));
+    });
+
+
+    return pointList.reversed.toList();
+  } catch (error) {
+    print('Error fetching order history: $error');
+    return [];
+  }
 }
 
 

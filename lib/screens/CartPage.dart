@@ -81,7 +81,7 @@ class _CartPageState extends State<CartPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ReusableAppBar(title: "Cart",  backButton: false),
+              ReusableAppBar(title: "Cart",  backButton: true),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Container(
