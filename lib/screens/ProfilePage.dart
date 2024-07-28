@@ -4,6 +4,7 @@ import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/screens/ChangePasswordPage.dart';
 import 'package:userfoodcatering/screens/PointPage.dart';
+import 'package:userfoodcatering/screens/RankPage.dart';
 import 'package:userfoodcatering/screens/TopupPage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:userfoodcatering/screens/WalletPage.dart';
@@ -191,6 +192,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
                                         )
+                                    ),
+                                    ElevatedButton(
+                                        onPressed: () async {
+                                          bool shouldRefresh = await Navigator.push(
+                                              context,
+                                              MaterialPageRoute(builder: (context) => RankPage()
+                                              )
+                                          );
+                                          if (shouldRefresh) {
+                                            setState(() {
+                                              fetchData();
+                                            });
+                                          }
+                                        },
+                                        child: Text("View Rank")
                                     ),
                                   ],
                                 ),

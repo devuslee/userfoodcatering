@@ -28,8 +28,6 @@ class _WalletPageState extends State<WalletPage> {
   void fetchData() async {
     try {
       allHistory = await returnAllOrderHistory();
-      activeHistory = await returnActiveOrderHistory();
-      pastHistory = await returnPastOrderHistory();
       Map<String, String> tempuserDetails = await getUserDetails();
 
       setState(() {

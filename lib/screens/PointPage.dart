@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import '../reusableWidgets/reusableFunctions.dart';
 import '../reusableWidgets/reusableWidgets.dart';
 
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
+import 'NavigationPage.dart';
+
 class PointPage extends StatefulWidget {
   const PointPage({super.key});
 
@@ -15,6 +20,7 @@ class _PointPageState extends State<PointPage> {
 
   Map<String, String> userDetails = {};
   String points = "Loading...";
+
 
   void initState() {
     super.initState();
@@ -29,7 +35,8 @@ class _PointPageState extends State<PointPage> {
       setState(() {
         userDetails = tempuserDetails;
         points = userDetails['points']!;
-      }); // Update the UI after fetching data
+      });
+
     } catch (error) {
       print('Error fetching data: $error');
     }
@@ -70,6 +77,24 @@ class _PointPageState extends State<PointPage> {
                             Text("Points", style: TextStyle(fontSize: 20)),
                             Text(points, style: TextStyle(fontSize: 20))
                           ],
+                        ),
+                        Spacer(),
+                        IconButton(
+                            onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(
+                                builder: (context) => NavigationPage(currentIndex: 1,),
+                              ));
+                            },
+                            icon: Column(
+                              children: [
+                                Icon(
+                                  Icons.redeem,
+                                  color: Colors.redAccent,
+                                  size: MediaQuery.of(context).size.width * 0.05,
+                                ),
+                                Text("Redeem", style: TextStyle(fontSize: 12))
+                              ],
+                            )
                         ),
                       ],
                     ),

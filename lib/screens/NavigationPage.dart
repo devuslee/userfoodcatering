@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
+import 'package:userfoodcatering/screens/PointPage.dart';
 import 'package:userfoodcatering/screens/ProfilePage.dart';
 import 'package:userfoodcatering/screens/HomePage.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
@@ -7,6 +8,7 @@ import 'package:userfoodcatering/screens/MenuPage.dart';
 import 'package:userfoodcatering/screens/CartPage.dart';
 import 'package:icon_badge/icon_badge.dart';
 import 'package:userfoodcatering/screens/HistoryPage.dart';
+import 'package:userfoodcatering/screens/RedeemPointPage.dart';
 
 class NavigationPage extends StatefulWidget {
   final int currentIndex;
@@ -40,7 +42,7 @@ class _NavigationPageState extends State<NavigationPage> {
 
   final List<Widget> _pages = [
     HomePage(),
-    CartPage(),
+    RedeemPointPage(),
     HistoryPage(),
     ProfilePage(),
     AddOrderPage(),

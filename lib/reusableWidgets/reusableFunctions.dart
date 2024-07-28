@@ -586,6 +586,7 @@ Future<Map<String, String>> getUserDetails() async {
     String tempProfile = value.get('profileImage');
     String downloadURL = await _storage.ref('users/$tempProfile.jpeg').getDownloadURL();
     userDetails['profileURL'] = downloadURL;
+    userDetails['pointstoNextRank'] = value.get('pointstoNextRank').toString();
   } catch (e) {
     print('Error fetching user details: $e');
   }
