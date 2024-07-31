@@ -213,3 +213,40 @@ class ReuseableSettingContainer extends StatelessWidget {
     );
   }
 }
+
+
+class ReusableCheckinIcon extends StatelessWidget {
+  final String title;
+  final String pointsEarned;
+  final int checkinCounter;
+  final int currentCheckinCounter;
+
+
+  const ReusableCheckinIcon({
+    Key? key,
+    required this.title,
+    required this.checkinCounter,
+    required this.currentCheckinCounter,
+    required this.pointsEarned,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey),
+            ),
+            child: CircleAvatar(
+              child: Icon(Icons.check,
+                color: checkinCounter > currentCheckinCounter ? Colors.green : Colors.grey,),
+            ),
+          ),
+          Text(title),
+          Text("${pointsEarned} points"),
+        ]
+    );
+  }
+}

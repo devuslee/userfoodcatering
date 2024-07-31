@@ -157,7 +157,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         'points': 0,
                         'pointstoNextRank': 50,
                         'rank': 'Beginner',
-                        'profileImage': 'blank_profile'
+                        'profileImage': 'blank_profile',
+                        'lastcheckedinTime': '',
+                        'checkinCounter': 0,
                       }).then((value) {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage()));
                       }).onError((error, stackTrace) {

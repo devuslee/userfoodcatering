@@ -1,6 +1,4 @@
 
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -32,24 +30,23 @@ final FirebaseStorage _storage = FirebaseStorage.instance;
 // }
 
 
-// Future<String> getUserPoints() async {
-//   DocumentReference userPoints =
-//   FirebaseFirestore.instance.collection('users').doc(currentUser);
-//   String points = "";
-//
-//   try {
-//     DocumentSnapshot documentSnapshot = await userPoints.get();
-//     if (documentSnapshot.exists) {
-//       points = documentSnapshot.get('points').toString();
-//       points = "$points pts";
-//       return points;
-//     } else {
-//       return 'No data';
-//     }
-//   } catch (error) {
-//     return 'Error: $error';
-//   }
-// }
+Future<String> getUserPoints() async {
+  DocumentReference userPoints =
+  FirebaseFirestore.instance.collection('users').doc(currentUser);
+  String points = "";
+
+  try {
+    DocumentSnapshot documentSnapshot = await userPoints.get();
+    if (documentSnapshot.exists) {
+      points = documentSnapshot.get('points').toString();
+      return points;
+    } else {
+      return 'No data';
+    }
+  } catch (error) {
+    return 'Error: $error';
+  }
+}
 
 // Future<String> getUserRank() async{
 //   DocumentReference userRank =
@@ -607,6 +604,103 @@ Future<void> updateProfile(String username, String profileImage) async {
   }
 }
 
+Future<int> getcheckinCounter() async {
+  final userDocumentRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+  int checkinCounter = 0;
+  String lastCheckedIn = "";
+
+  DocumentSnapshot value = await userDocumentRef.get();
+  checkinCounter = value.get('checkinCounter');
+  lastCheckedIn = value.get('lastcheckedinTime');
+
+  DateTime lastCheckedInTime = DateTime.parse(lastCheckedIn);
+  DateTime now = DateTime.now();
+
+  //if last checked in is more than 1 day ago, reset the counter
+  if (lastCheckedInTime.difference(now).inDays > 1) {
+    checkinCounter = 0;
+    userDocumentRef.update({'checkinCounter': checkinCounter});
+    return 0;
+  }
+
+
+
+  return checkinCounter;
+}
+
+Future<bool> getIsCheckin() async {
+  final userDocumentRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+  bool isCheckin = false;
+  String lastCheckedIn = "";
+
+  DocumentSnapshot value = await userDocumentRef.get();
+  lastCheckedIn = value.get('lastcheckedinTime');
+
+  DateTime lastCheckedInTime = DateTime.parse(lastCheckedIn);
+  DateTime now = DateTime.now();
+
+  //if the user has already checked in display another button
+  if (lastCheckedInTime.difference(now).inDays < 0) {
+    isCheckin = true;
+  }
+
+  return isCheckin;
+}
+
+Future<int> incrementcheckinCounter() async {
+  final userDocumentRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+  int checkinCounter = 0;
+  int currentPoints = 0;
+  int pointsObtained = 0;
+  String lastCheckedIn = "";
+
+  DocumentSnapshot value = await userDocumentRef.get();
+  checkinCounter = value.get('checkinCounter');
+  currentPoints = value.get('points');
+
+
+  checkinCounter++;
+
+  if (checkinCounter == 1) {
+    pointsObtained = 1;
+    currentPoints = currentPoints + pointsObtained;
+    lastCheckedIn = DateTime.now().toString();
+  } else if (checkinCounter == 2) {
+    pointsObtained = 1;
+    currentPoints = currentPoints + pointsObtained;
+    lastCheckedIn = DateTime.now().toString();
+  } else if (checkinCounter == 3) {
+    pointsObtained = 2;
+    currentPoints = currentPoints + pointsObtained;
+    lastCheckedIn = DateTime.now().toString();
+  } else if (checkinCounter == 4) {
+    pointsObtained = 4;
+    currentPoints = currentPoints + pointsObtained;
+    lastCheckedIn = DateTime.now().toString();
+  } else if (checkinCounter == 5) {
+    pointsObtained = 6;
+    currentPoints = currentPoints + pointsObtained;
+    lastCheckedIn = DateTime.now().toString();
+  } else if (checkinCounter == 6) {
+    pointsObtained = 10;
+    currentPoints = currentPoints + pointsObtained;
+    lastCheckedIn = DateTime.now().toString();
+  } else if (checkinCounter == 7) {
+    checkinCounter = 0;
+    pointsObtained = 15;
+    currentPoints = currentPoints + pointsObtained;
+    lastCheckedIn = DateTime.now().toString();
+  }
+  userDocumentRef.update({'checkinCounter': checkinCounter});
+  userDocumentRef.update({'points': currentPoints});
+  userDocumentRef.update({'lastcheckedinTime': lastCheckedIn});
+
+  return pointsObtained;
+}
+
+
+
+//used to test database
 void TempCreateMenu() {
   final menuRef = FirebaseFirestore.instance.collection('menu').doc('Menu').collection('food_1');
 
@@ -620,13 +714,13 @@ void TempCreateMenu() {
   });
 }
 
+//used to test database
 void TempCreateCategory() {
   final categoryRef = FirebaseFirestore.instance.collection('admin').doc('categories');
 
   categoryRef.set({
     'categories': ['Vegetables', 'Meat', 'Seafood', 'Dessert', 'Drinks']
   });
-
 }
 
 
