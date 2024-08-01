@@ -48,21 +48,61 @@ Future<String> getUserPoints() async {
   }
 }
 
-// Future<String> getUserRank() async{
-//   DocumentReference userRank =
-//   FirebaseFirestore.instance.collection('users').doc(currentUser);
-//
-//   try {
-//     DocumentSnapshot documentSnapshot = await userRank.get();
-//     if (documentSnapshot.exists) {
-//       return documentSnapshot.get('rank').toString();
-//     } else {
-//       return 'No data';
-//     }
-//   } catch (error) {
-//     return 'Error: $error';
-//   }
-// }
+Future<String> getUserDiscountID() async {
+  DocumentReference userPoints =
+  FirebaseFirestore.instance.collection('users').doc(currentUser);
+  String discountID = "";
+
+  try {
+    DocumentSnapshot documentSnapshot = await userPoints.get();
+    if (documentSnapshot.exists) {
+      discountID = documentSnapshot.get('discountID').toString();
+      return discountID;
+    } else {
+      return 'No data';
+    }
+  } catch (error) {
+    return 'Error: $error';
+  }
+}
+
+Future<String> getSpecificDiscount(String discountID) async {
+  DocumentReference userPoints =
+  FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('discounts')
+      .doc(discountID);
+  String discountAmount = "";
+
+  try {
+    DocumentSnapshot documentSnapshot = await userPoints.get();
+    if (documentSnapshot.exists) {
+      discountAmount = documentSnapshot.get('discount').toString();
+      return discountAmount;
+    } else {
+      return 'No data';
+    }
+  } catch (error) {
+    return 'Error: $error';
+  }
+}
+
+Future<String> getUserRank() async{
+  DocumentReference userRank =
+  FirebaseFirestore.instance.collection('users').doc(currentUser);
+
+  try {
+    DocumentSnapshot documentSnapshot = await userRank.get();
+    if (documentSnapshot.exists) {
+      return documentSnapshot.get('rank').toString();
+    } else {
+      return 'No data';
+    }
+  } catch (error) {
+    return 'Error: $error';
+  }
+}
 
 Future<List<MenuClass>> getMenuData() async {
   CollectionReference menuCollection = FirebaseFirestore.instance.collection('menu');
@@ -109,6 +149,33 @@ Future<List> getAllCategories() async {
     }));
 
     return menuList;
+  } catch (error) {
+    print('Error fetching menu data: $error');
+    return [];
+  }
+}
+
+Future<List<Map<String, dynamic>>> getAllDiscounts() async {
+  CollectionReference discountCollection = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('discounts');
+
+  try {
+    QuerySnapshot querySnapshot = await discountCollection.get();
+    List<Map<String, dynamic>> discountList = [];
+
+    for (var doc in querySnapshot.docs) {
+      discountList.add({
+        'discount': doc['discount'],
+        'expiredAt': doc['expiredAt'],
+        'deliverymethod': doc['deliverymethod'],
+        'imageURL': doc['imageURL'],
+        'id': doc.id,
+      });
+    }
+
+    return discountList;
   } catch (error) {
     print('Error fetching menu data: $error');
     return [];
@@ -356,6 +423,13 @@ void updateUserPoints(double points) {
     double currentPoints = value.get('points');
     double newPoints = currentPoints + points;
     userRef.update({'points': newPoints});
+  });
+}
+
+void updateUserDiscount(String discountID) {
+  final userRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+  userRef.get().then((value) {
+    userRef.update({'discountID': discountID});
   });
 }
 
@@ -617,7 +691,7 @@ Future<int> getcheckinCounter() async {
   DateTime now = DateTime.now();
 
   //if last checked in is more than 1 day ago, reset the counter
-  if (lastCheckedInTime.difference(now).inDays > 1) {
+  if (now.difference(lastCheckedInTime).inHours >= 48) {
     checkinCounter = 0;
     userDocumentRef.update({'checkinCounter': checkinCounter});
     return 0;
@@ -640,7 +714,7 @@ Future<bool> getIsCheckin() async {
   DateTime now = DateTime.now();
 
   //if the user has already checked in display another button
-  if (lastCheckedInTime.difference(now).inDays < 0) {
+  if (now.difference(lastCheckedInTime).inHours < 48 && now.difference(lastCheckedInTime).inHours > 24) {
     isCheckin = true;
   }
 
@@ -698,6 +772,32 @@ Future<int> incrementcheckinCounter() async {
   return pointsObtained;
 }
 
+void createDiscount(String points, String discount, DateTime validuntil, String deliverymethod, String imageURL) {
+  final discountCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('discounts');
+
+  final userCollectionRef = FirebaseFirestore.instance
+    .collection('users')
+    .doc(currentUser);
+
+  //deduct points
+  userCollectionRef.get().then((value) {
+    int userPoints = value.get('points');
+    userPoints = userPoints - int.parse(points);
+    userCollectionRef.update({'points': userPoints});
+  });
+
+
+  //add discount voucher
+  discountCollectionRef.add({
+    'discount': discount,
+    'expiredAt': validuntil,
+    'deliverymethod': deliverymethod,
+    'imageURL': imageURL,
+  });
+}
 
 
 //used to test database
@@ -732,6 +832,17 @@ String TimestampFormatter(String timestamp) {
   return formattedDate;
 }
 
+String DayMonthYearFormatter(String timestamp) {
+  DateTime dateTime = DateTime.parse(timestamp);
+  String formattedDate = DateFormat('dd MMMM yyyy').format(dateTime);
+  return formattedDate;
+}
+
+String TimestampToStringFormatter(Timestamp timestamp) {
+  DateTime dateTime = timestamp.toDate();
+  String formattedDate = DateFormat('dd MMMM yyyy HH:mm').format(dateTime);
+  return formattedDate;
+}
 
 String DaysFromTimeStamp(String timestamp) {
   DateTime dateTime = DateTime.parse(timestamp);

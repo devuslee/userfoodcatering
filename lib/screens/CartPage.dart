@@ -32,6 +32,8 @@ class _CartPageState extends State<CartPage> {
   List _cartItems = [];
   double cartQuantity = 0;
   double cartTotal = 0;
+  String discountID = '';
+  String discountAmount = "0";
 
   Map<String, String> userDetails = {};
   String balance = "Loading...";
@@ -50,6 +52,8 @@ class _CartPageState extends State<CartPage> {
   void fetchData() async {
     try {
       Map<String, String> tempuserDetails = await getUserDetails();
+      String tempDiscountID = await getUserDiscountID();
+      String tempDiscountAmount = await getSpecificDiscount(tempDiscountID);
       _cartItems = await getUserCart();
       cartQuantity = 0;
       cartTotal = 0;
@@ -59,6 +63,8 @@ class _CartPageState extends State<CartPage> {
       }
       setState(() {
         userDetails = tempuserDetails;
+        discountID = tempDiscountID;
+        discountAmount = tempDiscountAmount;
         balance = userDetails['balance']!;
         paymentMethods = [
           'Cash',
@@ -474,6 +480,125 @@ class _CartPageState extends State<CartPage> {
                               border: OutlineInputBorder(),
                             ),
                           ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border(
+                          top: BorderSide(
+                            color: Colors.grey,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                          Text(
+                            "Select Discount",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+
+                          if (discountID == '')
+                            Center(
+                              child: Column(
+                                children: [
+                                  Icon(
+                                    Icons.discount,
+                                    size: 100,
+                                    color: Colors.grey,
+                                  ),
+                                  Text(
+                                    'No Discounts Selected',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Container(
+                                    width: MediaQuery.of(context).size.width * 0.75,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.push(context, MaterialPageRoute(
+                                          builder: (context) => NavigationPage(currentIndex: 1, redeemPagecurrentIndex: 2,),
+                                        ));
+                                      },
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                          Text(
+                                            'Select a discount',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.black,
+                                        padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                                        textStyle: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                          if (discountID != '')
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor: Colors.grey,
+                                      child: Icon(
+                                        Icons.check,
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                    SizedBox(width: MediaQuery.of(context).size.width * 0.005),
+                                    Text(
+                                      'RM ${discountAmount} Discount Applied',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(Icons.arrow_forward_ios)
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ),
+
+
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                         ],
                       ),

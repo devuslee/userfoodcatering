@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../screens/CartPage.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
+import '../screens/RedeemDiscountPage.dart';
+import 'package:icon_badge/icon_badge.dart';
 
 class ReusableTextField extends StatefulWidget {
   final String labelText;
@@ -105,12 +109,14 @@ class ReusableAppBar extends StatelessWidget {
   final String title;
   final bool backButton;
   final bool cartButton;
+  final int cartCount;
 
   const ReusableAppBar({
     Key? key,
     required this.title,
     required this.backButton,
     this.cartButton = false,
+    this.cartCount = 0
   }) : super(key: key);
 
   @override
@@ -144,11 +150,17 @@ class ReusableAppBar extends StatelessWidget {
                 if (cartButton)
                   Align(
                     alignment: Alignment.centerRight,
-                    child: IconButton(
-                      onPressed: () {
+                    child: IconBadge(
+                      icon: Icon(Icons.shopping_cart, color: Colors.grey, size: 30,),
+                      itemCount: cartCount,
+                      badgeColor: Colors.red,
+                      right: 6,
+                      top: 0,
+                      hideZero: true,
+                      itemColor: Colors.white,
+                      onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
                       },
-                      icon: Icon(Icons.shopping_cart),
                     ),
                   ),
               ],
@@ -250,3 +262,81 @@ class ReusableCheckinIcon extends StatelessWidget {
     );
   }
 }
+
+class ReusableDiscount extends StatefulWidget {
+  final String downloadURL;
+  final String pointCost;
+  final String discountRM;
+  final Function() fetchData;
+
+
+  const ReusableDiscount({
+    Key? key,
+    required this.downloadURL,
+    required this.pointCost,
+    required this.discountRM,
+    required this.fetchData,
+  }) : super(key: key);
+
+  @override
+  State<ReusableDiscount> createState() => _ReusableDiscountState();
+}
+
+class _ReusableDiscountState extends State<ReusableDiscount> {
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () async {
+        bool shouldRefresh = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => RedeemDiscountPage(
+                points: widget.pointCost,
+                discount: widget.discountRM,
+                downloadURL: widget.downloadURL)));
+
+        if (shouldRefresh) {
+            widget.fetchData();
+          }
+        },
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.95,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Center(child: widget.downloadURL == "" ? Text("No Image") : CachedNetworkImage(imageUrl: widget.downloadURL)),
+              Divider(
+                color: Colors.grey,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
+                    children: [
+                      Text("Redeem with", style: TextStyle(color: Colors.grey)),
+                      Text("${widget.pointCost} pts")
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      Text("Reward",style: TextStyle(color: Colors.grey)),
+                      Text("RM${widget.discountRM} off")
+                    ],
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+

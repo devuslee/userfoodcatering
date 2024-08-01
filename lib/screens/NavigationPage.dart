@@ -12,8 +12,13 @@ import 'package:userfoodcatering/screens/RedeemPointPage.dart';
 
 class NavigationPage extends StatefulWidget {
   final int currentIndex;
+  final int redeemPagecurrentIndex;
 
-  const NavigationPage({Key? key, required this.currentIndex}) : super(key: key);
+  const NavigationPage({
+    Key? key,
+    required this.currentIndex,
+    this.redeemPagecurrentIndex = 0,
+  }) : super(key: key);
 
   @override
   State<NavigationPage> createState() => _NavigationPageState();
@@ -21,32 +26,38 @@ class NavigationPage extends StatefulWidget {
 
 class _NavigationPageState extends State<NavigationPage> {
   int currentPageIndex = 0;
-  int cartCount = 0;
+  int redeemPageIndex = 0;
+  late List<Widget> _pages;
 
-
+  @override
   void initState() {
     super.initState();
-    currentPageIndex = widget.currentIndex == null ? 0 : widget.currentIndex;
+    currentPageIndex = widget.currentIndex;
+    redeemPageIndex = widget.redeemPagecurrentIndex;
+    _pages = _initializePages(); // Initialize _pages after setting redeemPageIndex
     fetchData();
   }
 
   void fetchData() async {
     try {
-      cartCount = await getCartQuantity();
-      // Fetch points and rank similarly
-      setState(() {}); // Update the UI after fetching data
+      setState(() {
+        redeemPageIndex = widget.redeemPagecurrentIndex;
+        _pages = _initializePages(); // Update _pages after fetching data
+      });
     } catch (error) {
       print('Error fetching data: $error');
     }
   }
 
-  final List<Widget> _pages = [
-    HomePage(),
-    RedeemPointPage(),
-    HistoryPage(),
-    ProfilePage(),
-    AddOrderPage(),
-  ];
+  List<Widget> _initializePages() {
+    return [
+      HomePage(),
+      RedeemPointPage(currentIndex: redeemPageIndex),
+      HistoryPage(),
+      ProfilePage(),
+      AddOrderPage(),
+    ];
+  }
 
   final IconList = [
     Icons.home,
@@ -102,7 +113,7 @@ class _NavigationPageState extends State<NavigationPage> {
                   children: [
                     IconBadge(
                       icon: Icon(IconList[index], color: color, size: 30,),
-                      itemCount: index == 1 ? cartCount : 0,
+                      itemCount: 0,
                       badgeColor: Colors.red,
                       right: 6,
                       top: 0,

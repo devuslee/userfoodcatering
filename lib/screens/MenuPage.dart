@@ -16,6 +16,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
   Map<String, List<MenuClass>> menuData = {};
   List<GlobalKey> _itemKeys = [];
   ScrollController _scrollController = ScrollController();
+  int cartCount = 0;
 
   int currentCategoryIndex = 0;
 
@@ -37,6 +38,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
     try {
       List<MenuClass> allMenuItems = await getMenuData();
       List categoryList = await getAllCategories();
+      cartCount = await getCartQuantity();
 
       // Categorize the menu items
       for (var category in categoryList) {
@@ -52,7 +54,12 @@ class _AddOrderPageState extends State<AddOrderPage> {
       }
 
       _itemKeys = List.generate(allMenuItems.length, (index) => GlobalKey());
-      setState(() {}); // Update the UI after fetching data
+
+      if (mounted) {
+        setState(() {
+          // Update the UI after fetching data
+        });
+      }
     } catch (error) {
       print('Error fetching data: $error');
     }
@@ -93,7 +100,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          ReusableAppBar(title: "Menu", backButton: false, cartButton: true),
+          ReusableAppBar(title: "Menu", backButton: false, cartButton: true, cartCount: cartCount,),
           Expanded(
             child: Row(
               children: [

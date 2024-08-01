@@ -45,7 +45,6 @@ class _ViewOrderPageState extends State<ViewOrderPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Image
           Container(
             height: 400,
             width: MediaQuery.of(context).size.width,
