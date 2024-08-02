@@ -32,6 +32,8 @@ class _CartPageState extends State<CartPage> {
   List _cartItems = [];
   double cartQuantity = 0;
   double cartTotal = 0;
+  double discountedcartTotal = 0;
+  bool discounted = false;
   String discountID = '';
   String discountAmount = "0";
 
@@ -53,7 +55,8 @@ class _CartPageState extends State<CartPage> {
     try {
       Map<String, String> tempuserDetails = await getUserDetails();
       String tempDiscountID = await getUserDiscountID();
-      String tempDiscountAmount = await getSpecificDiscount(tempDiscountID);
+
+
       _cartItems = await getUserCart();
       cartQuantity = 0;
       cartTotal = 0;
@@ -61,15 +64,32 @@ class _CartPageState extends State<CartPage> {
         cartQuantity = cartQuantity + item.quantity;
         cartTotal = cartTotal + item.total;
       }
+
+      if (tempDiscountID != "") {
+        discountAmount = await getSpecificDiscount(tempDiscountID);
+      }
       setState(() {
         userDetails = tempuserDetails;
         discountID = tempDiscountID;
-        discountAmount = tempDiscountAmount;
+        discountAmount = discountAmount;
         balance = userDetails['balance']!;
         paymentMethods = [
           'Cash',
           'E-Wallet (RM $balance)',
         ];
+
+        if (double.parse(discountAmount) != 0) {
+          if (cartTotal > double.parse(discountAmount)) {
+            discountedcartTotal = cartTotal - double.parse(discountAmount);
+            discounted = true;
+          } else if (cartTotal < double.parse(discountAmount)) {
+            discountedcartTotal = 0;
+            discounted = true;
+          } else {
+            discountAmount = "0";
+            discounted = false;
+          }
+        }
       });
     } catch (error) {
       print('Error fetching data: $error');
@@ -574,11 +594,22 @@ class _CartPageState extends State<CartPage> {
                                 child: Row(
                                   children: [
                                     CircleAvatar(
-                                      backgroundColor: Colors.grey,
-                                      child: Icon(
-                                        Icons.check,
-                                        color: Colors.green,
-                                      ),
+                                      backgroundColor: Colors.grey[200],
+                                      child: cartTotal == 0 ?
+                                      Tooltip(
+                                        message: 'Discount cannot be applied as there are items in cart',
+                                        child: Icon(
+                                          Icons.error,
+                                          color: Colors.red,
+                                        ),
+                                      ) :
+                                      Tooltip(
+                                        message: 'Discount applied',
+                                        child: Icon(
+                                          Icons.check,
+                                          color: Colors.green,
+                                        ),
+                                      )
                                     ),
                                     SizedBox(width: MediaQuery.of(context).size.width * 0.005),
                                     Text(
@@ -590,7 +621,11 @@ class _CartPageState extends State<CartPage> {
                                     ),
                                     Spacer(),
                                     IconButton(
-                                        onPressed: () {},
+                                        onPressed: () {
+                                          Navigator.push(context, MaterialPageRoute(
+                                            builder: (context) => NavigationPage(currentIndex: 1, redeemPagecurrentIndex: 2,),
+                                          ));
+                                        },
                                         icon: Icon(Icons.arrow_forward_ios)
                                     ),
                                   ],
@@ -629,44 +664,49 @@ class _CartPageState extends State<CartPage> {
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
-                                      color: Colors.grey,
+                                      color: Colors.black,
                                     ),
                                   ),
-                                  Text(
-                                    "RM ${cartTotal.toStringAsFixed(2)}",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                  Container(
-                                    width: MediaQuery.of(context).size.width * 0.60,
-                                    height: MediaQuery.of(context).size.height * 0.10,
-                                    child: Row(
+
+                                  if (discounted == true)
+                                    Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(4.0),
-                                          child: Icon(
-                                            Icons.location_on,
-                                            size: 20,
-                                            color: Colors.grey,
+                                        Text(
+                                          "RM ${cartTotal.toStringAsFixed(2)}",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: discounted ? Colors.grey[500] : Colors.green,
+                                            decoration: discounted ? TextDecoration.lineThrough : TextDecoration.none,
+                                            decorationColor: Colors.grey,
+                                            decorationThickness: 2,
                                           ),
                                         ),
-                                        SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            '5-G-1,Promenade, Jalan Mahsuri, 11900 Bayan Baru, Pulau Pinang',
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.grey,
-                                            ),
+                                        Text(
+                                          "RM ${discountedcartTotal.toStringAsFixed(2)}",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green,
                                           ),
                                         ),
                                       ],
                                     ),
-                                  ),
+                                  if (discounted == false)
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "RM ${cartTotal.toStringAsFixed(2)}",
+                                          style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.green,
+                                          ),
+                                        ),
+                                      ],
+                                    )
                                 ],
                               ),
                               ElevatedButton(
@@ -713,17 +753,36 @@ class _CartPageState extends State<CartPage> {
                                     return;
                                   }
 
-
-                                  await Navigator.push(context, MaterialPageRoute(
-                                    builder: (context) => SendingOrderPage(
-                                      cartList: _cartItems,
-                                      specialRemark: specialRequestController.text,
-                                      desiredPickupTime: _selectedTime,
-                                      cartTotal: cartTotal,
-                                      paymentMethod: _selectedPaymentMethod,
-                                      ),
+                                  if (discounted == false) {
+                                    await Navigator.push(
+                                      context, MaterialPageRoute(
+                                      builder: (context) =>
+                                          SendingOrderPage(
+                                            cartList: _cartItems,
+                                            specialRemark: specialRequestController
+                                                .text,
+                                            desiredPickupTime: _selectedTime,
+                                            cartTotal: cartTotal,
+                                            paymentMethod: _selectedPaymentMethod,
+                                          ),
                                     ),
-                                  ).then((value) => fetchData());
+                                    ).then((value) => fetchData());
+                                  }
+                                  if (discounted == true) {
+                                    await Navigator.push(
+                                      context, MaterialPageRoute(
+                                      builder: (context) =>
+                                          SendingOrderPage(
+                                            cartList: _cartItems,
+                                            specialRemark: specialRequestController
+                                                .text,
+                                            desiredPickupTime: _selectedTime,
+                                            cartTotal: discountedcartTotal,
+                                            paymentMethod: _selectedPaymentMethod,
+                                          ),
+                                    ),
+                                    ).then((value) => fetchData());
+                                  }
 
                                   setState(() {
                                     fetchData();

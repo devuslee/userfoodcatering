@@ -5,6 +5,7 @@ import 'package:userfoodcatering/screens/ClaimDiscountPage.dart';
 import 'package:userfoodcatering/screens/RankPage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:floating_snackbar/floating_snackbar.dart';
 
 
 class RedeemPointPage extends StatefulWidget {
@@ -142,6 +143,50 @@ class _RedeemPointPageState extends State<RedeemPointPage> {
       },
     );
   }
+
+  void showResetDiscountIDDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Refresh Discount Selection"),
+        content: Text("This will unselect any current discount selection."),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              TextButton(
+                onPressed: () {
+                  resetDiscountID();
+                  setState(() {
+                    fetchData();
+                  });
+                  floatingSnackBar(
+                    message: "Discount Refreshed!",
+                    context: context,
+                    textColor: Colors.white,
+                    backgroundColor: Colors.grey,
+                    duration: Duration(seconds: 2),
+                    textStyle: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
+                  );
+                  Navigator.pop(context);
+                },
+                child: Text("Confirm"),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Cancel"),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -170,7 +215,7 @@ class _RedeemPointPageState extends State<RedeemPointPage> {
                           color: Colors.grey,
                         ),
                         shape: RoundedRectangleBorder(),
-        
+
                       )
                   ),
                 ),
@@ -450,8 +495,22 @@ class _RedeemPointPageState extends State<RedeemPointPage> {
                         );
                       },
                     ),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.02,),
+                    ElevatedButton(
+                        onPressed: () {
+                          showResetDiscountIDDialog();
+                        },
+                        child: Text("Clear Selection"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:  Colors.white,
+                          side: BorderSide(
+                            color: Colors.grey,
+                          ),
+                        )
+                    ),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.1,),
                   ],
-                )
+                ),
           ],
         ),
       )

@@ -73,7 +73,6 @@ class _ReusableContainerState extends State<ReusableContainer> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 75, // Adjust height as needed
       width: MediaQuery.of(context).size.width * 0.25, // Adjust width as needed
       margin: EdgeInsets.all(8.0), // Adjust margin as needed
       padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // Adjust padding as needed
@@ -81,25 +80,31 @@ class _ReusableContainerState extends State<ReusableContainer> {
         border: Border.all(color: Colors.grey), // Add border
         borderRadius: BorderRadius.circular(8.0), // Add border radius for rounded corners
       ),
-      child: Column(
-        children: [
-          Text(
-            widget.text,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16.0, // Adjust font size
-              fontWeight: FontWeight.bold, // Adjust font weight
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              widget.text,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: MediaQuery.of(context).size.width * 0.015, // Adjust font size
+                fontWeight: FontWeight.bold,
+                color: Colors.grey// Adjust font weight
+              ),
             ),
-          ),
-          Text(
-            widget.textvalue,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16.0, // Adjust font size
-              fontWeight: FontWeight.bold, // Adjust font weight
+            Text(
+              widget.textvalue,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: MediaQuery.of(context).size.width * 0.02, // Adjust font size
+                fontWeight: FontWeight.bold, // Adjust font weight
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

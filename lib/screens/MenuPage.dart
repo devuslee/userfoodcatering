@@ -110,11 +110,11 @@ class _AddOrderPageState extends State<AddOrderPage> {
                     color: Colors.grey[200],
                     border: Border(
                       right: BorderSide(
-                        color: Colors.black,
+                        color: Colors.grey,
                         width: 2.0,
                       ),
                       left: BorderSide(
-                        color: Colors.black,
+                        color: Colors.grey,
                         width: 2.0,
                       ),
                     ),
@@ -126,11 +126,11 @@ class _AddOrderPageState extends State<AddOrderPage> {
                         decoration: BoxDecoration(
                           border: Border(
                             top: BorderSide(
-                              color: Colors.black,
-                              width: 2.0,
+                              color: Colors.grey,
+                              width: (menuData.keys.first == category) ? 0.0: 2.0,
                             ),
                             bottom: BorderSide(
-                              color: Colors.black,
+                              color: Colors.grey,
                               width: (menuData.keys.last == category) ? 2.0 : 0.0,
                             ),
                           ),

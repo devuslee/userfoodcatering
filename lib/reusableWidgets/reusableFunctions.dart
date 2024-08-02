@@ -426,6 +426,14 @@ void updateUserPoints(double points) {
   });
 }
 
+void resetDiscountID() {
+  final userRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+  userRef.get().then((value) {
+
+    userRef.update({'discountID': ""});
+  });
+}
+
 void updateUserDiscount(String discountID) {
   final userRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
   userRef.get().then((value) {
