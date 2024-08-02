@@ -27,6 +27,8 @@ class SendingOrderPage extends StatefulWidget {
 class _SendingOrderPageState extends State<SendingOrderPage> {
   bool _processing = false;
 
+  String discountID = "";
+
   @override
   void initState() {
     super.initState();
@@ -34,6 +36,9 @@ class _SendingOrderPageState extends State<SendingOrderPage> {
   }
 
   void processOrder() async {
+
+    discountID = await getUserDiscountID();
+
     if (mounted) {
       setState(() {
         _processing = true;
@@ -58,6 +63,10 @@ class _SendingOrderPageState extends State<SendingOrderPage> {
       setState(() {
         if (widget.paymentMethod == "E-Wallet") {
           deductWalletBalance(widget.cartTotal);
+        }
+
+        if (discountID != "") {
+          deleteSpecificDiscount(discountID);
         }
 
         sendOrder(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal, randomNumber, widget.paymentMethod);

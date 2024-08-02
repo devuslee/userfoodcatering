@@ -58,11 +58,13 @@ class _ReusableTextFieldState extends State<ReusableTextField> {
 class ReusableContainer extends StatefulWidget {
   final String text;
   final String textvalue;
+  final Function() onPressed;
 
   const ReusableContainer({
     Key? key,
     required this.text,
     required this.textvalue,
+    required this.onPressed,
   }) : super(key: key);
 
   @override
@@ -72,38 +74,43 @@ class ReusableContainer extends StatefulWidget {
 class _ReusableContainerState extends State<ReusableContainer> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: MediaQuery.of(context).size.width * 0.25, // Adjust width as needed
-      margin: EdgeInsets.all(8.0), // Adjust margin as needed
-      padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // Adjust padding as needed
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey), // Add border
-        borderRadius: BorderRadius.circular(8.0), // Add border radius for rounded corners
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Text(
-              widget.text,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: MediaQuery.of(context).size.width * 0.015, // Adjust font size
-                fontWeight: FontWeight.bold,
-                color: Colors.grey// Adjust font weight
+    return InkWell(
+      onTap: () {
+        widget.onPressed();
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.25, // Adjust width as needed
+        margin: EdgeInsets.all(8.0), // Adjust margin as needed
+        padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // Adjust padding as needed
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey), // Add border
+          borderRadius: BorderRadius.circular(8.0), // Add border radius for rounded corners
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                widget.text,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.015, // Adjust font size
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey// Adjust font weight
+                ),
               ),
-            ),
-            Text(
-              widget.textvalue,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: MediaQuery.of(context).size.width * 0.02, // Adjust font size
-                fontWeight: FontWeight.bold, // Adjust font weight
+              Text(
+                widget.textvalue,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: MediaQuery.of(context).size.width * 0.02, // Adjust font size
+                  fontWeight: FontWeight.bold, // Adjust font weight
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -137,7 +144,7 @@ class ReusableAppBar extends StatelessWidget {
                     alignment: Alignment.centerLeft,
                     child: IconButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context, true);
                       },
                       icon: Icon(Icons.arrow_back_ios),
                     ),

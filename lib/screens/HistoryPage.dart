@@ -173,19 +173,23 @@ class _HistoryPageState extends State<HistoryPage> {
                                           Row(
                                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text('ID: ${history.id}'),
-                                              Text('Total:      '),
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text('ID: ${history.id}'),
+                                                  Text('Created at: ${TimestampFormatter(history.createdAt)}'),
+                                                ],
+                                              ),
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text("Total"),
+                                                  Text('RM${NumberFormat('##0.00').format(history.total)}'),
+                                                ],
+                                              ),
                                             ],
                                           ),
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text('Created at: ${TimestampFormatter(history.createdAt)}'),
-                                              Text('RM${NumberFormat('##0.00').format(history.total)}'),
-                                            ],
-                                          ),
-                                          Text('Picked up at: ${PickupTimestampFormatter(
-                                              history.createdAt,
+                                          Text('Picked up at: ${TimestampFormatter(
                                               history.desiredPickupTime)
                                             }'
                                           ),

@@ -66,6 +66,17 @@ Future<String> getUserDiscountID() async {
   }
 }
 
+void deleteSpecificDiscount(String discountID) async {
+  DocumentReference userRef =
+  FirebaseFirestore.instance.collection('users').doc(currentUser);
+
+  DocumentReference discountRef =
+  FirebaseFirestore.instance.collection('users').doc(currentUser).collection('discounts').doc(discountID);
+
+  userRef.update({'discountID': ""});
+  discountRef.delete();
+}
+
 Future<String> getSpecificDiscount(String discountID) async {
   DocumentReference userPoints =
   FirebaseFirestore.instance
@@ -617,6 +628,39 @@ Future<List> returnPastOrderHistory() async{
   }
 }
 
+Future<List> returnTodayOrderHistory() async{
+  final orderCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('history');
+
+  try {
+    final orderCollectionSnapshot = await orderCollectionRef.get();
+    List orderList = [];
+    orderCollectionSnapshot.docs.forEach((doc) {
+      if (DateTime.parse(doc.get('desiredPickupTime')).day == DateTime.now().day) {
+        orderList.add((
+        id: doc.get('id'),
+        orderHistory: doc.get('orderHistory'),
+        status: doc.get('status'),
+        createdAt: doc.get('createdAt'),
+        specialRemarks: doc.get('specialRemarks'),
+        desiredPickupTime: doc.get('desiredPickupTime'),
+        total: doc.get('total'),
+        paymentMethod: doc.get('paymentMethod'),
+        type: doc.get('type'),
+        ));
+      }
+    });
+
+
+    return orderList.reversed.toList();
+  } catch (error) {
+    print('Error fetching order history: $error');
+    return [];
+  }
+}
+
 void TopupUserWallet(double amount) {
   final userDocumentRef = FirebaseFirestore.instance
         .collection('users')
@@ -729,11 +773,11 @@ Future<bool> getIsCheckin() async {
   return isCheckin;
 }
 
-Future<int> incrementcheckinCounter() async {
+Future<double> incrementcheckinCounter() async {
   final userDocumentRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
-  int checkinCounter = 0;
-  int currentPoints = 0;
-  int pointsObtained = 0;
+  double checkinCounter = 0;
+  double currentPoints = 0;
+  double pointsObtained = 0;
   String lastCheckedIn = "";
 
   DocumentSnapshot value = await userDocumentRef.get();
@@ -837,6 +881,12 @@ void TempCreateCategory() {
 String TimestampFormatter(String timestamp) {
   DateTime dateTime = DateTime.parse(timestamp);
   String formattedDate = DateFormat('dd MMMM yyyy HH:mm').format(dateTime);
+  return formattedDate;
+}
+
+String HourFormatter(String timestamp) {
+  DateTime dateTime = DateTime.parse(timestamp);
+  String formattedDate = DateFormat('hh:mm a').format(dateTime);
   return formattedDate;
 }
 

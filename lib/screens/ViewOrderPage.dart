@@ -188,7 +188,7 @@ class _ViewOrderPageState extends State<ViewOrderPage> {
                     child: IconButton(
                       padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 0.0),
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context, true);
                       },
                       icon: Icon(Icons.arrow_back_ios, color: Colors.black),
                     ),
@@ -269,7 +269,7 @@ class _ViewOrderPageState extends State<ViewOrderPage> {
                   ElevatedButton(
                     onPressed: () {
                       addToCart(widget.menuData.name, widget.menuData.price, counter, total, widget.menuData.imageURL);
-                      Navigator.pop(context);
+                      Navigator.pop(context, true);
 
                       floatingSnackBar(
                         message: "Item added to cart",

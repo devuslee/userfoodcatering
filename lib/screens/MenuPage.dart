@@ -228,8 +228,8 @@ class _AddOrderPageState extends State<AddOrderPage> {
                                       ),
                                       Expanded(
                                         child: InkWell(
-                                          onTap: () {
-                                            Navigator.push(
+                                          onTap: () async {
+                                            bool isRefresh = await Navigator.push(
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) => ViewOrderPage(
@@ -237,6 +237,11 @@ class _AddOrderPageState extends State<AddOrderPage> {
                                                 ),
                                               ),
                                             );
+
+                                            if (isRefresh) {
+                                              cartCount = await getCartQuantity();
+                                              setState(() {});
+                                            }
                                           },
                                           child: CachedNetworkImage(
                                             imageUrl: menuItem?.imageURL ?? '',

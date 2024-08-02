@@ -24,7 +24,7 @@ class RedeemPointPage extends StatefulWidget {
 
 class _RedeemPointPageState extends State<RedeemPointPage> {
   int checkinCounter = 0;
-  int pointObtained = 0;
+  double pointObtained = 0;
   bool isCheckin = false;
   String points = "";
   String rank = "";

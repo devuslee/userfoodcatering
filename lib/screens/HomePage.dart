@@ -5,8 +5,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
-
+import 'package:userfoodcatering/screens/RankPage.dart';
+import 'package:userfoodcatering/screens/WalletPage.dart';
+import 'package:intl/intl.dart';
 import '../class/menuClass.dart';
+import 'PointPage.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,6 +39,8 @@ class _HomePageState extends State<HomePage> {
   double currentPointprogress = 0;
   List<MenuClass> allMenuItems = [];
 
+  List todayHistory = [];
+
   @override
   void initState() {
     super.initState();
@@ -46,7 +51,7 @@ class _HomePageState extends State<HomePage> {
     try {
       Map<String, String> tempUserDetails = await getUserDetails();
       List<MenuClass> tempAllMenuItems = await getMenuData();
-
+      todayHistory = await returnTodayOrderHistory();
 
 
       if (mounted) {
@@ -55,6 +60,7 @@ class _HomePageState extends State<HomePage> {
           balance = userDetails['balance']!;
           points = userDetails['points']!;
           rank = userDetails['rank']!;
+
 
           // Welcome message
           username = userDetails['username']!;
@@ -82,6 +88,7 @@ class _HomePageState extends State<HomePage> {
           }
           pointsToNextRank = double.parse(userDetails['pointstoNextRank']!);
           currentPointprogress = progressDenominator - pointsToNextRank;
+          currentPointprogress = double.parse(currentPointprogress.toStringAsFixed(2));
           progressBarText = "$currentPointprogress/$progressDenominator";
           allMenuItems = tempAllMenuItems;
         });
@@ -183,8 +190,7 @@ class _HomePageState extends State<HomePage> {
                       )
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                  Align(
-                    child: Container(
+                  Container(
                         margin: EdgeInsets.all(8.0),
                         padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8.0), // Adjust padding as needed
                         decoration: BoxDecoration(
@@ -194,13 +200,117 @@ class _HomePageState extends State<HomePage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            ReusableContainer(text: "Wallet", textvalue: "RM ${balance}"),
-                            ReusableContainer(text: "Points", textvalue: "${points} pts"),
-                            ReusableContainer(text: rank, textvalue: progressBarText),
+                            ReusableContainer(text: "Wallet", textvalue: "RM ${balance}", onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => WalletPage()),);
+                            }),
+                            ReusableContainer(text: "Points", textvalue: "${points} pts", onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => PointPage()),);
+                            },),
+                            ReusableContainer(text: rank, textvalue: progressBarText, onPressed: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => RankPage()),);
+                            },),
                           ],
                         )
                     ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  Text(
+                    "Heres the orders you have for today",
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                  for (var history in todayHistory)
+                    if (history.type == 'Expense')
+                      Column(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                    width: MediaQuery.of(context).size.width * 0.81,
+                                    decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10),
+                                        )
+
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            "Pickup Order",
+                                          ),
+                                        ),
+                                      ],
+                                    )
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text('Location: 5-G-1,Promenade, Jalan Mahsuri, 11900 Bayan Baru, Pulau Pinang'),
+                                                  Text('Pickup Time: ${HourFormatter(
+                                                      history.desiredPickupTime)
+                                                  }'
+                                                  ),
+                                                ],
+                                              ),
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text("Total"),
+                                                  Text('RM${NumberFormat('##0.00').format(history.total)}'),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                          Text(history.specialRemarks == "" ? 'Special Remarks: None' : 'Special Remarks: ${history.specialRemarks}'),
+                                          Text('Payment Method: ${history.paymentMethod}'),
+                                          Divider(color: Colors.grey[300],),
+                                          for (var order in history.orderHistory)
+                                            Column(
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Text(order['name']),
+                                                    Text(order['quantity'].toString()),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                        ],
+                                      )
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+                        ],
+                      ),
                 ],
               ),
             ),

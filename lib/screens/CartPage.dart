@@ -5,6 +5,8 @@ import 'package:userfoodcatering/screens/MenuPage.dart';
 import 'package:userfoodcatering/screens/NavigationPage.dart';
 import 'package:userfoodcatering/screens/ViewOrderPage.dart';
 import 'package:userfoodcatering/class/menuClass.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:intl/intl.dart';
 
 import 'SendingOrderPage.dart';
 
@@ -16,6 +18,9 @@ class CartPage extends StatefulWidget {
 }
 
 class _CartPageState extends State<CartPage> {
+  TextEditingController _dateController = TextEditingController();
+
+
   List<String> pickupTimes = [
     '10:00 AM',
     '11:00 AM',
@@ -25,7 +30,7 @@ class _CartPageState extends State<CartPage> {
     '3:00 PM',
   ];
 
-
+  DateTime selectedDate = DateTime.now();
   String _selectedPaymentMethod = 'Cash';
 
   String _selectedTime = '10:00 AM';
@@ -95,6 +100,7 @@ class _CartPageState extends State<CartPage> {
       print('Error fetching data: $error');
     }
   }
+
 
 
   @override
@@ -435,6 +441,103 @@ class _CartPageState extends State<CartPage> {
                         children: [
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                           Text(
+                            "Pickup Date",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                          Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.grey,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                        backgroundColor: Colors.grey[200],
+                                        child: _dateController.text == '' ?
+                                        Tooltip(
+                                          message: 'Select a date',
+                                          child: Icon(
+                                            Icons.error,
+                                            color: Colors.red,
+                                          ),
+                                        ) :
+                                        Tooltip(
+                                          message: 'Date Selected',
+                                          child: Icon(
+                                            Icons.check,
+                                            color: Colors.green,
+                                          ),
+                                        )
+                                    ),
+                                    SizedBox(width: MediaQuery.of(context).size.width * 0.005),
+                                    Text(
+                                      _dateController.text == '' ? 'Select a date' : _dateController.text,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    IconButton(
+                                      onPressed: () async {
+                                        DateTime? date = await showDatePicker(
+                                          context: context,
+                                          initialDate: DateTime.now().add(Duration(days: 1)),
+                                          firstDate: DateTime.now().add(Duration(days: 1)),
+                                          lastDate: DateTime(2025),
+                                        );
+
+                                        if (date != null) {
+                                          setState(() {
+                                            DateTime AMPMtoDatetime = parseTime(_selectedTime);
+                                            selectedDate = DateTime(
+                                              date.year,
+                                              date.month,
+                                              date.day,
+                                              AMPMtoDatetime.hour,
+                                              AMPMtoDatetime.minute,
+                                            );
+                                            _dateController.text = DayMonthYearFormatter(date.toString().split(' ')[0]);
+                                          });
+                                        }
+                                      },
+                                      icon: Icon(Icons.calendar_today),
+                                    ),
+                                  ],
+                                ),
+                              )
+                          ),
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border(
+                          top: BorderSide(
+                            color: Colors.grey,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                          Text(
                             "Special Request",
                             style: TextStyle(
                               fontSize: 20,
@@ -753,15 +856,35 @@ class _CartPageState extends State<CartPage> {
                                     return;
                                   }
 
+                                  if (_dateController.text == "") {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Error'),
+                                          content: Text('Please select a date'),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(); // Dismiss the dialog
+                                              },
+                                              child: Text('OK'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                    return;
+                                  }
+
                                   if (discounted == false) {
                                     await Navigator.push(
                                       context, MaterialPageRoute(
                                       builder: (context) =>
                                           SendingOrderPage(
                                             cartList: _cartItems,
-                                            specialRemark: specialRequestController
-                                                .text,
-                                            desiredPickupTime: _selectedTime,
+                                            specialRemark: specialRequestController.text,
+                                            desiredPickupTime: selectedDate.toString(),
                                             cartTotal: cartTotal,
                                             paymentMethod: _selectedPaymentMethod,
                                           ),
@@ -774,9 +897,8 @@ class _CartPageState extends State<CartPage> {
                                       builder: (context) =>
                                           SendingOrderPage(
                                             cartList: _cartItems,
-                                            specialRemark: specialRequestController
-                                                .text,
-                                            desiredPickupTime: _selectedTime,
+                                            specialRemark: specialRequestController.text,
+                                            desiredPickupTime: selectedDate.toString(),
                                             cartTotal: discountedcartTotal,
                                             paymentMethod: _selectedPaymentMethod,
                                           ),
@@ -814,4 +936,22 @@ class _CartPageState extends State<CartPage> {
       ),
     );
   }
+}
+
+DateTime parseTime(String time) {
+  final parts = time.split(' ');
+  final timePart = parts[0];
+  final period = parts[1];
+
+  final timeParts = timePart.split(':');
+  int hour = int.parse(timeParts[0]);
+  final int minute = int.parse(timeParts[1]);
+
+  if (period == 'PM' && hour != 12) {
+    hour += 12;
+  } else if (period == 'AM' && hour == 12) {
+    hour = 0;
+  }
+
+  return DateTime(0, 1, 1, hour, minute);
 }
