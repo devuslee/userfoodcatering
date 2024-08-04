@@ -37,6 +37,7 @@ class _SendingOrderPageState extends State<SendingOrderPage> {
 
   void processOrder() async {
 
+
     discountID = await getUserDiscountID();
 
     if (mounted) {
@@ -73,6 +74,7 @@ class _SendingOrderPageState extends State<SendingOrderPage> {
         createOrderHistory(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal, randomNumber, widget.paymentMethod, "Expense");
         createPointHistory(widget.cartTotal, randomNumber);
         deleteWholeCart();
+        Navigator.pop(context);
         Navigator.pop(context);
       });
     }

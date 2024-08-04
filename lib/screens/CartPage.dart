@@ -73,29 +73,32 @@ class _CartPageState extends State<CartPage> {
       if (tempDiscountID != "") {
         discountAmount = await getSpecificDiscount(tempDiscountID);
       }
-      setState(() {
-        userDetails = tempuserDetails;
-        discountID = tempDiscountID;
-        discountAmount = discountAmount;
-        balance = userDetails['balance']!;
-        paymentMethods = [
-          'Cash',
-          'E-Wallet (RM $balance)',
-        ];
 
-        if (double.parse(discountAmount) != 0) {
-          if (cartTotal > double.parse(discountAmount)) {
-            discountedcartTotal = cartTotal - double.parse(discountAmount);
-            discounted = true;
-          } else if (cartTotal < double.parse(discountAmount)) {
-            discountedcartTotal = 0;
-            discounted = true;
-          } else {
-            discountAmount = "0";
-            discounted = false;
+      if (mounted) {
+        setState(() {
+          userDetails = tempuserDetails;
+          discountID = tempDiscountID;
+          discountAmount = discountAmount;
+          balance = userDetails['balance']!;
+          paymentMethods = [
+            'Cash',
+            'E-Wallet (RM $balance)',
+          ];
+
+          if (double.parse(discountAmount) != 0) {
+            if (cartTotal > double.parse(discountAmount)) {
+              discountedcartTotal = cartTotal - double.parse(discountAmount);
+              discounted = true;
+            } else if (cartTotal < double.parse(discountAmount)) {
+              discountedcartTotal = 0;
+              discounted = true;
+            } else {
+              discountAmount = "0";
+              discounted = false;
+            }
           }
-        }
-      });
+        });
+      }
     } catch (error) {
       print('Error fetching data: $error');
     }

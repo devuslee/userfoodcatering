@@ -140,7 +140,6 @@ Future<List<MenuClass>> getMenuData() async {
       ));
     }));
 
-
     return menuList;
   } catch (error) {
     print('Error fetching menu data: $error');
@@ -370,11 +369,14 @@ void createOrderHistory(List cartItems, String specialRemarks, String desiredPic
       .collection('users')
       .doc(currentUser)
       .collection('history')
-      .doc(DateTime.now().toString());
+      .doc(uniqueID.toString());
 
   List<Map<String, dynamic>> orderHistory = cartItems.map((item) => {
     'name': item.name,
     'quantity': item.quantity,
+    'price': item.price,
+    'total': item.total,
+    'imageURL': item.imageURL,
   }).toList();
 
   orderCollectionRef.set({
@@ -540,9 +542,13 @@ Future<List> returnAllOrderHistory() async{
 
   try {
     final orderCollectionSnapshot = await orderCollectionRef.get();
+    List pendingorderList = [];
+    List completedorderList = [];
+
     List orderList = [];
+
     orderCollectionSnapshot.docs.forEach((doc) {
-      orderList.add((
+      final order = ((
         id: doc.get('id'),
         orderHistory: doc.get('orderHistory'),
         status: doc.get('status'),
@@ -553,10 +559,21 @@ Future<List> returnAllOrderHistory() async{
         paymentMethod: doc.get('paymentMethod'),
         type: doc.get('type'),
       ));
+
+      if (order.status == 'Pending') {
+        pendingorderList.add(order);
+      } else {
+        completedorderList.add(order);
+      }
     });
 
 
-    return orderList.reversed.toList();
+    //sort from latest to oldest
+    pendingorderList.sort((a, b) => a.desiredPickupTime.compareTo(b.desiredPickupTime));
+    completedorderList.sort((a, b) => a.desiredPickupTime.compareTo(b.desiredPickupTime));
+
+    orderList = pendingorderList + completedorderList;
+    return orderList.toList();
   } catch (error) {
     print('Error fetching order history: $error');
     return [];
@@ -588,6 +605,8 @@ Future<List> returnActiveOrderHistory() async{
       }
     });
 
+    //sort from latest to oldest
+    orderList.sort((a, b) => a.desiredPickupTime.compareTo(b.desiredPickupTime));
 
     return orderList.reversed.toList();
   } catch (error) {
@@ -606,7 +625,7 @@ Future<List> returnPastOrderHistory() async{
     final orderCollectionSnapshot = await orderCollectionRef.get();
     List orderList = [];
     orderCollectionSnapshot.docs.forEach((doc) {
-      if (doc.get('status') == 'Completed') {
+      if (doc.get('status') != 'Pending') {
         orderList.add((
         id: doc.get('id'),
         orderHistory: doc.get('orderHistory'),
@@ -620,6 +639,10 @@ Future<List> returnPastOrderHistory() async{
         ));
       }
     });
+
+
+  //sort from latest to oldest
+    orderList.sort((a, b) => a.desiredPickupTime.compareTo(b.desiredPickupTime));
 
     return orderList.reversed.toList();
   } catch (error) {
@@ -638,21 +661,26 @@ Future<List> returnTodayOrderHistory() async{
     final orderCollectionSnapshot = await orderCollectionRef.get();
     List orderList = [];
     orderCollectionSnapshot.docs.forEach((doc) {
-      if (DateTime.parse(doc.get('desiredPickupTime')).day == DateTime.now().day) {
-        orderList.add((
-        id: doc.get('id'),
-        orderHistory: doc.get('orderHistory'),
-        status: doc.get('status'),
-        createdAt: doc.get('createdAt'),
-        specialRemarks: doc.get('specialRemarks'),
-        desiredPickupTime: doc.get('desiredPickupTime'),
-        total: doc.get('total'),
-        paymentMethod: doc.get('paymentMethod'),
-        type: doc.get('type'),
-        ));
+
+
+      if (doc.get('type') != 'Topup') {
+        if (DateTime.parse(doc.get('desiredPickupTime')).day == DateTime.now().day) {
+          orderList.add((
+          id: doc.get('id'),
+          orderHistory: doc.get('orderHistory'),
+          status: doc.get('status'),
+          createdAt: doc.get('createdAt'),
+          specialRemarks: doc.get('specialRemarks'),
+          desiredPickupTime: doc.get('desiredPickupTime'),
+          total: doc.get('total'),
+          paymentMethod: doc.get('paymentMethod'),
+          type: doc.get('type'),
+          ));
+        }
       }
     });
 
+    orderList.sort((a, b) => a.desiredPickupTime.compareTo(b.desiredPickupTime));
 
     return orderList.reversed.toList();
   } catch (error) {
@@ -851,6 +879,57 @@ void createDiscount(String points, String discount, DateTime validuntil, String 
   });
 }
 
+void createReview(List<dynamic> orderHistory, int id) {
+
+  for (var history in orderHistory) {
+    final reviewCollectionRef = FirebaseFirestore.instance
+        .collection('admin')
+        .doc('reviews')
+        .collection(history['name']);
+
+    final menuCollectionRef = FirebaseFirestore.instance
+        .collection('menu');
+
+    menuCollectionRef.get().then((value) {
+      for (var doc in value.docs) {
+        if (doc.get('name') == history['name']) {
+          double currentRating = doc.get('totalRating');
+          int currentRatingCount = doc.get('totalUsersRating');
+          currentRatingCount = currentRatingCount + 1;
+          currentRating = currentRating + history['rating'];
+          double newRating = currentRating / currentRatingCount;
+          menuCollectionRef
+              .doc(doc.id)
+              .update({
+            'rating': newRating,
+            'totalRating': currentRating,
+            'totalUsersRating': currentRatingCount,
+          });
+        }
+      }
+    });
+
+    reviewCollectionRef.doc(id.toString()).set({
+      'id': id,
+      'userID': currentUser,
+      'comment': history['comment'],
+      'rating': history['rating'],
+      'quantity': history['quantity'],
+    });
+
+    updateHistoryStatus(id, "Completed and Reviewed");
+  }
+}
+
+void updateHistoryStatus(int id, String status) {
+  final orderCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('history')
+      .doc(id.toString());
+
+  orderCollectionRef.update({'status': status});
+}
 
 //used to test database
 void TempCreateMenu() {

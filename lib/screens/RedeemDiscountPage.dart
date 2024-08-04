@@ -106,7 +106,7 @@ class _RedeemDiscountPageState extends State<RedeemDiscountPage> {
                 child: ElevatedButton(
                   onPressed: () {
 
-                    if (int.parse(userPoints) < int.parse(widget.points))
+                    if (double.parse(userPoints) < double.parse(widget.points))
                       showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
@@ -124,7 +124,7 @@ class _RedeemDiscountPageState extends State<RedeemDiscountPage> {
                       );
                     else
 
-                    if (int.parse(userPoints) >= int.parse(widget.points))
+                    if (double.parse(userPoints) >= double.parse(widget.points))
                     showDialog(
                         context: context,
                         builder: (context) => AlertDialog(

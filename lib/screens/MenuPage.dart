@@ -53,8 +53,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
         }
       }
 
-      _itemKeys = List.generate(allMenuItems.length, (index) => GlobalKey());
-
+      _itemKeys = List.generate(categoryList.length, (index) => GlobalKey());
       if (mounted) {
         setState(() {
           // Update the UI after fetching data
@@ -66,6 +65,9 @@ class _AddOrderPageState extends State<AddOrderPage> {
   }
 
   void scrollToMenu(int index) {
+
+    if (index < 0 || index >= _itemKeys.length) return; // Guard against out-of-bounds
+
 
     if (_itemKeys[index].currentContext != null) {
       final RenderBox renderBox = _itemKeys[index].currentContext!.findRenderObject() as RenderBox;
@@ -207,6 +209,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
                               itemCount: menuData[category]?.length ?? 0,
                               itemBuilder: (context, index) {
                                 var menuItem = menuData[category]?[index];
+
 
                                 return Container(
                                   decoration: BoxDecoration(
