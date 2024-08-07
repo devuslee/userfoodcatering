@@ -7,8 +7,27 @@ import 'package:userfoodcatering/class/menuClass.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 
-final currentUser = FirebaseAuth.instance.currentUser!.uid;
+import '../screens/LoginPage.dart';
+
+String? currentUser = FirebaseAuth.instance.currentUser!.uid;
 final FirebaseStorage _storage = FirebaseStorage.instance;
+
+void getCurrentUserId() {
+  currentUser = FirebaseAuth.instance.currentUser?.uid;
+}
+
+
+Future<void> logout(BuildContext context) async {
+  await FirebaseAuth.instance.signOut();
+  print(currentUser);
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (context) => LoginPage()),
+        (route) => false,
+  );
+}
+
+
 
 // Future<String> getUserBalance() async {
 //   DocumentReference userBalance =
@@ -793,8 +812,12 @@ Future<bool> getIsCheckin() async {
   DateTime lastCheckedInTime = DateTime.parse(lastCheckedIn);
   DateTime now = DateTime.now();
 
-  //if the user has already checked in display another button
-  if (now.difference(lastCheckedInTime).inHours < 48 && now.difference(lastCheckedInTime).inHours > 24) {
+
+  if (now.difference(lastCheckedInTime).inHours < 24) {
+    isCheckin = false;
+  } else if (now.difference(lastCheckedInTime).inHours >= 24 && now.difference(lastCheckedInTime).inHours < 48) {
+    isCheckin = true;
+  } else {
     isCheckin = true;
   }
 

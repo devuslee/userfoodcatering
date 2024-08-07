@@ -269,7 +269,7 @@ class ReusableCheckinIcon extends StatelessWidget {
             ),
           ),
           Text(title),
-          Text("${pointsEarned} points"),
+          Text("${pointsEarned}pts"),
         ]
     );
   }

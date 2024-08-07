@@ -6,6 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:userfoodcatering/screens/RegisterPage.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:userfoodcatering/screens/NavigationPage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../reusableWidgets/reusableFunctions.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -48,11 +51,13 @@ class _LoginPageState extends State<LoginPage> {
               ),
               ElevatedButton(
                 onPressed: () {
+
                   invalidCredentials = false;
                   FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: "devuslee1@yahoo.com",
-                      password: "123123"
-                  ).then((value) {
+                      email: emailController.text,
+                      password: passwordController.text
+                  ).then((value)  {
+                    getCurrentUserId();
                     Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationPage(currentIndex: 0,)));
                   }).onError((error, stackTrace) {
                     print("Error: $error");

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:userfoodcatering/screens/HomePage.dart';
 import 'package:userfoodcatering/screens/LoginPage.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:userfoodcatering/screens/NavigationPage.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,11 +16,23 @@ void main() async {
       storageBucket: 'foodcatering-6bb02.appspot.com',
     ),
   );
-  runApp(const MyApp());
+
+  User? user = FirebaseAuth.instance.currentUser;
+  if (user != null) {
+    // User is signed in
+    runApp(MyApp(home: NavigationPage(currentIndex: 0,)));
+  } else {
+    // User is not signed in
+    runApp(MyApp(home: LoginPage()));
+  }
 }
 
+
+
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final Widget home;
+
+  const MyApp({Key? key, required this.home}) : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -28,7 +43,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: LoginPage(),
+      home: home,
     );
   }
 }

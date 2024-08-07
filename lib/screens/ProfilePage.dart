@@ -267,9 +267,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         title: "Logout",
                         icon: Icons.logout,
                         onTap: () {
-                          FirebaseAuth.instance.signOut();
-                          //dont allow user's to back button into the account
-                          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
+                          logout(context);
                         }
                         ),
                     SizedBox(height: MediaQuery.of(context).size.height * 0.05),
