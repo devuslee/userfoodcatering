@@ -7,7 +7,7 @@ import 'package:userfoodcatering/screens/RegisterPage.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:userfoodcatering/screens/NavigationPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:userfoodcatering/firebase_api.dart';
 import '../reusableWidgets/reusableFunctions.dart';
 
 
@@ -54,10 +54,11 @@ class _LoginPageState extends State<LoginPage> {
 
                   invalidCredentials = false;
                   FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: emailController.text,
-                      password: passwordController.text
+                      email: "devuslee1@yahoo.com",
+                      password: "123123"
                   ).then((value)  {
                     getCurrentUserId();
+                    saveFCMtoken();
                     Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationPage(currentIndex: 0,)));
                   }).onError((error, stackTrace) {
                     print("Error: $error");

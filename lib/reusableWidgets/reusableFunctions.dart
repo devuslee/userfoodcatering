@@ -6,11 +6,34 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:userfoodcatering/class/menuClass.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 import '../screens/LoginPage.dart';
+import 'package:userfoodcatering/notification.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:permission_handler/permission_handler.dart';
 
 String? currentUser = FirebaseAuth.instance.currentUser!.uid;
 final FirebaseStorage _storage = FirebaseStorage.instance;
+final _firebaseMessaging = FirebaseMessaging.instance;
+
+Future<void> handleBackgroundMessage(RemoteMessage message) async {
+  print('Title: ${message.notification?.title}');
+  print('Body: ${message.notification?.body}');
+  print('Payload: ${message.data}');
+}
+
+Future<void> saveFCMtoken() async {
+  await _firebaseMessaging.requestPermission();
+  final fCMToken = await _firebaseMessaging.getToken();
+
+  final userRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+  print('FCM Token: $fCMToken');
+  userRef.update({'fcmToken': fCMToken});
+
+  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+}
+
 
 void getCurrentUserId() {
   currentUser = FirebaseAuth.instance.currentUser?.uid;
@@ -19,7 +42,9 @@ void getCurrentUserId() {
 
 Future<void> logout(BuildContext context) async {
   await FirebaseAuth.instance.signOut();
-  print(currentUser);
+  final userRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+  userRef.update({'fcmToken': ""});
+
   Navigator.pushAndRemoveUntil(
     context,
     MaterialPageRoute(builder: (context) => LoginPage()),
@@ -902,7 +927,7 @@ void createDiscount(String points, String discount, DateTime validuntil, String 
   });
 }
 
-void createReview(List<dynamic> orderHistory, int id) {
+Future<void> createReview(List<dynamic> orderHistory, int id) async {
 
   for (var history in orderHistory) {
     final reviewCollectionRef = FirebaseFirestore.instance
@@ -913,26 +938,29 @@ void createReview(List<dynamic> orderHistory, int id) {
     final menuCollectionRef = FirebaseFirestore.instance
         .collection('menu');
 
-    menuCollectionRef.get().then((value) {
-      for (var doc in value.docs) {
-        if (doc.get('name') == history['name']) {
-          double currentRating = doc.get('totalRating');
-          int currentRatingCount = doc.get('totalUsersRating');
-          currentRatingCount = currentRatingCount + 1;
-          currentRating = currentRating + history['rating'];
-          double newRating = currentRating / currentRatingCount;
-          menuCollectionRef
-              .doc(doc.id)
-              .update({
-            'rating': newRating,
-            'totalRating': currentRating,
-            'totalUsersRating': currentRatingCount,
-          });
-        }
-      }
-    });
+    final menuSnapshot = await menuCollectionRef.get();
 
-    reviewCollectionRef.doc(id.toString()).set({
+    for (var doc in menuSnapshot.docs) {
+      final docData = doc.data() as Map<String, dynamic>;
+      if (docData['name'] == history['name']) {
+        double currentRating = docData['totalRating']?.toDouble() ?? 0.0;
+        int currentRatingCount = docData['totalUsersRating']?.toInt() ?? 0;
+
+        currentRatingCount += 1;
+        currentRating += history['rating'];
+        double newRating = currentRating / currentRatingCount;
+
+        // Update the document with the new rating values
+        await menuCollectionRef.doc(doc.id).update({
+          'rating': newRating,
+          'totalRating': currentRating,
+          'totalUsersRating': currentRatingCount,
+        });
+      }
+    }
+
+    // Add review to the reviews collection
+    await reviewCollectionRef.doc(id.toString()).set({
       'id': id,
       'userID': currentUser,
       'comment': history['comment'],
@@ -940,11 +968,28 @@ void createReview(List<dynamic> orderHistory, int id) {
       'quantity': history['quantity'],
     });
 
-    updateHistoryStatus(id, "Completed and Reviewed");
+    // Update history status
+    await updateHistoryStatus(id, "Completed and Reviewed");
   }
+
+  // Initialize time zones
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Asia/Kuala_Lumpur'));
+
+  // Schedule notification
+  DateTime tempTime = DateTime.now().add(Duration(seconds: 10));
+  print("Time: ${tz.TZDateTime.from(tempTime, tz.local)}");
+  print("Current Time: ${DateTime.now()}");
+  NotificationService().scheduleNotification(
+    title: 'Scheduled Notification',
+    body: 'Testing',
+    scheduledNotificationDateTime: DateTime.now().add(Duration(seconds: 10)),
+  );
+
+
 }
 
-void updateHistoryStatus(int id, String status) {
+Future<void> updateHistoryStatus(int id, String status) async {
   final orderCollectionRef = FirebaseFirestore.instance
       .collection('users')
       .doc(currentUser)

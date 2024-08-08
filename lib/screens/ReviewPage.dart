@@ -51,6 +51,8 @@ class _ReviewPageState extends State<ReviewPage> {
                 physics: NeverScrollableScrollPhysics(),
                 itemCount: widget.orderHistory.length,
                 itemBuilder: (context, index) {
+                  widget.orderHistory[index]['rating'] = 0;
+                  widget.orderHistory[index]['comment'] = "";
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
@@ -137,10 +139,13 @@ class _ReviewPageState extends State<ReviewPage> {
             ElevatedButton(
               onPressed: () {
                 createReview(widget.orderHistory, widget.id);
+
+
                 Navigator.pop(context,true);
               },
               child: Text("Submit Review"),
             ),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.01,),
           ],
         ),
       )

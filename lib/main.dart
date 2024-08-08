@@ -4,6 +4,12 @@ import 'package:userfoodcatering/screens/LoginPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:userfoodcatering/screens/NavigationPage.dart';
+import 'package:userfoodcatering/firebase_api.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:userfoodcatering/notification.dart';
+
+final navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,6 +22,10 @@ void main() async {
       storageBucket: 'foodcatering-6bb02.appspot.com',
     ),
   );
+
+  NotificationService().initNotification();
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Asia/Kuala_Lumpur'));
 
   User? user = FirebaseAuth.instance.currentUser;
   if (user != null) {
