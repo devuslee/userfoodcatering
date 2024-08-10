@@ -384,27 +384,32 @@ void deleteWholeCart() async {
 }
 
 void sendOrder(List cartItems, String specialRemarks, String desiredPickupTime, double total, int uniqueID, String paymentMethod) {
+  print(desiredPickupTime.split(' ')[0]);
+
   final orderCollectionRef = FirebaseFirestore.instance
       .collection('admin')
       .doc('orders')
-      .collection(DateTime.now().toString());
+      .collection(desiredPickupTime.split(' ')[0].toString())
+      .doc(uniqueID.toString());
 
-  cartItems.forEach((item) async {
-    await orderCollectionRef.doc(item.name).set({
-      'id': uniqueID,
-      'name': item.name,
-      'price': item.price,
-      'quantity': item.quantity,
-      'total': item.total,
-      'imageURL': item.imageURL,
-      'status': 'Pending',
-      'customer': currentUser,
-      'createdAt': DateTime.now().toString(),
-      'specialRemarks': specialRemarks,
-      'desiredPickupTime': desiredPickupTime,
-      'total': total,
-      'paymentMethod': paymentMethod,
-    });
+  List<Map<String, dynamic>> orderHistory = cartItems.map((item) => {
+    'name': item.name,
+    'quantity': item.quantity,
+    'price': item.price,
+    'total': item.total,
+    'imageURL': item.imageURL,
+  }).toList();
+
+  orderCollectionRef.set({
+    'id': uniqueID,
+    'userID': currentUser,
+    'orderHistory': orderHistory,
+    'status': 'Pending',
+    'createdAt': DateTime.now().toString(),
+    'specialRemarks': specialRemarks,
+    'desiredPickupTime': desiredPickupTime,
+    'total': total,
+    'paymentMethod': paymentMethod,
   });
 }
 
@@ -955,6 +960,7 @@ Future<void> createReview(List<dynamic> orderHistory, int id) async {
           'rating': newRating,
           'totalRating': currentRating,
           'totalUsersRating': currentRatingCount,
+          'createdAt': DateTime.now().toString(),
         });
       }
     }
