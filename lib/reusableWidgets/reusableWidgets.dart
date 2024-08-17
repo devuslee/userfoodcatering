@@ -350,5 +350,3 @@ class _ReusableDiscountState extends State<ReusableDiscount> {
     );
   }
 }
-
-

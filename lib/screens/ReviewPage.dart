@@ -38,6 +38,18 @@ class _ReviewPageState extends State<ReviewPage> {
     }
   }
 
+  Future<void> _showLoadingDialog() async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +63,6 @@ class _ReviewPageState extends State<ReviewPage> {
                 physics: NeverScrollableScrollPhysics(),
                 itemCount: widget.orderHistory.length,
                 itemBuilder: (context, index) {
-                  widget.orderHistory[index]['rating'] = 0;
-                  widget.orderHistory[index]['comment'] = "";
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
@@ -90,7 +100,7 @@ class _ReviewPageState extends State<ReviewPage> {
                                     ),
                                   ),
                                   RatingBar.builder(
-                                    initialRating: 0,
+                                    initialRating: (0 as num).toDouble(),
                                     direction: Axis.horizontal,
                                     allowHalfRating: false,
                                     itemCount: 5,
@@ -101,7 +111,9 @@ class _ReviewPageState extends State<ReviewPage> {
                                       color: Colors.amber,
                                     ),
                                     onRatingUpdate: (rating) {
-                                      widget.orderHistory[index]['rating'] = rating;
+                                      setState(() {
+                                        widget.orderHistory[index]['rating'] = rating;
+                                      });
                                     },
                                   ),
                                     SizedBox(height: MediaQuery.of(context).size.height * 0.04,),
@@ -117,14 +129,16 @@ class _ReviewPageState extends State<ReviewPage> {
                                           ),
                                           contentPadding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
                                         ),
-        
+
                                         onChanged: (value) {
-                                          widget.orderHistory[index]['comment'] = value;
+                                          setState(() {
+                                            widget.orderHistory[index]['comment'] = value;
+                                          });
                                         },
                                       ),
                                       ],
                                     ),
-        
+
                                 ],
                               ),
                             ),
@@ -137,10 +151,10 @@ class _ReviewPageState extends State<ReviewPage> {
               ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.01,),
             ElevatedButton(
-              onPressed: () {
-                createReview(widget.orderHistory, widget.id);
-
-
+              onPressed: () async {
+                _showLoadingDialog();
+                await createReview(widget.orderHistory, widget.id);
+                Navigator.pop(context);
                 Navigator.pop(context,true);
               },
               child: Text("Submit Review"),

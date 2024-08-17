@@ -12,10 +12,16 @@ import 'package:userfoodcatering/notification.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
+import 'package:huggingface_dart/huggingface_dart.dart';
+
+HfInference hfInference = HfInference('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');
 
 String? currentUser = FirebaseAuth.instance.currentUser!.uid;
+
 final FirebaseStorage _storage = FirebaseStorage.instance;
 final _firebaseMessaging = FirebaseMessaging.instance;
+
+
 
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
   print('Title: ${message.notification?.title}');
@@ -965,6 +971,8 @@ Future<void> createReview(List<dynamic> orderHistory, int id) async {
       }
     }
 
+    List<dynamic> sentiment = await analyzeComment(history['comment']);
+
     // Add review to the reviews collection
     await reviewCollectionRef.doc(id.toString()).set({
       'id': id,
@@ -972,6 +980,10 @@ Future<void> createReview(List<dynamic> orderHistory, int id) async {
       'comment': history['comment'],
       'rating': history['rating'],
       'quantity': history['quantity'],
+      'createdAt': DateTime.now().toString(),
+      'positive': sentiment[0]['score'],
+      'neutral': sentiment[1]['score'],
+      'negative': sentiment[2]['score'],
     });
 
     // Update history status
@@ -991,8 +1003,35 @@ Future<void> createReview(List<dynamic> orderHistory, int id) async {
     body: 'Testing',
     scheduledNotificationDateTime: DateTime.now().add(Duration(seconds: 10)),
   );
+}
+
+Future<List<dynamic>> analyzeComment(String inputText) async {
+  final response = await hfInference.fillMask(
+    model: 'cardiffnlp/twitter-roberta-base-sentiment',
+    inputs: [inputText],
+  );
+
+  //improved version
+  Map<String, String> labelMapping = {
+    'LABEL_0': 'negative',
+    'LABEL_1': 'neutral',
+    'LABEL_2': 'positive',
+  };
+
+  for (var i = 0; i < response[0].length; i++) {
+    String label = response[0][i]['label'];
+    if (labelMapping.containsKey(label)) {
+      response[0][i]['label'] = labelMapping[label];
+    }
+  }
+
+  response[0].sort((a, b) {
+    const order = ['positive', 'neutral', 'negative'];
+    return order.indexOf(a['label']).compareTo(order.indexOf(b['label']));
+  });
 
 
+  return response[0];
 }
 
 Future<void> updateHistoryStatus(int id, String status) async {
