@@ -7,6 +7,7 @@ import 'package:userfoodcatering/class/menuClass.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import '../screens/CalendarPage.dart';
 import '../screens/LoginPage.dart';
 import 'package:userfoodcatering/notification.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -452,7 +453,7 @@ Future<void> createPointHistory(double total, int uniqueID) async {
       .collection('users')
       .doc(currentUser)
       .collection('points')
-      .doc(DateTime.now().toString());
+      .doc(uniqueID.toString());
 
   double points = 0;
 
@@ -624,8 +625,8 @@ Future<List> returnAllOrderHistory() async{
 
 
     //sort from latest to oldest
-    pendingorderList.sort((a, b) => a.desiredPickupTime.compareTo(b.desiredPickupTime));
-    completedorderList.sort((a, b) => a.desiredPickupTime.compareTo(b.desiredPickupTime));
+    pendingorderList.sort((b, a) => a.createdAt.compareTo(b.createdAt));
+    completedorderList.sort((b, a) => a.createdAt.compareTo(b.createdAt));
 
     orderList = pendingorderList + completedorderList;
     return orderList.toList();
@@ -706,20 +707,20 @@ Future<List> returnPastOrderHistory() async{
   }
 }
 
-Future<List> returnTodayOrderHistory() async{
+Future<List> returnOrderHistory(String selectedTime) async{
   final orderCollectionRef = FirebaseFirestore.instance
       .collection('users')
       .doc(currentUser)
       .collection('history');
 
+
+
   try {
     final orderCollectionSnapshot = await orderCollectionRef.get();
     List orderList = [];
     orderCollectionSnapshot.docs.forEach((doc) {
-
-
       if (doc.get('type') != 'Topup') {
-        if (DateTime.parse(doc.get('desiredPickupTime')).day == DateTime.now().day) {
+        if (DateTime.parse(doc.get('desiredPickupTime')).day == DateTime.parse(selectedTime).day) {
           orderList.add((
           id: doc.get('id'),
           orderHistory: doc.get('orderHistory'),
@@ -812,6 +813,33 @@ Future<void> updateProfile(String username, String profileImage) async {
     print('Error updating profile: $e');
   }
 }
+
+Future<double> getPointsGained(String orderID) async {
+  double points = 0.0;
+  print(orderID.toString());
+
+  try {
+    final userDocumentRef = FirebaseFirestore.instance
+        .collection('users')
+        .doc(currentUser)
+        .collection('points')
+        .doc(orderID);
+
+    final documentSnapshot = await userDocumentRef.get();
+
+    if (documentSnapshot.exists) {
+      // Safely access the 'points' field and ensure it's of type double
+      points = (documentSnapshot.data()?['points'] ?? 0.0).toDouble();
+    } else {
+      print('Document does not exist');
+    }
+  } catch (error) {
+    print('Error fetching points: $error');
+  }
+
+  return points;
+}
+
 
 Future<int> getcheckinCounter() async {
   final userDocumentRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
@@ -938,7 +966,37 @@ void createDiscount(String points, String discount, DateTime validuntil, String 
   });
 }
 
+Future<Map<String, dynamic>> getOrderDetails(String uniqueID) async {
+  Map<String, dynamic> orderDetails = {};
+
+  final orderCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('history')
+      .doc(uniqueID);
+
+  try {
+    final orderDocumentSnapshot = await orderCollectionRef.get();
+      orderDetails['orderID'] = orderDocumentSnapshot.get('id');
+      orderDetails['orderHistory'] = orderDocumentSnapshot.get('orderHistory');
+      orderDetails['status'] = orderDocumentSnapshot.get('status');
+      orderDetails['createdAt'] = orderDocumentSnapshot.get('createdAt');
+      orderDetails['specialRemarks'] = orderDocumentSnapshot.get('specialRemarks');
+      orderDetails['desiredPickupTime'] = orderDocumentSnapshot.get('desiredPickupTime');
+      orderDetails['total'] = orderDocumentSnapshot.get('total');
+      orderDetails['paymentMethod'] = orderDocumentSnapshot.get('paymentMethod');
+      orderDetails['type'] = orderDocumentSnapshot.get('type');
+  } catch (error) {
+    print('Error fetching order details: $error');
+  }
+
+
+ return orderDetails;
+}
+
+
 Future<void> createReview(List<dynamic> orderHistory, int id) async {
+  String category = "";
 
   for (var history in orderHistory) {
     final reviewCollectionRef = FirebaseFirestore.instance
@@ -1005,6 +1063,28 @@ Future<void> createReview(List<dynamic> orderHistory, int id) async {
   );
 }
 
+Future<String> returnCategorywithName(String name) async {
+  final menuCollectionRef = FirebaseFirestore.instance.collection('menu');
+
+  try {
+    final menuSnapshot = await menuCollectionRef.get();
+    String category = "";
+
+    for (var doc in menuSnapshot.docs) {
+      final docData = doc.data() as Map<String, dynamic>;
+      if (docData['name'] == name) {
+        category = docData['category'];
+      }
+    }
+
+    return category;
+  } catch (error) {
+    print('Error fetching category: $error');
+    return "";
+  }
+}
+
+
 Future<List<dynamic>> analyzeComment(String inputText) async {
   final response = await hfInference.fillMask(
     model: 'cardiffnlp/twitter-roberta-base-sentiment',
@@ -1067,7 +1147,43 @@ void TempCreateCategory() {
   });
 }
 
+Future<Map<DateTime, List<Map<String,dynamic>>>> getCalendarData() async {
+  Map<DateTime, List<Map<String, dynamic>>> calendarData = {};
 
+  final calendarDataRef = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('history');
+
+  await calendarDataRef.get().then((value) {
+    value.docs.forEach((doc) {
+      String type = doc.get('type');
+      if (type != 'Topup') {
+        String desiredPickupTime = doc.get('desiredPickupTime');
+        DateTime dateTime = DateTime.parse(desiredPickupTime);
+        DateTime date = DateTime(dateTime.year, dateTime.month, dateTime.day);
+
+        if (calendarData[date] == null) {
+          calendarData[date] = [];
+        }
+
+        calendarData[date]!.add({
+          'createdAt': doc.get('createdAt'),
+          'desiredPickupTime': doc.get('desiredPickupTime'),
+          'orderID': doc.get('id'),
+          'orderHistory': doc.get('orderHistory'),
+          'paymentMethod': doc.get('paymentMethod'),
+          'specialRemarks': doc.get('specialRemarks'),
+          'status': doc.get('status'),
+          'total': doc.get('total'),
+          'type': doc.get('type'),
+        });
+      }
+    });
+  });
+
+  return calendarData;
+}
 
 
 String TimestampFormatter(String timestamp) {
@@ -1121,3 +1237,6 @@ String PickupTimestampFormatter(String timestamp, String desiredPickupTime) {
   return formattedDate;
 }
 
+int getHashCode(DateTime key) {
+  return key.day * 1000000 + key.month * 10000 + key.year;
+}

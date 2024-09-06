@@ -4,6 +4,7 @@ import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class ReviewPage extends StatefulWidget {
   final List<dynamic> orderHistory;
@@ -28,7 +29,7 @@ class _ReviewPageState extends State<ReviewPage> {
 
   void fetchData() async {
     try {
-
+      print(widget.orderHistory);
 
       if (mounted) {
         setState(() {});

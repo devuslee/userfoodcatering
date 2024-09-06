@@ -5,15 +5,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
+import 'package:userfoodcatering/screens/CalendarPage.dart';
 import 'package:userfoodcatering/screens/RankPage.dart';
 import 'package:userfoodcatering/screens/WalletPage.dart';
 import 'package:intl/intl.dart';
 import '../class/menuClass.dart';
+import '../reusableWidgets/reusableColor.dart';
 import 'PointPage.dart';
 import 'ReviewPage.dart';
-
-Color darkYellow = Color(0xFFF8AC4C); // Dark yellow color
-
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -43,6 +42,10 @@ class _HomePageState extends State<HomePage> {
   double currentPointprogress = 0;
   List<MenuClass> allMenuItems = [];
 
+  String selectedDateTime = DateTime.now().toString().split(" ")[0];
+
+  DateTime selectedDate = DateTime.now();
+
   List todayHistory = [];
 
   @override
@@ -55,7 +58,7 @@ class _HomePageState extends State<HomePage> {
     try {
       Map<String, String> tempUserDetails = await getUserDetails();
       List<MenuClass> tempAllMenuItems = await getMenuData();
-      todayHistory = await returnTodayOrderHistory();
+      todayHistory = await returnOrderHistory(selectedDateTime);
 
 
       if (mounted) {
@@ -100,6 +103,26 @@ class _HomePageState extends State<HomePage> {
     } catch (error) {
       print('Error fetching data: $error');
     }
+  }
+
+  void _incrementDate() {
+    setState(() {
+      selectedDate = selectedDate.add(Duration(days: 1));
+      selectedDateTime = selectedDate.toString().split(" ")[0];
+      setState(() {
+        fetchData();
+      });
+    });
+  }
+
+  void _decrementDate() {
+    setState(() {
+      selectedDate = selectedDate.subtract(Duration(days: 1));
+      selectedDateTime = selectedDate.toString().split(" ")[0];
+      setState(() {
+        fetchData();
+      });
+    });
   }
 
   Future<Map<String, String>> _getImageUrls() async {
@@ -224,14 +247,66 @@ class _HomePageState extends State<HomePage> {
                         )
                     ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                  Text(
-                    "Heres the orders you have for today",
-                    style: TextStyle(
-                      fontSize: 20.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  // Text(
+                  //   "Heres the orders you have for today",
+                  //   style: TextStyle(
+                  //     fontSize: 20.0,
+                  //     fontWeight: FontWeight.bold,
+                  //   ),
+                  // ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: _decrementDate,
+                        icon: Icon(
+                          Icons.arrow_left,
+                          size: 50,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          DateTime? date = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.parse(selectedDateTime),
+                            firstDate: DateTime(2021),
+                            lastDate: DateTime(2025),
+                          );
+
+                          if (date != null) {
+                            selectedDateTime = date.toString().split(" ")[0];
+                            setState(() {
+                              fetchData();
+                            });
+                          }
+                        },
+                        child: Text(
+                          DayMonthYearFormatter(selectedDateTime),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: _incrementDate,
+                        icon: Icon(
+                          Icons.arrow_right,
+                          size: 50,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => CalendarPage()),);
+                      },
+                      child: Text("View Calendar"),
+                  ),
+
+
 
                   if (todayHistory.isEmpty)
                     Column(
