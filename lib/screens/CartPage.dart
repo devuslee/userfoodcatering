@@ -7,7 +7,7 @@ import 'package:userfoodcatering/screens/ViewOrderPage.dart';
 import 'package:userfoodcatering/class/menuClass.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:intl/intl.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'SendingOrderPage.dart';
 
 class CartPage extends StatefulWidget {
@@ -19,7 +19,7 @@ class CartPage extends StatefulWidget {
 
 class _CartPageState extends State<CartPage> {
   TextEditingController _dateController = TextEditingController();
-
+  TextEditingController specialRequestController = TextEditingController();
 
   List<String> pickupTimes = [
     '10:00 AM',
@@ -50,6 +50,10 @@ class _CartPageState extends State<CartPage> {
     'E-Wallet',
   ];
 
+  late SharedPreferences prefs;
+
+  String tempDateTime = "";
+
   @override
   void initState() {
     super.initState();
@@ -60,6 +64,25 @@ class _CartPageState extends State<CartPage> {
     try {
       Map<String, String> tempuserDetails = await getUserDetails();
       String tempDiscountID = await getUserDiscountID();
+      prefs = await SharedPreferences.getInstance();
+
+      if (prefs.getString('date') != null) {
+        tempDateTime = prefs.getString('date').toString();
+        selectedDate = DateTime.parse(tempDateTime);
+        _dateController.text = DayMonthYearFormatter(tempDateTime.toString().split(' ')[0]);
+      }
+
+      if (prefs.getString('pickupTime') != null) {
+        _selectedTime = prefs.getString('pickupTime').toString();
+      }
+
+      if (prefs.getString('specialRequest') != null) {
+        specialRequestController.text = prefs.getString('specialRequest').toString();
+      }
+
+      if (prefs.getString('paymentMethod') != null) {
+        _selectedPaymentMethod = prefs.getString('paymentMethod').toString();
+      }
 
 
       _cartItems = await getUserCart();
@@ -108,7 +131,6 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController specialRequestController = TextEditingController();
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -416,6 +438,7 @@ class _CartPageState extends State<CartPage> {
                             onChanged: (value) {
                               setState(() {
                                 _selectedTime = value.toString();
+                                prefs.setString("pickupTime", _selectedTime);
                               });
                             },
                             decoration: InputDecoration(
@@ -510,7 +533,9 @@ class _CartPageState extends State<CartPage> {
                                               AMPMtoDatetime.hour,
                                               AMPMtoDatetime.minute,
                                             );
+                                            print(selectedDate);
                                             _dateController.text = DayMonthYearFormatter(date.toString().split(' ')[0]);
+                                            prefs.setString('date', selectedDate.toString());
                                           });
                                         }
                                       },
@@ -558,6 +583,9 @@ class _CartPageState extends State<CartPage> {
                               ),
                             ),
                             controller: specialRequestController,
+                            onChanged: (value) async {
+                              prefs.setString('specialRequest', value);
+                            },
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                         ],
@@ -599,6 +627,7 @@ class _CartPageState extends State<CartPage> {
                             onChanged: (value) {
                               setState(() {
                                 _selectedPaymentMethod = value.toString();
+                                prefs.setString("paymentMethod", _selectedPaymentMethod);
                               });
                             },
                             decoration: InputDecoration(

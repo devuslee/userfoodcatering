@@ -227,84 +227,75 @@ class _HomePageState extends State<HomePage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            ReusableContainer(text: "Wallet", textvalue: "RM ${balance}", onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => WalletPage()),);
+                            ReusableContainer(text: "Wallet", textvalue: "RM ${balance}", onPressed: () async {
+                              bool isRefresh = await Navigator.push(context, MaterialPageRoute(builder: (context) => WalletPage()),);
+
+                              if (isRefresh) {
+                                setState(() {
+                                  fetchData();
+                                });
+                              }
                             }),
-                            ReusableContainer(text: "Points", textvalue: "${points} pts", onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => PointPage()),);
+                            ReusableContainer(text: "Points", textvalue: "${points} pts", onPressed: () async {
+                              bool isRefresh = await Navigator.push(context, MaterialPageRoute(builder: (context) => PointPage()),);
+
+                              if (isRefresh) {
+                                setState(() {
+                                  fetchData();
+                                });
+                              }
                             },),
 
                             if (rank == "Expert")
-                            ReusableContainer(text: rank, textvalue: "Highest Rank", onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => RankPage()),);
+                            ReusableContainer(text: rank, textvalue: "Highest Rank", onPressed: () async {
+                              bool isRefresh = await Navigator.push(context, MaterialPageRoute(builder: (context) => RankPage()),);
+
+                              if (isRefresh) {
+                                setState(() {
+                                  fetchData();
+                                });
+                              }
                             },),
 
                             if (rank != "Expert")
-                            ReusableContainer(text: rank, textvalue: progressBarText, onPressed: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => RankPage()),);
+                            ReusableContainer(text: rank, textvalue: progressBarText, onPressed: () async {
+                              bool isRefresh = await Navigator.push(context, MaterialPageRoute(builder: (context) => RankPage()),);
+
+                              if (isRefresh) {
+                                setState(() {
+                                  fetchData();
+                                });
+                              }
                             },),
                           ],
                         )
                     ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                  // Text(
-                  //   "Heres the orders you have for today",
-                  //   style: TextStyle(
-                  //     fontSize: 20.0,
-                  //     fontWeight: FontWeight.bold,
-                  //   ),
-                  // ),
-
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      IconButton(
-                        onPressed: _decrementDate,
-                        icon: Icon(
-                          Icons.arrow_left,
-                          size: 50,
+                      Text(
+                        "Heres the orders you have for today",
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      InkWell(
-                        onTap: () async {
-                          DateTime? date = await showDatePicker(
-                            context: context,
-                            initialDate: DateTime.parse(selectedDateTime),
-                            firstDate: DateTime(2021),
-                            lastDate: DateTime(2025),
-                          );
+                      Spacer(),
+                      ElevatedButton(onPressed: () async {
+                        bool isRefresh = await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => CalendarPage())
+                        );
 
-                          if (date != null) {
-                            selectedDateTime = date.toString().split(" ")[0];
-                            setState(() {
-                              fetchData();
-                            });
-                          }
-                        },
-                        child: Text(
-                          DayMonthYearFormatter(selectedDateTime),
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: _incrementDate,
-                        icon: Icon(
-                          Icons.arrow_right,
-                          size: 50,
-                        ),
-                      ),
+                        if (isRefresh) {
+                          setState(() {
+                            fetchData();
+                          });
+                        }
+                      }, child: Text("View Calendar")),
                     ],
                   ),
-
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => CalendarPage()),);
-                      },
-                      child: Text("View Calendar"),
-                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
 
 
 
@@ -329,7 +320,7 @@ class _HomePageState extends State<HomePage> {
                         Column(
                           children: [
                             Container(
-                              width: MediaQuery.of(context).size.width * 0.8,
+                              width: MediaQuery.of(context).size.width * 1,
                               decoration: BoxDecoration(
                                 border: Border.all(
                                   color: Colors.black,
@@ -341,7 +332,7 @@ class _HomePageState extends State<HomePage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
-                                      width: MediaQuery.of(context).size.width * 0.81,
+                                      width: MediaQuery.of(context).size.width * 1,
                                       decoration: BoxDecoration(
                                           color: Colors.grey[200],
                                           borderRadius: BorderRadius.only(
@@ -401,7 +392,10 @@ class _HomePageState extends State<HomePage> {
                                                     Text('Status: '),
                                                     Container(
                                                         decoration: BoxDecoration(
-                                                            color: history.status == 'Pending' ? darkYellow : Colors.green,
+                                                            color:
+                                                              history.status == 'Pending' ? darkYellow :
+                                                              history.status == "Cancelled" ? Colors.red :
+                                                              Colors.green,
                                                             borderRadius: BorderRadius.circular(5)
                                                         ),
                                                         child: Padding(

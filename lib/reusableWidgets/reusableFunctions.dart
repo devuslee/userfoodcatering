@@ -261,6 +261,18 @@ void addToCart(String foodName, double price, int quantity, double total, String
   });
 }
 
+Future<void> clearCart() async {
+  final foodDocumentRef = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('cart')
+      .get();
+
+  foodDocumentRef.docs.forEach((doc) {
+    doc.reference.delete();
+  });
+}
+
 
 Future<int> getFoodQuantity(String foodName) async {
   final foodDocumentRef = FirebaseFirestore.instance
@@ -719,7 +731,7 @@ Future<List> returnOrderHistory(String selectedTime) async{
     final orderCollectionSnapshot = await orderCollectionRef.get();
     List orderList = [];
     orderCollectionSnapshot.docs.forEach((doc) {
-      if (doc.get('type') != 'Topup') {
+      if (doc.get('type') == 'Expense') {
         if (DateTime.parse(doc.get('desiredPickupTime')).day == DateTime.parse(selectedTime).day) {
           orderList.add((
           id: doc.get('id'),
@@ -761,6 +773,24 @@ void TopupUserWallet(double amount) {
 
   //creates income history
   createOrderHistory([], "", "", amount, randomNumber, "", "Topup");
+}
+
+void RefundUserWallet(double amount) {
+  final userDocumentRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser);
+
+  userDocumentRef.get().then((value) {
+    double currentBalance = value.get('balance');
+    double newBalance = currentBalance + amount;
+    userDocumentRef.update({'balance': newBalance});
+  });
+
+  Random random = Random();
+  int randomNumber = random.nextInt(1000000000) + 1;
+
+  //creates income history
+  createOrderHistory([], "", "", amount, randomNumber, "", "Refund");
 
 }
 
@@ -1158,7 +1188,7 @@ Future<Map<DateTime, List<Map<String,dynamic>>>> getCalendarData() async {
   await calendarDataRef.get().then((value) {
     value.docs.forEach((doc) {
       String type = doc.get('type');
-      if (type != 'Topup') {
+      if (type == 'Expense') {
         String desiredPickupTime = doc.get('desiredPickupTime');
         DateTime dateTime = DateTime.parse(desiredPickupTime);
         DateTime date = DateTime(dateTime.year, dateTime.month, dateTime.day);

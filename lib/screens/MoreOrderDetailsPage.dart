@@ -1,9 +1,14 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../reusableWidgets/reusableFunctions.dart';
 import 'ReviewPage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MoreOrderDetailsPage extends StatefulWidget {
   Map<String, dynamic> orderDetails;
@@ -23,14 +28,28 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
   double total = 0.0;
   double pointGained = 0.0;
 
+  String uniqueIdentifier = DateTime.now().millisecondsSinceEpoch.toString();
+
 
   void initState() {
     super.initState();
     fetchData();
+
+    FirebaseFirestore.instance
+        .collection('qrCodes')
+        .doc(uniqueIdentifier)
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.exists && snapshot.data()?['scanned'] == true) {
+        _onQrCodeScanned();
+      }
+    });
   }
 
   void fetchData() async {
     try {
+      print(widget.orderDetails);
+
       for (var item in widget.orderDetails['orderHistory']) {
         total = total + item['total'];
       }
@@ -67,6 +86,27 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
     }
   }
 
+  void createQrCode() async {
+    await FirebaseFirestore.instance.collection('qrCodes').doc(uniqueIdentifier).set({
+      'scanned': false,
+      'amount': widget.orderDetails['total'],
+      'userId': FirebaseAuth.instance.currentUser!.uid,
+    });
+  }
+
+  void _onQrCodeScanned() {
+    Navigator.pop(context);
+
+    Random random = Random();
+    int randomNumber = random.nextInt(1000000000) + 1;
+    updateHistoryStatus(widget.orderDetails['orderID'], "Completed");
+    createPointHistory(widget.orderDetails['total'], randomNumber);
+    refreshData();
+
+    SnackBar snackBar = SnackBar(content: Text("Order Completed"));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,6 +116,23 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
             ReusableAppBar(title: "Details", backButton: true),
             SizedBox(height: MediaQuery.of(context).size.height * 0.01),
 
+            if (widget.orderDetails['status'] == "Cancelled")
+              Container(
+                width: MediaQuery.of(context).size.width * 0.95,
+                decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10)
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("This order has been cancelled!", style : TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                ),
+              ),
             if (widget.orderDetails['status'] == "Pending")
               Container(
                 width: MediaQuery.of(context).size.width * 0.95,
@@ -214,7 +271,7 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                                     children: [
                                       Text("${item['name']}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.02, fontWeight: FontWeight.bold)),
                                       Text("RM ${item['price']}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.02, fontWeight: FontWeight.bold)),
-                                      SizedBox(height: MediaQuery.of(context).size.height * 0.11),
+                                      SizedBox(height: MediaQuery.of(context).size.height * 0.1),
                                       Text("Quantity: ${item['quantity']}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
                                     ],
                                   ),
@@ -289,7 +346,10 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
           ],
         ),
       ),
-      bottomNavigationBar:  BottomAppBar(
+      bottomNavigationBar: widget.orderDetails['status'] == "Pending" &&
+          DateTime.parse(widget.orderDetails['desiredPickupTime']).compareTo(DateTime.now()) < 0
+          ? null
+          : BottomAppBar(
         height: MediaQuery.of(context).size.height * 0.12,
         child: Container(
           padding: EdgeInsets.all(8.0),
@@ -302,12 +362,72 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                 child: ElevatedButton(
                   onPressed: () async {
                     if (widget.orderDetails['status'] == "Pending") {
-
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Cancel Order"),
+                              content: Text("Are you sure you want to cancel this order? This process is irreversible."),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text("No"),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    updateHistoryStatus(widget.orderDetails['orderID'], "Cancelled");
+                                    if (widget.orderDetails['paymentMethod'] == "E-Wallet") {
+                                      RefundUserWallet(widget.orderDetails['total']);
+                                    }
+                                    refreshData();
+                                  },
+                                  child: Text("Yes"),
+                                ),
+                              ],
+                            );
+                          }
+                      );
                     }
 
                     if (widget.orderDetails['status'] == "Ready") {
-                      updateHistoryStatus(widget.orderDetails['orderID'], "Completed");
-                      refreshData();
+                      createQrCode();
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text("Scan this QR Code"),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  height: MediaQuery.of(context).size.height * 0.2,
+                                  width: MediaQuery.of(context).size.height * 0.2,
+                                  child: QrImageView(
+                                    data: "${uniqueIdentifier} ${widget.orderDetails['orderID']}",
+                                    size: 200,
+                                  ),
+                                ),
+                                SizedBox(height: 10),
+                                Text(
+                                  "Please scan this code to confirm your order.",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context); // Close the dialog
+                                },
+                                child: Text("Close"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     }
 
                     if (widget.orderDetails['status'] == "Completed") {
@@ -328,7 +448,63 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                     }
 
                     if (widget.orderDetails['status'] == "Completed and Reviewed") {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Reorder"),
+                              content: Text("Reordering will clear your current cart. Are you sure you want to reorder?"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text("No"),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    await clearCart();
+                                    for (var item in widget.orderDetails['orderHistory']) {
+                                      addToCart(item['name'], item['price'], item['quantity'], item['total'], item['imageURL']);
+                                    }
+                                  },
+                                  child: Text("Yes"),
+                                ),
+                              ],
+                            );
+                          }
+                      );
+                    }
 
+                    if (widget.orderDetails['status'] == "Cancelled") {
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text("Reorder"),
+                              content: Text("Reordering will clear your current cart. Are you sure you want to reorder?"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Text("No"),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    Navigator.pop(context);
+                                    await clearCart();
+                                    for (var item in widget.orderDetails['orderHistory']) {
+                                      addToCart(item['name'], item['price'], item['quantity'], item['total'], item['imageURL']);
+                                    }
+                                  },
+                                  child: Text("Yes"),
+                                ),
+                              ],
+                            );
+                          }
+                      );
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -341,6 +517,7 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                       : widget.orderDetails['status'] == "Ready" ? "Order Picked Up"
                       : widget.orderDetails['status'] == "Completed" ? "Review Order"
                       : widget.orderDetails['status'] == "Completed and Reviewed" ? "Reorder"
+                      : widget.orderDetails['status'] == "Cancelled" ? "Reorder"
                       : "Error",
                   style: TextStyle(color: Colors.white),),
                 ),

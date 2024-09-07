@@ -3,6 +3,7 @@ import 'package:simple_animation_progress_bar/simple_animation_progress_bar.dart
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'dart:math';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SendingOrderPage extends StatefulWidget {
   final List cartList;
@@ -61,7 +62,7 @@ class _SendingOrderPageState extends State<SendingOrderPage> {
     int randomNumber = random.nextInt(1000000000) + 1;
 
     if (mounted) {
-      setState(() {
+      setState(() async {
         if (widget.paymentMethod == "E-Wallet") {
           deductWalletBalance(widget.cartTotal);
         }
@@ -72,8 +73,9 @@ class _SendingOrderPageState extends State<SendingOrderPage> {
 
         sendOrder(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal, randomNumber, widget.paymentMethod);
         createOrderHistory(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal, randomNumber, widget.paymentMethod, "Expense");
-        createPointHistory(widget.cartTotal, randomNumber);
         deleteWholeCart();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
         Navigator.pop(context);
         Navigator.pop(context);
       });
