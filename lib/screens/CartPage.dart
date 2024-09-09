@@ -138,7 +138,48 @@ class _CartPageState extends State<CartPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ReusableAppBar(title: "Cart",  backButton: true),
+              //usually use the reusable widget but i need to alter the appbar
+              SafeArea(
+              child: Column(
+              mainAxisSize: MainAxisSize.min,
+                children: [
+                  Stack(
+                    children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: IconButton(
+                            onPressed: () {
+                              //instead of pop use push to navigate to the navigation page
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationPage(currentIndex: 4,)));
+                            },
+                            icon: Icon(Icons.arrow_back_ios),
+                          ),
+                        ),
+                      Center(
+                        child: Text(
+                          "Cart",
+                          style: TextStyle(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.grey.withOpacity(0.5),
+                            width: 2.0,
+                          ),
+                        ),
+                      )
+                  )
+                ],
+              ),
+            ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Container(

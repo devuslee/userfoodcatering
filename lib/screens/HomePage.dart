@@ -11,6 +11,7 @@ import 'package:userfoodcatering/screens/WalletPage.dart';
 import 'package:intl/intl.dart';
 import '../class/menuClass.dart';
 import '../reusableWidgets/reusableColor.dart';
+import 'MoreOrderDetailsPage.dart';
 import 'PointPage.dart';
 import 'ReviewPage.dart';
 
@@ -61,6 +62,13 @@ class _HomePageState extends State<HomePage> {
       todayHistory = await returnOrderHistory(selectedDateTime);
 
 
+      for (var event in todayHistory) {
+        print(await convertOrderHistoryToMap(event.createdAt, event.desiredPickupTime, event.id, event.orderHistory, event.paymentMethod, event.specialRemarks, event.status, event.total, event.type).runtimeType);
+      }
+
+
+
+
       if (mounted) {
         setState(() {
           userDetails = tempUserDetails;
@@ -105,28 +113,9 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _incrementDate() {
-    setState(() {
-      selectedDate = selectedDate.add(Duration(days: 1));
-      selectedDateTime = selectedDate.toString().split(" ")[0];
-      setState(() {
-        fetchData();
-      });
-    });
-  }
-
-  void _decrementDate() {
-    setState(() {
-      selectedDate = selectedDate.subtract(Duration(days: 1));
-      selectedDateTime = selectedDate.toString().split(" ")[0];
-      setState(() {
-        fetchData();
-      });
-    });
-  }
-
   Future<Map<String, String>> _getImageUrls() async {
     Map<String, String> imageUrls = {};
+
 
 
     for (var i = 0; i < allMenuItems.length; i++) {
@@ -173,13 +162,13 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                Text(
-                                  name,
-                                  style: TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
+                                // Text(
+                                //   name,
+                                //   style: TextStyle(
+                                //     fontSize: 20.0,
+                                //     fontWeight: FontWeight.bold,
+                                //   ),
+                                // ),
                                 Expanded(
                                   child: CachedNetworkImage(
                                     imageUrl: url,
@@ -310,6 +299,7 @@ class _HomePageState extends State<HomePage> {
                             color: Colors.grey,
                           ),
                         ),
+                        SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                       ]
                     ),
 
@@ -317,187 +307,226 @@ class _HomePageState extends State<HomePage> {
                   if (todayHistory.isNotEmpty)
                     for (var history in todayHistory)
                       if (history.type == 'Expense')
-                        Column(
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 1,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.black,
-                                  width: 2.0,
-                                ),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                      width: MediaQuery.of(context).size.width * 1,
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey[200],
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(10),
-                                            topRight: Radius.circular(10),
-                                          )
 
+                          Column(
+                            children: [
+                              InkWell(
+                                onTap: () async {
+                                  Map<String, dynamic> TemporderDetails = await convertOrderHistoryToMap(
+                                      history.createdAt,
+                                      history.desiredPickupTime,
+                                      history.id,
+                                      history.orderHistory,
+                                      history.paymentMethod,
+                                      history.specialRemarks,
+                                      history.status,
+                                      history.total,
+                                      history.type
+                                  );
+
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MoreOrderDetailsPage(
+                                        orderDetails: TemporderDetails['${DateTime.now().toString().split(' ')[0]}'],
                                       ),
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "Pickup Order",
-                                            ),
-                                          ),
-                                        ],
-                                      )
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width * 1,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Colors.black,
+                                      width: 2.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Container(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text('Location: 5-G-1,Promenade, Jalan Mahsuri, 11900 Bayan Baru, Pulau Pinang'),
-                                                    Text('Pickup Time: ${HourFormatter(
-                                                        history.desiredPickupTime)
-                                                    }'
-                                                    ),
-                                                  ],
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                          width: MediaQuery.of(context).size.width * 1,
+                                          decoration: BoxDecoration(
+                                              color: Colors.grey[200],
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(10),
+                                                topRight: Radius.circular(10),
+                                              )
+
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  "Pickup Order",
                                                 ),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text("Total"),
-                                                    Text('RM${NumberFormat('##0.00').format(history.total)}'),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            Text('Pickup Date: ${DayMonthYearFormatter(history.desiredPickupTime)} (Today)'),
-                                            Text(history.specialRemarks == "" ? 'Special Remarks: None' : 'Special Remarks: ${history.specialRemarks}'),
-                                            Row(
+                                              ),
+                                            ],
+                                          )
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                            child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Text('Payment Method: ${history.paymentMethod}'),
-                                                Spacer(),
                                                 Row(
+                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                   children: [
-                                                    Text('Status: '),
-                                                    Container(
-                                                        decoration: BoxDecoration(
-                                                            color:
-                                                              history.status == 'Pending' ? darkYellow :
-                                                              history.status == "Cancelled" ? Colors.red :
-                                                              Colors.green,
-                                                            borderRadius: BorderRadius.circular(5)
+                                                    Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text('Location: 5-G-1,Promenade, Jalan Mahsuri, 11900 Bayan Baru, Pulau Pinang'),
+                                                        Text('Pickup Time: ${HourFormatter(
+                                                            history.desiredPickupTime)
+                                                        }'
                                                         ),
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.all(8.0),
-                                                          child: Text(
-                                                            history.status,
-                                                            style: TextStyle(
-                                                                color: Colors.white),
-                                                          ),
-                                                        )
+                                                      ],
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text("Total"),
+                                                        Text('RM${NumberFormat('##0.00').format(history.total)}'),
+                                                      ],
                                                     ),
                                                   ],
                                                 ),
-                                                ],
-                                            ),
-                                            Divider(color: Colors.grey[300],),
-                                            for (var order in history.orderHistory)
-                                              Column(
-                                                children: [
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                Text('Pickup Date: ${DayMonthYearFormatter(history.desiredPickupTime)} (Today)'),
+                                                Text(history.specialRemarks == "" ? 'Special Remarks: None' : 'Special Remarks: ${history.specialRemarks}'),
+                                                Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text('Payment Method: ${history.paymentMethod}'),
+                                                    Spacer(),
+                                                    Row(
+                                                      children: [
+                                                        Text('Status: '),
+                                                        Container(
+                                                            decoration: BoxDecoration(
+                                                                color:
+                                                                  history.status == 'Pending' ? darkYellow :
+                                                                  history.status == "Cancelled" ? Colors.red :
+                                                                  Colors.green,
+                                                                borderRadius: BorderRadius.circular(5)
+                                                            ),
+                                                            child: Padding(
+                                                              padding: const EdgeInsets.all(8.0),
+                                                              child: Text(
+                                                                history.status,
+                                                                style: TextStyle(
+                                                                    color: Colors.white),
+                                                              ),
+                                                            )
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    ],
+                                                ),
+                                                Divider(color: Colors.grey[300],),
+                                                for (var order in history.orderHistory)
+                                                  Column(
                                                     children: [
-                                                      Text(order['name']),
-                                                      Text(order['quantity'].toString()),
+                                                      Row(
+                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                        children: [
+                                                          Text(order['name']),
+                                                          Text(order['quantity'].toString()),
+                                                        ],
+                                                      ),
                                                     ],
                                                   ),
-                                                ],
-                                              ),
 
-                                            if (history.status == "Ready")
-                                              Column(
-                                                children: [
-                                                  Divider(color: Colors.grey[300],),
-                                                  Text("Yours order is ready! Please come and pick it up!"),
-                                                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                                                  ElevatedButton(
-                                                    child: Text("I have picked up my order"),
-                                                    onPressed: ()  {
-                                                      setState(() {
-                                                        updateHistoryStatus(history.id, "Completed");
-                                                        fetchData();
-                                                      });
+                                                if (history.status == "Ready")
+                                                  Column(
+                                                    children: [
+                                                      Divider(color: Colors.grey[300],),
+                                                      Text("Yours order is ready! Please come and pick it up!"),
+                                                      SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                                                      ElevatedButton(
+                                                        child: Text("I have picked up my order"),
+                                                        onPressed: ()  async {
+                                                          Map<String, dynamic> TemporderDetails = await convertOrderHistoryToMap(
+                                                              history.createdAt,
+                                                              history.desiredPickupTime,
+                                                              history.id,
+                                                              history.orderHistory,
+                                                              history.paymentMethod,
+                                                              history.specialRemarks,
+                                                              history.status,
+                                                              history.total,
+                                                              history.type
+                                                          );
 
-                                                      //bound to change when qr code is done
-
-                                                    },
-                                                    style: ElevatedButton.styleFrom(
-                                                      side: BorderSide(color: Colors.grey),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-
-                                            if (history.status == "Completed")
-                                              Column(
-                                                children: [
-                                                  Divider(color: Colors.grey[300],),
-                                                  Text("Thanks for ordering with us! Please leave a review!"),
-                                                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                                                  ElevatedButton(
-                                                    child: Text("Leave a Review"),
-                                                    onPressed: () async {
-                                                      bool isRefresh = await Navigator.push(
-                                                        context, MaterialPageRoute(
-                                                          builder: (context) => ReviewPage(
-                                                            orderHistory: history.orderHistory,
-                                                            id: history.id,
-                                                          )
+                                                          await Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) => MoreOrderDetailsPage(
+                                                                orderDetails: TemporderDetails['${DateTime.now().toString().split(' ')[0]}'],
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                          side: BorderSide(color: Colors.grey),
                                                         ),
-                                                      );
-
-                                                      if (isRefresh) {
-                                                        setState(() {
-                                                          fetchData();
-                                                        });
-                                                      }
-                                                    },
-                                                    style: ElevatedButton.styleFrom(
-                                                      side: BorderSide(color: Colors.grey),
                                                       ),
+                                                    ],
                                                   ),
-                                                ],
-                                              ),
 
-                                            if (history.status == "Completed and Reviewed")
-                                              Column(
-                                                children: [
-                                                  Divider(color: Colors.grey[300],),
-                                                  Text("Thanks for ordering with us!"),
-                                                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                                                ],
-                                              ),
-                                          ],
-                                        )
-                                    ),
+                                                if (history.status == "Completed")
+                                                  Column(
+                                                    children: [
+                                                      Divider(color: Colors.grey[300],),
+                                                      Text("Thanks for ordering with us! Please leave a review!"),
+                                                      SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                                                      ElevatedButton(
+                                                        child: Text("Leave a Review"),
+                                                        onPressed: () async {
+                                                          bool isRefresh = await Navigator.push(
+                                                            context, MaterialPageRoute(
+                                                              builder: (context) => ReviewPage(
+                                                                orderHistory: history.orderHistory,
+                                                                id: history.id,
+                                                              )
+                                                            ),
+                                                          );
+
+                                                          if (isRefresh) {
+                                                            setState(() {
+                                                              fetchData();
+                                                            });
+                                                          }
+                                                        },
+                                                        style: ElevatedButton.styleFrom(
+                                                          side: BorderSide(color: Colors.grey),
+                                                          ),
+                                                      ),
+                                                    ],
+                                                  ),
+
+                                                if (history.status == "Completed and Reviewed")
+                                                  Column(
+                                                    children: [
+                                                      Divider(color: Colors.grey[300],),
+                                                      Text("Thanks for ordering with us!"),
+                                                      SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                                                    ],
+                                                  ),
+                                              ],
+                                            )
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
-                            ),
-                            SizedBox(height: MediaQuery.of(context).size.height * 0.04),
-                          ],
-                        ),
+                              SizedBox(height: MediaQuery.of(context).size.height * 0.04),
+                            ],
+                          ),
+                  
                 ],
               ),
             ),

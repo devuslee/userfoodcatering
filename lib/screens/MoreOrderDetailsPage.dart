@@ -5,7 +5,9 @@ import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import '../reusableWidgets/reusableColor.dart';
 import '../reusableWidgets/reusableFunctions.dart';
+import 'CartPage.dart';
 import 'ReviewPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -35,6 +37,8 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
     super.initState();
     fetchData();
 
+    print(widget.orderDetails);
+
     FirebaseFirestore.instance
         .collection('qrCodes')
         .doc(uniqueIdentifier)
@@ -48,7 +52,10 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
 
   void fetchData() async {
     try {
+      print(widget.orderDetails.runtimeType);
       print(widget.orderDetails);
+
+      total = 0;
 
       for (var item in widget.orderDetails['orderHistory']) {
         total = total + item['total'];
@@ -68,6 +75,8 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
 
   Future<void> refreshData() async {
     try {
+      total = 0;
+
       widget.orderDetails = await getOrderDetails(widget.orderDetails['orderID'].toString());
 
       for (var item in widget.orderDetails['orderHistory']) {
@@ -97,14 +106,59 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
   void _onQrCodeScanned() {
     Navigator.pop(context);
 
-    Random random = Random();
-    int randomNumber = random.nextInt(1000000000) + 1;
     updateHistoryStatus(widget.orderDetails['orderID'], "Completed");
-    createPointHistory(widget.orderDetails['total'], randomNumber);
+    createPointHistory(widget.orderDetails['total'], widget.orderDetails['orderID']);
     refreshData();
 
-    SnackBar snackBar = SnackBar(content: Text("Order Completed"));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    _showCompletedDialog();
+  }
+
+  void _showCompletedDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Order Completed!"),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("You've been awarded $pointGained points!"),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+              Text("Please leave a review to gain more points!"),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                bool isRefresh = await Navigator.push(
+                  context, MaterialPageRoute(
+                    builder: (context) => ReviewPage(
+                      orderHistory: widget.orderDetails['orderHistory'],
+                      id: widget.orderDetails["orderID"],
+                    )
+                ),
+                );
+
+                if (isRefresh) {
+                  setState(() async {
+                    Navigator.pop(context);
+                    await refreshData();
+                  });
+                }
+              },
+              child: Text("Leave Review"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -226,6 +280,34 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text("Order Details", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.02, fontWeight: FontWeight.bold)),
+                    Text('Status: ', style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
+                    Container(
+                        decoration: BoxDecoration(
+                            color:
+                            widget.orderDetails['status'] == 'Pending' ? darkYellow :
+                            widget.orderDetails['status'] == "Cancelled" ? Colors.red :
+                            Colors.green,
+                            borderRadius: BorderRadius.circular(5)
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            widget.orderDetails['status'],
+                            style: TextStyle(
+                                color: Colors.white),
+                          ),
+                        )
+                    ),
+                    Divider(
+                      color: Colors.grey,
+                      thickness: 1,
+                    ),
+                    Text("Pickup Time: ", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
+                    Text('${DayMonthYearFormatter(widget.orderDetails['desiredPickupTime'])}, ${HourFormatter(widget.orderDetails['desiredPickupTime'])}', style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.black),),
+                    Divider(
+                      color: Colors.grey,
+                      thickness: 1,
+                    ),
                     Text("Pickup Location: ", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
                     Text('Location: 5-G-1, Promenade, Jalan Mahsuri, 11900 Bayan Baru, Pulau Pinang', style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.black),),
                     Divider(
@@ -292,7 +374,15 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                       color: Colors.grey,
                       thickness: 1,
                     ),
-                    Text("Payment Summary"),
+                    Text("Special Remarks: ", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
+                    Text(widget.orderDetails['specialRemarks'] == "" ?
+                    "No Remarks" :
+                    '${widget.orderDetails['specialRemarks']}', style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.black),),
+                    Divider(
+                      color: Colors.grey,
+                      thickness: 1,
+                    ),
+                    Text("Payment Summary", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.02, fontWeight: FontWeight.bold)),
                     Divider(
                       color: Colors.grey,
                       thickness: 1,
@@ -463,11 +553,11 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    Navigator.pop(context);
                                     await clearCart();
                                     for (var item in widget.orderDetails['orderHistory']) {
                                       addToCart(item['name'], item['price'], item['quantity'], item['total'], item['imageURL']);
                                     }
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
                                   },
                                   child: Text("Yes"),
                                 ),
@@ -493,11 +583,11 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                                 ),
                                 TextButton(
                                   onPressed: () async {
-                                    Navigator.pop(context);
                                     await clearCart();
                                     for (var item in widget.orderDetails['orderHistory']) {
                                       addToCart(item['name'], item['price'], item['quantity'], item['total'], item['imageURL']);
                                     }
+                                    Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
                                   },
                                   child: Text("Yes"),
                                 ),

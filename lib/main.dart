@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:userfoodcatering/reusableWidgets/reusableColor.dart';
 import 'package:userfoodcatering/screens/HomePage.dart';
 import 'package:userfoodcatering/screens/LoginPage.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -50,6 +51,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
+        scaffoldBackgroundColor: lightCyan,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),

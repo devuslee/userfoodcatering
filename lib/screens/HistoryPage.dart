@@ -3,6 +3,9 @@ import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:intl/intl.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 
+import '../reusableWidgets/reusableColor.dart';
+import 'MoreOrderDetailsPage.dart';
+
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
 
@@ -131,91 +134,143 @@ class _HistoryPageState extends State<HistoryPage> {
                     if (history.type == 'Expense')
                     Column(
                       children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.black,
-                              width: 2.0,
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                    width: MediaQuery.of(context).size.width * 0.81,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[200],
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        topRight: Radius.circular(10),
-                                      )
+                        InkWell(
+                          onTap: () async {
+                            Map<String, dynamic> TemporderDetails = await convertOrderHistoryToMap(
+                                history.createdAt,
+                                history.desiredPickupTime,
+                                history.id,
+                                history.orderHistory,
+                                history.paymentMethod,
+                                history.specialRemarks,
+                                history.status,
+                                history.total,
+                                history.type
+                            );
 
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            history.status == 'Pending' ? 'Order is on the way' : 'Order has been delivered',
-                                          ),
-                                        ),
-                                      ],
-                                    )
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MoreOrderDetailsPage(
+                                  orderDetails: TemporderDetails['${DateTime.now().toString().split(' ')[0]}'],
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.black,
+                                width: 2.0,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                      width: MediaQuery.of(context).size.width * 0.81,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[200],
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(10),
+                                          topRight: Radius.circular(10),
+                                        )
+
+                                      ),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text('ID: ${history.id}'),
-                                                  Text('Created at: ${TimestampFormatter(history.createdAt)}'),
-                                                ],
-                                              ),
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text("Total"),
-                                                  Text('RM${NumberFormat('##0.00').format(history.total)}'),
-                                                ],
-                                              ),
-                                            ],
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              history.status == 'Pending' ? 'Order is on the way' : 'Order has been delivered',
+                                            ),
                                           ),
-                                          Text('Picked up at: ${TimestampFormatter(
-                                              history.desiredPickupTime)
-                                            }'
-                                          ),
-                                          Text(history.specialRemarks == "" ? 'Special Remarks: None' : 'Special Remarks: ${history.specialRemarks}'),
-                                          Text('Payment Method: ${history.paymentMethod}'),
-                                          Divider(
-                                            color: Colors.grey[300],
-                                          ),
-                                          for (var order in history.orderHistory)
-                                            Column(
+                                        ],
+                                      )
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    Text(order['name']),
-                                                    Text(order['quantity'].toString()),
+                                                    Text('ID: ${history.id}'),
+                                                    Text('Created at: ${TimestampFormatter(history.createdAt)}'),
+                                                  ],
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text("Total"),
+                                                    Text('RM${NumberFormat('##0.00').format(history.total)}'),
                                                   ],
                                                 ),
                                               ],
                                             ),
-                                        ],
-                                      )
+                                            Text('Picked up at: ${TimestampFormatter(
+                                                history.desiredPickupTime)
+                                              }'
+                                            ),
+                                            Text(history.specialRemarks == "" ? 'Special Remarks: None' : 'Special Remarks: ${history.specialRemarks}'),
+                                            Row(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text('Payment Method: ${history.paymentMethod}'),
+                                                Spacer(),
+                                                Row(
+                                                  children: [
+                                                    Text('Status: '),
+                                                    Container(
+                                                        decoration: BoxDecoration(
+                                                            color:
+                                                            history.status == 'Pending' ? darkYellow :
+                                                            history.status == "Cancelled" ? Colors.red :
+                                                            Colors.green,
+                                                            borderRadius: BorderRadius.circular(5)
+                                                        ),
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Text(
+                                                            history.status,
+                                                            style: TextStyle(
+                                                                color: Colors.white),
+                                                          ),
+                                                        )
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            Divider(
+                                              color: Colors.grey[300],
+                                            ),
+                                            for (var order in history.orderHistory)
+                                              Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text(order['name']),
+                                                      Text(order['quantity'].toString()),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                          ],
+                                        )
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                          ),
                         ),
                         SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                       ],
@@ -232,90 +287,142 @@ class _HistoryPageState extends State<HistoryPage> {
                     if (history.type == 'Expense')
                       Column(
                         children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.black,
-                                width: 2.0,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                    width: MediaQuery.of(context).size.width * 0.81,
-                                    decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          topRight: Radius.circular(10),
-                                        )
+                          InkWell(
+                            onTap: () async {
+                              Map<String, dynamic> TemporderDetails = await convertOrderHistoryToMap(
+                                  history.createdAt,
+                                  history.desiredPickupTime,
+                                  history.id,
+                                  history.orderHistory,
+                                  history.paymentMethod,
+                                  history.specialRemarks,
+                                  history.status,
+                                  history.total,
+                                  history.type
+                              );
 
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            history.status == 'Pending' ? 'Order is on the way' : 'Order has been delivered',
-                                          ),
-                                        ),
-                                      ],
-                                    )
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MoreOrderDetailsPage(
+                                    orderDetails: TemporderDetails['${DateTime.now().toString().split(' ')[0]}'],
+                                  ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
+                              );
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.8,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 2.0,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                      width: MediaQuery.of(context).size.width * 0.81,
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10),
+                                          )
+
+                                      ),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text('ID: ${history.id}'),
-                                                  Text('Created at: ${TimestampFormatter(history.createdAt)}'),
-                                                ],
-                                              ),
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text("Total"),
-                                                  Text('RM${NumberFormat('##0.00').format(history.total)}'),
-                                                ],
-                                              ),
-                                            ],
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              history.status == 'Pending' ? 'Order is on the way' : 'Order has been delivered',
+                                            ),
                                           ),
-                                          Text('Picked up at: ${TimestampFormatter(
-                                              history.desiredPickupTime)
-                                          }'
-                                          ),
-                                          Text(history.specialRemarks == "" ? 'Special Remarks: None' : 'Special Remarks: ${history.specialRemarks}'),
-                                          Text('Payment Method: ${history.paymentMethod}'),
-                                          Divider(
-                                            color: Colors.grey[300],
-                                          ),
-                                          for (var order in history.orderHistory)
-                                            Column(
+                                        ],
+                                      )
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    Text(order['name']),
-                                                    Text(order['quantity'].toString()),
+                                                    Text('ID: ${history.id}'),
+                                                    Text('Created at: ${TimestampFormatter(history.createdAt)}'),
+                                                  ],
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text("Total"),
+                                                    Text('RM${NumberFormat('##0.00').format(history.total)}'),
                                                   ],
                                                 ),
                                               ],
                                             ),
-                                        ],
-                                      )
+                                            Text('Picked up at: ${TimestampFormatter(
+                                                history.desiredPickupTime)
+                                            }'
+                                            ),
+                                            Text(history.specialRemarks == "" ? 'Special Remarks: None' : 'Special Remarks: ${history.specialRemarks}'),
+                                            Row(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text('Payment Method: ${history.paymentMethod}'),
+                                                Spacer(),
+                                                Row(
+                                                  children: [
+                                                    Text('Status: '),
+                                                    Container(
+                                                        decoration: BoxDecoration(
+                                                            color:
+                                                            history.status == 'Pending' ? darkYellow :
+                                                            history.status == "Cancelled" ? Colors.red :
+                                                            Colors.green,
+                                                            borderRadius: BorderRadius.circular(5)
+                                                        ),
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Text(
+                                                            history.status,
+                                                            style: TextStyle(
+                                                                color: Colors.white),
+                                                          ),
+                                                        )
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            Divider(
+                                              color: Colors.grey[300],
+                                            ),
+                                            for (var order in history.orderHistory)
+                                              Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text(order['name']),
+                                                      Text(order['quantity'].toString()),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                          ],
+                                        )
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
@@ -333,90 +440,142 @@ class _HistoryPageState extends State<HistoryPage> {
                     if (history.type == 'Expense')
                       Column(
                         children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.black,
-                                width: 2.0,
-                              ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                    width: MediaQuery.of(context).size.width * 0.81,
-                                    decoration: BoxDecoration(
-                                        color: Colors.grey[200],
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          topRight: Radius.circular(10),
-                                        )
+                          InkWell(
+                            onTap: () async {
+                              Map<String, dynamic> TemporderDetails = await convertOrderHistoryToMap(
+                                  history.createdAt,
+                                  history.desiredPickupTime,
+                                  history.id,
+                                  history.orderHistory,
+                                  history.paymentMethod,
+                                  history.specialRemarks,
+                                  history.status,
+                                  history.total,
+                                  history.type
+                              );
 
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            history.status == 'Pending' ? 'Order is on the way' : 'Order has been delivered',
-                                          ),
-                                        ),
-                                      ],
-                                    )
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => MoreOrderDetailsPage(
+                                    orderDetails: TemporderDetails['${DateTime.now().toString().split(' ')[0]}'],
+                                  ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
+                              );
+                            },
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.8,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 2.0,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                      width: MediaQuery.of(context).size.width * 0.81,
+                                      decoration: BoxDecoration(
+                                          color: Colors.grey[200],
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            topRight: Radius.circular(10),
+                                          )
+
+                                      ),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text('ID: ${history.id}'),
-                                                  Text('Created at: ${TimestampFormatter(history.createdAt)}'),
-                                                ],
-                                              ),
-                                              Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text("Total"),
-                                                  Text('RM${NumberFormat('##0.00').format(history.total)}'),
-                                                ],
-                                              ),
-                                            ],
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              history.status == 'Pending' ? 'Order is on the way' : 'Order has been delivered',
+                                            ),
                                           ),
-                                          Text('Picked up at: ${TimestampFormatter(
-                                              history.desiredPickupTime)
-                                          }'
-                                          ),
-                                          Text(history.specialRemarks == "" ? 'Special Remarks: None' : 'Special Remarks: ${history.specialRemarks}'),
-                                          Text('Payment Method: ${history.paymentMethod}'),
-                                          Divider(
-                                            color: Colors.grey[300],
-                                          ),
-                                          for (var order in history.orderHistory)
-                                            Column(
+                                        ],
+                                      )
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Container(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                               children: [
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
-                                                    Text(order['name']),
-                                                    Text(order['quantity'].toString()),
+                                                    Text('ID: ${history.id}'),
+                                                    Text('Created at: ${TimestampFormatter(history.createdAt)}'),
+                                                  ],
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text("Total"),
+                                                    Text('RM${NumberFormat('##0.00').format(history.total)}'),
                                                   ],
                                                 ),
                                               ],
                                             ),
-                                        ],
-                                      )
+                                            Text('Picked up at: ${TimestampFormatter(
+                                                history.desiredPickupTime)
+                                            }'
+                                            ),
+                                            Text(history.specialRemarks == "" ? 'Special Remarks: None' : 'Special Remarks: ${history.specialRemarks}'),
+                                            Row(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Text('Payment Method: ${history.paymentMethod}'),
+                                                Spacer(),
+                                                Row(
+                                                  children: [
+                                                    Text('Status: '),
+                                                    Container(
+                                                        decoration: BoxDecoration(
+                                                            color:
+                                                            history.status == 'Pending' ? darkYellow :
+                                                            history.status == "Cancelled" ? Colors.red :
+                                                            Colors.green,
+                                                            borderRadius: BorderRadius.circular(5)
+                                                        ),
+                                                        child: Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: Text(
+                                                            history.status,
+                                                            style: TextStyle(
+                                                                color: Colors.white),
+                                                          ),
+                                                        )
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            Divider(
+                                              color: Colors.grey[300],
+                                            ),
+                                            for (var order in history.orderHistory)
+                                              Column(
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text(order['name']),
+                                                      Text(order['quantity'].toString()),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                          ],
+                                        )
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),

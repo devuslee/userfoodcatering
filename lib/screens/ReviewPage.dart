@@ -1,4 +1,6 @@
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
@@ -59,6 +61,13 @@ class _ReviewPageState extends State<ReviewPage> {
         child: Column(
           children: [
             ReusableAppBar(title: "Review", backButton: true),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.01,),
+            Text("Please rate and leave a comment for each item in your order",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
@@ -153,10 +162,40 @@ class _ReviewPageState extends State<ReviewPage> {
             SizedBox(height: MediaQuery.of(context).size.height * 0.01,),
             ElevatedButton(
               onPressed: () async {
+
                 _showLoadingDialog();
+
                 await createReview(widget.orderHistory, widget.id);
+
                 Navigator.pop(context);
-                Navigator.pop(context,true);
+
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text("Review Submitted"),
+                      content: Text("Thank you for your review! You have been awarded 10 points."),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Random random = Random();
+                            int uniqueID = random.nextInt(100000000);
+
+                            // Award points
+                            createReviewPointHistory(10, uniqueID);
+
+                            // Close the success dialog
+                            Navigator.pop(context);
+                          },
+                          child: Text("Close"),
+                        ),
+                      ],
+                    );
+                  },
+                ).then((_) {
+                  // After dialog is closed, pop the parent page with true to indicate success
+                  Navigator.pop(context, true);
+                });
               },
               child: Text("Submit Review"),
             ),

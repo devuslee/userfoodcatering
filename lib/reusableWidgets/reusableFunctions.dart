@@ -1,4 +1,6 @@
 
+import 'dart:js';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -313,6 +315,26 @@ Future<int> getCartQuantity() async {
   }
 }
 
+Future<double> getCartTotal() async {
+  final cartCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('cart');
+
+  double? total = 0;
+
+  try {
+    final cartCollectionSnapshot = await cartCollectionRef.get();
+    cartCollectionSnapshot.docs.forEach((doc) {
+      total = doc.get('total') + total!;
+    });
+    return total!;
+  } catch (error) {
+    print('Error fetching cart quantity: $error');
+    return 0;
+  }
+}
+
 Future<List> getUserCart() async{
   final cartCollectionRef = FirebaseFirestore.instance
       .collection('users')
@@ -498,6 +520,31 @@ Future<void> createPointHistory(double total, int uniqueID) async {
   });
 }
 
+Future<void> createReviewPointHistory(double total, int uniqueID) async {
+  final pointCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('points')
+      .doc(uniqueID.toString());
+
+  double points = 0;
+
+  points = total * 1;
+
+  //THIS POINT SYSTEM CURRENTLY DOES NOT AWARD PLAYER EXCESS POINTS REGARDLESS OF THE RANK UP
+  //FUTURE NOTE: MAYBE ADD A FUNCTION TO AWARD EXCESS POINTS TO THE USER
+  updateUserPoints(points);
+  updateRank(points);
+
+
+  pointCollectionRef.set({
+    'id': uniqueID,
+    'createdAt': DateTime.now().toString(),
+    'points': points,
+    'type' : 'Income',
+  });
+}
+
 void updateUserPoints(double points) {
   final userRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
   userRef.get().then((value) {
@@ -593,6 +640,8 @@ Future<List> returnAllPointHistory() async{
       ));
     });
 
+    pointList.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
 
     return pointList.reversed.toList();
   } catch (error) {
@@ -671,12 +720,26 @@ Future<List> returnActiveOrderHistory() async{
           type: doc.get('type'),
         ));
       }
+
+      if (doc.get('status') == 'Ready') {
+        orderList.add((
+        id: doc.get('id'),
+        orderHistory: doc.get('orderHistory'),
+        status: doc.get('status'),
+        createdAt: doc.get('createdAt'),
+        specialRemarks: doc.get('specialRemarks'),
+        desiredPickupTime: doc.get('desiredPickupTime'),
+        total: doc.get('total'),
+        paymentMethod: doc.get('paymentMethod'),
+        type: doc.get('type'),
+        ));
+      }
     });
 
     //sort from latest to oldest
     orderList.sort((a, b) => a.desiredPickupTime.compareTo(b.desiredPickupTime));
 
-    return orderList.reversed.toList();
+    return orderList.toList();
   } catch (error) {
     print('Error fetching order history: $error');
     return [];
@@ -693,7 +756,21 @@ Future<List> returnPastOrderHistory() async{
     final orderCollectionSnapshot = await orderCollectionRef.get();
     List orderList = [];
     orderCollectionSnapshot.docs.forEach((doc) {
-      if (doc.get('status') != 'Pending') {
+      if (doc.get('status') == 'Completed and Reviewed') {
+        orderList.add((
+        id: doc.get('id'),
+        orderHistory: doc.get('orderHistory'),
+        status: doc.get('status'),
+        createdAt: doc.get('createdAt'),
+        specialRemarks: doc.get('specialRemarks'),
+        desiredPickupTime: doc.get('desiredPickupTime'),
+        total: doc.get('total'),
+        paymentMethod: doc.get('paymentMethod'),
+        type: doc.get('type'),
+        ));
+      }
+
+      if (doc.get('status') == 'Completed') {
         orderList.add((
         id: doc.get('id'),
         orderHistory: doc.get('orderHistory'),
@@ -732,7 +809,7 @@ Future<List> returnOrderHistory(String selectedTime) async{
     List orderList = [];
     orderCollectionSnapshot.docs.forEach((doc) {
       if (doc.get('type') == 'Expense') {
-        if (DateTime.parse(doc.get('desiredPickupTime')).day == DateTime.parse(selectedTime).day) {
+        if (DateTime.parse(doc.get('desiredPickupTime')).toString().split(' ')[0] == DateTime.parse(selectedTime).toString().split(' ')[0]) {
           orderList.add((
           id: doc.get('id'),
           orderHistory: doc.get('orderHistory'),
@@ -756,6 +833,28 @@ Future<List> returnOrderHistory(String selectedTime) async{
     return [];
   }
 }
+
+Future<Map<String, dynamic>> convertOrderHistoryToMap(String createdAt, String desiredPickupTime, int id, List<dynamic> orderHistory, String paymentMethod, String specialRemarks, String status, double total, String type) async {
+  Map<String, dynamic> orderHistoryMap = {};
+
+
+
+    orderHistoryMap[DateTime.now().toString().split(' ')[0]] = {
+      'createdAt': createdAt,
+      'desiredPickupTime': desiredPickupTime,
+      'orderID': id,
+      'orderHistory': orderHistory,
+      'paymentMethod': paymentMethod,
+      'specialRemarks': specialRemarks,
+      'status': status,
+      'total': total,
+      'type': type,
+    };
+
+
+  return orderHistoryMap;
+}
+
 
 void TopupUserWallet(double amount) {
   final userDocumentRef = FirebaseFirestore.instance
@@ -1059,7 +1158,19 @@ Future<void> createReview(List<dynamic> orderHistory, int id) async {
       }
     }
 
-    List<dynamic> sentiment = await analyzeComment(history['comment']);
+    String comment = history['comment']?.trim() ?? '';
+    List<dynamic> sentiment;
+    if (comment.isEmpty) {
+      // Set sentiment to None if comment is empty
+      sentiment = [
+        {'label': 'positive', 'score': 0.0},
+        {'label': 'neutral', 'score': 0.0},
+        {'label': 'negative', 'score': 0.0},
+      ];
+      comment = "None"; // Use "None" if there's no comment
+    } else {
+      sentiment = await analyzeComment(comment);
+    }
 
     // Add review to the reviews collection
     await reviewCollectionRef.doc(id.toString()).set({
@@ -1208,6 +1319,45 @@ Future<Map<DateTime, List<Map<String,dynamic>>>> getCalendarData() async {
           'total': doc.get('total'),
           'type': doc.get('type'),
         });
+      }
+    });
+  });
+
+  return calendarData;
+}
+
+Future<Map<DateTime, List<Map<String,dynamic>>>> getTodayCalendarData() async {
+  Map<DateTime, List<Map<String, dynamic>>> calendarData = {};
+
+  final calendarDataRef = await FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('history');
+
+  await calendarDataRef.get().then((value) {
+    value.docs.forEach((doc) {
+      String type = doc.get('type');
+      if (type == 'Expense') {
+        String desiredPickupTime = doc.get('desiredPickupTime');
+        DateTime dateTime = DateTime.parse(desiredPickupTime);
+        DateTime date = DateTime(dateTime.year, dateTime.month, dateTime.day);
+
+        if (date == DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day))
+          if (calendarData[date] == null) {
+            calendarData[date] = [];
+          }
+
+          calendarData[date]!.add({
+            'createdAt': doc.get('createdAt'),
+            'desiredPickupTime': doc.get('desiredPickupTime'),
+            'orderID': doc.get('id'),
+            'orderHistory': doc.get('orderHistory'),
+            'paymentMethod': doc.get('paymentMethod'),
+            'specialRemarks': doc.get('specialRemarks'),
+            'status': doc.get('status'),
+            'total': doc.get('total'),
+            'type': doc.get('type'),
+          });
       }
     });
   });

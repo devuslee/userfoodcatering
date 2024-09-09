@@ -177,16 +177,6 @@ class ReusableAppBar extends StatelessWidget {
                   ),
               ],
             ),
-            Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(
-                    color: Colors.grey.withOpacity(0.5),
-                    width: 2.0,
-                  ),
-                ),
-              )
-            )
           ],
         ),
     );
