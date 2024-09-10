@@ -412,7 +412,6 @@ class _RankPageState extends State<RankPage> {
                                 Divider(
                                   color: Colors.grey[500],
                                 ),
-                                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                                 Container(
                                     child: Row(
                                       children: [

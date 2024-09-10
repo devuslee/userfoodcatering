@@ -138,8 +138,6 @@ class _NavigationPageState extends State<NavigationPage> {
         activeIndex: currentPageIndex,
         gapLocation: GapLocation.center,
         notchSmoothness: NotchSmoothness.defaultEdge,
-        leftCornerRadius: 32,
-        rightCornerRadius: 32,
         onTap: (index) => setState(() => currentPageIndex = index),
       ),
     );

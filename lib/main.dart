@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableColor.dart';
+import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/screens/HomePage.dart';
 import 'package:userfoodcatering/screens/LoginPage.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -25,6 +26,7 @@ void main() async {
   );
 
   NotificationService().initNotification();
+  initNotifications();
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Asia/Kuala_Lumpur'));
 
@@ -51,7 +53,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        scaffoldBackgroundColor: lightCyan,
+        scaffoldBackgroundColor: backGroundColor,
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),

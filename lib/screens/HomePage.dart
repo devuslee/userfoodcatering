@@ -73,7 +73,8 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           userDetails = tempUserDetails;
           balance = userDetails['balance']!;
-          points = userDetails['points']!;
+          points = (double.parse(userDetails['points']!).toStringAsFixed(2)).toString();
+
           rank = userDetails['rank']!;
 
 
@@ -207,8 +208,6 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                   Container(
-                        margin: EdgeInsets.all(8.0),
-                        padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8.0), // Adjust padding as needed
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey), // Add border
                           borderRadius: BorderRadius.circular(8.0), // Add border radius for rounded corners
@@ -265,28 +264,31 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         "Heres the orders you have for today",
                         style: TextStyle(
-                          fontSize: 20.0,
+                          fontSize: MediaQuery.of(context).size.width * 0.03,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Spacer(),
-                      ElevatedButton(onPressed: () async {
-                        bool isRefresh = await Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => CalendarPage())
-                        );
+                      IconButton(
+                        icon: Icon(Icons.calendar_today_outlined),
+                        onPressed: () {
+                          setState(() async {
+                            bool isRefresh = await Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => CalendarPage())
+                            );
 
-                        if (isRefresh) {
-                          setState(() {
-                            fetchData();
+                            if (isRefresh) {
+                              setState(() {
+                                fetchData();
+                              });
+                            }
                           });
-                        }
-                      }, child: Text("View Calendar")),
+                        },
+                      )
                     ],
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-
-
 
                   if (todayHistory.isEmpty)
                     Column(
@@ -307,7 +309,6 @@ class _HomePageState extends State<HomePage> {
                   if (todayHistory.isNotEmpty)
                     for (var history in todayHistory)
                       if (history.type == 'Expense')
-
                           Column(
                             children: [
                               InkWell(
@@ -336,6 +337,7 @@ class _HomePageState extends State<HomePage> {
                                 child: Container(
                                   width: MediaQuery.of(context).size.width * 1,
                                   decoration: BoxDecoration(
+                                    color: lightPeach,
                                     border: Border.all(
                                       color: Colors.black,
                                       width: 2.0,
@@ -348,7 +350,7 @@ class _HomePageState extends State<HomePage> {
                                       Container(
                                           width: MediaQuery.of(context).size.width * 1,
                                           decoration: BoxDecoration(
-                                              color: Colors.grey[200],
+                                              color: darkPeach,
                                               borderRadius: BorderRadius.only(
                                                 topLeft: Radius.circular(10),
                                                 topRight: Radius.circular(10),
@@ -367,7 +369,7 @@ class _HomePageState extends State<HomePage> {
                                           )
                                       ),
                                       Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: EdgeInsets.all(MediaQuery.of(context).size.height * 0.01),
                                         child: Container(
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,7 +380,7 @@ class _HomePageState extends State<HomePage> {
                                                     Column(
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
-                                                        Text('Location: 5-G-1,Promenade, Jalan Mahsuri, 11900 Bayan Baru, Pulau Pinang'),
+                                                        Text('Location: 5-G-1,Promenade'),
                                                         Text('Pickup Time: ${HourFormatter(
                                                             history.desiredPickupTime)
                                                         }'

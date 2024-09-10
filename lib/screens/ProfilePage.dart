@@ -10,6 +10,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:userfoodcatering/screens/WalletPage.dart';
 import 'EditProfilePage.dart';
 import 'LoginPage.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -46,7 +47,7 @@ class _ProfilePageState extends State<ProfilePage> {
         setState(() {
           userDetails = tempuserDetails;
           balance = userDetails['balance']!;
-          points = userDetails['points']!;
+          points = (double.parse(userDetails['points']!).toStringAsFixed(2)).toString();
           rank = userDetails['rank']!;
           username = userDetails['username']!;
           profileURL = userDetails['profileURL']!;
@@ -262,7 +263,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           }
                         },
                     ),
-                    ReuseableSettingContainer(title: "Delete Account", icon: Icons.delete, onTap: () {}),
+                    ReuseableSettingContainer(title: "Delete Account", icon: Icons.delete, onTap: () {
+
+                    }),
                     ReuseableSettingContainer(
                         title: "Logout",
                         icon: Icons.logout,

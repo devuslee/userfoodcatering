@@ -63,7 +63,7 @@ class _RedeemPointPageState extends State<RedeemPointPage> {
       if (mounted)
         setState(() {
           checkinCounter = tempcheckinCounter;
-          points = tempPoints;
+          points = (double.parse(tempPoints!).toStringAsFixed(2)).toString();
           discountID = tempdiscountID;
           isCheckin = tempIsCheckin;
           rank = tempRank;

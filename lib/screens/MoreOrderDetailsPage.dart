@@ -437,7 +437,7 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
         ),
       ),
       bottomNavigationBar: widget.orderDetails['status'] == "Pending" &&
-          DateTime.parse(widget.orderDetails['desiredPickupTime']).compareTo(DateTime.now()) < 0
+          DateTime.parse(widget.orderDetails['desiredPickupTime']).compareTo(DateTime.now().add(Duration(days: 1))) < 0
           ? null
           : BottomAppBar(
         height: MediaQuery.of(context).size.height * 0.12,

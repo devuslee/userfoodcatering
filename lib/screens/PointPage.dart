@@ -34,7 +34,7 @@ class _PointPageState extends State<PointPage> {
 
       setState(() {
         userDetails = tempuserDetails;
-        points = userDetails['points']!;
+        points = (double.parse(userDetails['points']!).toStringAsFixed(2)).toString();
       });
 
     } catch (error) {

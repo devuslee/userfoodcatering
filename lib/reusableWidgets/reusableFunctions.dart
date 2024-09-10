@@ -1,6 +1,3 @@
-
-import 'dart:js';
-
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,6 +13,12 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:huggingface_dart/huggingface_dart.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 HfInference hfInference = HfInference('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');
 
@@ -24,7 +27,110 @@ String? currentUser = FirebaseAuth.instance.currentUser!.uid;
 final FirebaseStorage _storage = FirebaseStorage.instance;
 final _firebaseMessaging = FirebaseMessaging.instance;
 
+// Future<void> sendNotification(String title, String body, String fcmToken) async {
+//   final String serverKey = '831398945187';
+//   final url = 'https://fcm.googleapis.com/fcm/send';
+//
+//   final headers = {
+//     'Content-Type': 'application/json',
+//     'Authorization': 'key=$serverKey',
+//   };
+//
+//   final payload = {
+//     'to': "e6_tACIaQWCxnmgSceWifj:APA91bFG92N06gwkaaYsuu-jOoihYkwUeTJgY_iEtkGDpOvUGbQqcbQaCxRa650f5uyjhG4g3av05UTwYuPkq6gTDmoH6cFURmmldbrVozSYuyxgDq3f5gfbwcg-4NtT3bbDlZhJhz4m", // The FCM token of the device to receive the notification
+//     'notification': {
+//       'title': title,
+//       'body': body,
+//       'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+//     },
+//   };
+//
+//   final response = await http.post(
+//     Uri.parse(url),
+//     headers: headers,
+//     body: json.encode(payload),
+//   );
+//
+//   if (response.statusCode == 200) {
+//     print('Notification sent successfully.');
+//   } else {
+//     print('Failed to send notification: ${response.body}');
+//   }
+// }
 
+Future<void> sendNotification(String title, String body, String fcmToken) async {
+  final url = 'https://fcm.googleapis.com/v1/projects/foodcatering-6bb02/messages:send';
+  final accessToken = "ya29.c.c0ASRK0GaVhww5A329efOIqOziCyv6zKpYdtlIOBoCdNjJxGsZjvDjy0cEMzEwkn0TaqlXrAxm1mBbXb1JYCrpe5gsLtTgMxAQS-AvocCZqfV0ZPX6Qrb7glgZSObYJm8fOIi-ogw9ptC8dPAKyPqSV0iPEHI9muLuUn99vkFtgReXLLRGxnyJZZF20Agoh-o8CFC9d_kZ3yS2PFwIVciBCf6ii9M-d9lqxf6NdSVLffmZ2Ug2j8wlW2wHAdwSqy8nSaNcQRMEX8gUdX7dlSNrFe_8gjLjE1H_IAPIuzxkbrPQNl6pSgj8VBYlgMgsooc6MjkLS5sQhr-_nZMIfQU-QFPvhuZM99ipZpQ2VqzSw2fTpV2fuwcsJTwL384KweFplr_zipwyglz0ehb243J3mz2MokeyRRsM1Zy0Jdv5rJa5g05o9c0Mb4kwRfdkwzsO5hlhhS-z0-Ra4w6tFafvdYs6U9bnXWpSXVaWYSyVsW973-OO3hi77S2JOy8_aO8eSa0UYSI_ZXozjfoWlYg2j4xuYwweydptk5w6htezj2oBWpr3Xe0S_i5tbJfWQn7sFUrSWYjkutrVBxRF8aOWdmMXjybO7-jxFooO9YsxjlwuxiUl9lw0YbJ9buy7Z5wg99da09si-w44eI81ityVaSb6bFI7UshWwolg2p1XiIOmRXSOUJSg3guy9V390MSZeBJzBaezniqdFM0xyYk2pBefrj7olqj_X8vWj69ir-nord2Ute4s40lg1FXgvJxds1iIfV3nIm4o2b5heStf-FvtWOe1WxxjB5ZxIXWX2IaMwRvSIuqOh65qgrYFu14s8eb_fOxd5woRd3f_5IapaMMeUQlXV_m14fta6iguSR9whoiOqIkMYY5vkYofJ68o2XWgk0eBW0jnkwwpflqfROpnij28fgMJq4kyvZbckvF5QcRr4ai8cQlx9nxtot16clsIyZbxS0ROYu9dW6sBSuVkybvmfs9RgFjV2t4oQxVvmhxBU5p8wO7";
+
+  final headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer $accessToken', // Use OAuth 2.0 token
+  };
+
+  final payload = {
+    'message': {
+      'token': "e6_tACIaQWCxnmgSceWifj:APA91bFG92N06gwkaaYsuu-jOoihYkwUeTJgY_iEtkGDpOvUGbQqcbQaCxRa650f5uyjhG4g3av05UTwYuPkq6gTDmoH6cFURmmldbrVozSYuyxgDq3f5gfbwcg-4NtT3bbDlZhJhz4m",
+      'notification': {
+        'title': title,
+        'body': body,
+      },
+      'android': {
+        'notification': {
+          'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+        },
+      },
+    },
+  };
+
+  final response = await http.post(
+    Uri.parse(url),
+    headers: headers,
+    body: json.encode(payload),
+  );
+
+  if (response.statusCode == 200) {
+    print('Notification sent successfully.');
+  } else {
+    print('Failed to send notification: ${response.body}');
+  }
+}
+
+Future<void> initNotifications() async {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+
+  const InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+}
+
+Future<void> scheduleNotification(tz.TZDateTime scheduledTime) async {
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+  AndroidNotificationDetails('your_channel_id', 'your_channel_name',
+      channelDescription: 'your_channel_description',
+      importance: Importance.max,
+      priority: Priority.high,
+      showWhen: false);
+
+  const NotificationDetails platformChannelSpecifics =
+  NotificationDetails(android: androidPlatformChannelSpecifics);
+
+  await flutterLocalNotificationsPlugin.zonedSchedule(
+    0,
+    'Scheduled Notification',
+    'This is the scheduled notification body',
+    scheduledTime,  // DateTime when the notification should be fired
+    platformChannelSpecifics,
+    androidAllowWhileIdle: true,
+    uiLocalNotificationDateInterpretation:
+    UILocalNotificationDateInterpretation.absoluteTime,
+    matchDateTimeComponents: DateTimeComponents.time,  // Can use time to trigger daily or weekly notifications
+  ).then((value) =>
+    print('Notification scheduled successfully')
+  );
+}
 
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
   print('Title: ${message.notification?.title}');
@@ -1080,8 +1186,8 @@ void createDiscount(String points, String discount, DateTime validuntil, String 
 
   //deduct points
   userCollectionRef.get().then((value) {
-    int userPoints = value.get('points');
-    userPoints = userPoints - int.parse(points);
+    double userPoints = value.get('points');
+    userPoints = userPoints - double.parse(points);
     userCollectionRef.update({'points': userPoints});
   });
 

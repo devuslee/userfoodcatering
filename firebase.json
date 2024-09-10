@@ -1,1 +1,38 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"foodcatering-6bb02","appId":"1:831398945187:android:a3290e4a59ea933d9b3a16","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"foodcatering-6bb02","configurations":{"android":"1:831398945187:android:a3290e4a59ea933d9b3a16","ios":"1:831398945187:ios:f4cf39d593a8d38a9b3a16"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "foodcatering-6bb02",
+          "appId": "1:831398945187:android:a3290e4a59ea933d9b3a16",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "foodcatering-6bb02",
+          "configurations": {
+            "android": "1:831398945187:android:a3290e4a59ea933d9b3a16",
+            "ios": "1:831398945187:ios:f4cf39d593a8d38a9b3a16"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint"
+      ]
+    }
+  ]
+}

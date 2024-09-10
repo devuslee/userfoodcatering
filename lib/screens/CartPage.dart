@@ -8,6 +8,7 @@ import 'package:userfoodcatering/class/menuClass.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../reusableWidgets/reusableColor.dart';
 import 'SendingOrderPage.dart';
 
 class CartPage extends StatefulWidget {
@@ -36,8 +37,10 @@ class _CartPageState extends State<CartPage> {
   String _selectedTime = '10:00 AM';
   List _cartItems = [];
   double cartQuantity = 0;
+
   double cartTotal = 0;
   double discountedcartTotal = 0;
+
   bool discounted = false;
   String discountID = '';
   String discountAmount = "0";
@@ -167,16 +170,6 @@ class _CartPageState extends State<CartPage> {
                       ),
                     ],
                   ),
-                  Container(
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.grey.withOpacity(0.5),
-                            width: 2.0,
-                          ),
-                        ),
-                      )
-                  )
                 ],
               ),
             ),
@@ -446,7 +439,7 @@ class _CartPageState extends State<CartPage> {
                     Container(
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: lightCyan,
                         border: Border(
                           top: BorderSide(
                             color: Colors.grey,
@@ -494,7 +487,7 @@ class _CartPageState extends State<CartPage> {
                     Container(
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: lightCyan,
                         border: Border(
                           top: BorderSide(
                             color: Colors.grey,
@@ -593,7 +586,7 @@ class _CartPageState extends State<CartPage> {
                     Container(
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: lightCyan,
                         border: Border(
                           top: BorderSide(
                             color: Colors.grey,
@@ -635,7 +628,7 @@ class _CartPageState extends State<CartPage> {
                     Container(
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: lightCyan,
                         border: Border(
                           top: BorderSide(
                             color: Colors.grey,
@@ -683,7 +676,7 @@ class _CartPageState extends State<CartPage> {
                     Container(
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: lightCyan,
                         border: Border(
                           top: BorderSide(
                             color: Colors.grey,
@@ -819,7 +812,7 @@ class _CartPageState extends State<CartPage> {
                         child: Container(
                           width: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: lightCyan,
                             border: Border(
                               top: BorderSide(
                                 color: Colors.grey,
@@ -942,6 +935,60 @@ class _CartPageState extends State<CartPage> {
                                                 Navigator.of(context).pop(); // Dismiss the dialog
                                               },
                                               child: Text('OK'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                    return;
+                                  }
+
+                                  if (selectedDate.toString().split(' ')[0] == DateTime.now().add(Duration(days: 1)).toString().split(' ')[0]) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('Note!'),
+                                          content: Text('Orders placed 1 day ahead cannnot be cancelled! '),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(); // Dismiss the dialog
+                                              },
+                                              child: Text('Close'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () async {
+                                                if (discounted == false) {
+                                                  await Navigator.push(
+                                                    context, MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        SendingOrderPage(
+                                                          cartList: _cartItems,
+                                                          specialRemark: specialRequestController.text,
+                                                          desiredPickupTime: selectedDate.toString(),
+                                                          cartTotal: cartTotal,
+                                                          paymentMethod: _selectedPaymentMethod,
+                                                        ),
+                                                  ),
+                                                  ).then((value) => fetchData());
+                                                }
+                                                if (discounted == true) {
+                                                  await Navigator.push(
+                                                    context, MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        SendingOrderPage(
+                                                          cartList: _cartItems,
+                                                          specialRemark: specialRequestController.text,
+                                                          desiredPickupTime: selectedDate.toString(),
+                                                          cartTotal: discountedcartTotal,
+                                                          paymentMethod: _selectedPaymentMethod,
+                                                        ),
+                                                  ),
+                                                  ).then((value) => fetchData());
+                                                } // Dismiss the dialog
+                                              },
+                                              child: Text('Continue'),
                                             ),
                                           ],
                                         );

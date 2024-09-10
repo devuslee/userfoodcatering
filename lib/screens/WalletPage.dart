@@ -129,7 +129,8 @@ class _WalletPageState extends State<WalletPage> {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        if (transaction.type == "Expense") CircleAvatar(
+                        if (transaction.type == "Expense")
+                          CircleAvatar(
                           radius: MediaQuery.of(context).size.width * 0.03,
                           backgroundColor: Colors.white,
                           child: Icon(
@@ -138,7 +139,8 @@ class _WalletPageState extends State<WalletPage> {
                             size: MediaQuery.of(context).size.width * 0.05,),
                         ),
         
-                        if (transaction.type == "Topup") CircleAvatar(
+                        if (transaction.type == "Topup")
+                          CircleAvatar(
                           radius: MediaQuery.of(context).size.width * 0.03,
                           backgroundColor: Colors.white,
                           child: Icon(
@@ -146,6 +148,16 @@ class _WalletPageState extends State<WalletPage> {
                             color: Colors.green,
                             size: MediaQuery.of(context).size.width * 0.05,),
                         ),
+
+                        if (transaction.type == "Refund")
+                          CircleAvatar(
+                            radius: MediaQuery.of(context).size.width * 0.03,
+                            backgroundColor: Colors.white,
+                            child: Icon(
+                              Icons.money_off,
+                              color: Colors.yellow,
+                              size: MediaQuery.of(context).size.width * 0.05,),
+                          ),
         
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +166,7 @@ class _WalletPageState extends State<WalletPage> {
                             Text('RM ${transaction.total.toString()}',
                               style: TextStyle(
                                 fontSize: 20,
-                                color: transaction.type == "Expense" ? Colors.red : Colors.green
+                                color: transaction.type == "Expense" ? Colors.red : transaction.type == "Refund" ? Colors.yellow : Colors.green
                               ),),
                             Text('Order ID (${transaction.id.toString()})',
                               style: TextStyle(
