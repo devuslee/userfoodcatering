@@ -71,6 +71,8 @@ dev_dependencies:
   qr_code_scanner: ^1.0.1
   table_calendar: ^3.1.2
   google_fonts: ^6.2.1
+  circular_bottom_navigation: ^2.4.0
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

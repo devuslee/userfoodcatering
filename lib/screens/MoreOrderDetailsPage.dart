@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -11,6 +12,8 @@ import 'CartPage.dart';
 import 'ReviewPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
+
 
 class MoreOrderDetailsPage extends StatefulWidget {
   Map<String, dynamic> orderDetails;
@@ -171,107 +174,246 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
             SizedBox(height: MediaQuery.of(context).size.height * 0.01),
 
             if (widget.orderDetails['status'] == "Cancelled")
-              Container(
-                width: MediaQuery.of(context).size.width * 0.95,
-                decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10)
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("This order has been cancelled!", style : TextStyle(color: Colors.red)),
-                    ],
+            Column(
+              children: [
+                Center(
+                  child: Image.asset(
+                      'assets/orderCancelled.png',
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      fit: BoxFit.contain
                   ),
                 ),
-              ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                Container(
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  decoration: BoxDecoration(
+                      color: Colors.grey[300],
+                      borderRadius: BorderRadius.circular(10)
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Text("This order has been cancelled!",
+                            style: GoogleFonts.lato(
+                              fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                              fontWeight: FontWeight.bold, // Adjust font weight
+                              color: Colors.red, // Adjust text color
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
             if (widget.orderDetails['status'] == "Pending")
-              Container(
-                width: MediaQuery.of(context).size.width * 0.95,
-                decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10)
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Your order has been received!"),
-                      if (widget.orderDetails['desiredPickupTime'].split(' ')[0] == DateTime.now().toString().split(' ')[0])
-                        Text("Your order is getting prepared!"),
-                    ],
+              Column(
+                children: [
+                  Center(
+                    child: Image.asset(
+                      'assets/orderPending.png',
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      fit: BoxFit.contain
+                    ),
                   ),
-                ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Text("Your order has been received!",
+                            style: GoogleFonts.lato(
+                              fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                              fontWeight: FontWeight.bold, // Adjust font weight
+                              color: selectedButtonColor, // Adjust text color
+                              ),
+                            ),
+                          ),
+                          if (widget.orderDetails['desiredPickupTime'].split(' ')[0] == DateTime.now().toString().split(' ')[0])
+                            Center(
+                                child: Text("Your order is getting prepared!",
+                                  style: GoogleFonts.lato(
+                                    fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                    fontWeight: FontWeight.bold, // Adjust font weight
+                                    color: selectedButtonColor, // Adjust text color
+                                  ),
+                                )
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
 
             if (widget.orderDetails['status'] == "Ready")
-              Container(
-                width: MediaQuery.of(context).size.width * 0.95,
-                decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10)
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Your order is ready!"),
-                      Text("Come pick it up!"),
-                    ],
+              Column(
+                children: [
+                  Center(
+                    child: Image.asset(
+                        'assets/orderReady.png',
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        height: MediaQuery.of(context).size.height * 0.3,
+                        fit: BoxFit.contain
+                    ),
                   ),
-                ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Text("Your order is ready!",
+                              style: GoogleFonts.lato(
+                                fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                fontWeight: FontWeight.bold, // Adjust font weight
+                                color: selectedButtonColor, // Adjust text color
+                              ),
+                            ),
+                          ),
+                          Center(
+                              child: Text("Come pick it up!",
+                                style: GoogleFonts.lato(
+                                  fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                  fontWeight: FontWeight.bold, // Adjust font weight
+                                  color: selectedButtonColor, // Adjust text color
+                                ),
+                              )
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
 
             if (widget.orderDetails['status'] == "Completed")
-              Container(
-                width: MediaQuery.of(context).size.width * 0.95,
-                decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10)
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Thank you for your support!"),
-                      Text("Please leave a review!"),
-                    ],
+              Column(
+                children: [
+                  Center(
+                    child: Image.asset(
+                        'assets/orderCompleted.png',
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        height: MediaQuery.of(context).size.height * 0.3,
+                        fit: BoxFit.contain
+                    ),
                   ),
-                ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Text("Thank you for your support!",
+                              style: GoogleFonts.lato(
+                                fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                fontWeight: FontWeight.bold, // Adjust font weight
+                                color: selectedButtonColor, // Adjust text color
+                              ),
+                            ),
+                          ),
+                          Center(
+                            child: Text("Please leave a review!",
+                              style: GoogleFonts.lato(
+                                fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                fontWeight: FontWeight.bold, // Adjust font weight
+                                color: selectedButtonColor, // Adjust text color
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
 
             if (widget.orderDetails['status'] == "Completed and Reviewed")
-              Container(
-                width: MediaQuery.of(context).size.width * 0.95,
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(10)
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("Thank you for your support!"),
-                      Text("Enjoy your meal!"),
-                    ],
+              Column(
+                children: [
+                  Center(
+                    child: Image.asset(
+                        'assets/orderReviewed.png',
+                        width: MediaQuery.of(context).size.width * 0.9,
+                        height: MediaQuery.of(context).size.height * 0.3,
+                        fit: BoxFit.contain
+                    ),
                   ),
-                ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10)
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Center(
+                            child: Text("Thank you for your support!",
+                              style: GoogleFonts.lato(
+                                fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                fontWeight: FontWeight.bold, // Adjust font weight
+                                color: selectedButtonColor, // Adjust text color
+                              ),
+                            ),
+                          ),
+                            Center(
+                                child: Text("Enjoy your meal!",
+                                  style: GoogleFonts.lato(
+                                    fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                    fontWeight: FontWeight.bold, // Adjust font weight
+                                    color: selectedButtonColor, // Adjust text color
+                                  ),
+                                )
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
+
+            SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             Divider(
-              color: Colors.grey[200],
+              color: Colors.grey[350],
               thickness: 7,
             ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.01),
             Container(
               width: MediaQuery.of(context).size.width * 0.98,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: backGroundColor,
                 borderRadius: BorderRadius.circular(10)
               ),
               child: Padding(
@@ -279,54 +421,124 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Order Details", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.02, fontWeight: FontWeight.bold)),
-                    Text('Status: ', style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
-                    Container(
-                        decoration: BoxDecoration(
-                            color:
-                            widget.orderDetails['status'] == 'Pending' ? darkYellow :
-                            widget.orderDetails['status'] == "Cancelled" ? Colors.red :
-                            Colors.green,
-                            borderRadius: BorderRadius.circular(5)
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            widget.orderDetails['status'],
-                            style: TextStyle(
-                                color: Colors.white),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Order Details",
+                          style: GoogleFonts.lato(
+                            fontSize: MediaQuery.of(context).size.width * 0.06, // Adjust font size
+                            fontWeight: FontWeight.bold, // Adjust font weight
+                            color: selectedButtonColor, // Adjust text color
                           ),
+                        ),
+                        Container(
+                            decoration: BoxDecoration(
+                                color:
+                                widget.orderDetails['status'] == 'Pending' ? darkYellow :
+                                widget.orderDetails['status'] == "Cancelled" ? Colors.red :
+                                Colors.green,
+                                borderRadius: BorderRadius.circular(5)
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                widget.orderDetails['status'],
+                                style: TextStyle(
+                                    color: Colors.white),
+                              ),
+                            )
+                        ),
+                      ],
+                    ),
+                    Divider(
+                      color: Colors.grey,
+                      thickness: 1,
+                    ),
+                    Text("Pickup Time: ",
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                            color: Colors.grey[500]
                         )
                     ),
+                    Text('${DayMonthYearFormatter(widget.orderDetails['desiredPickupTime'])}, ${HourFormatter(widget.orderDetails['desiredPickupTime'])}',
+                        style: GoogleFonts.lato(
+                          fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                          fontWeight: FontWeight.bold, // Adjust font weight
+                          color: selectedButtonColor, // Adjust text color
+                        ),
+                    ),
                     Divider(
                       color: Colors.grey,
                       thickness: 1,
                     ),
-                    Text("Pickup Time: ", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
-                    Text('${DayMonthYearFormatter(widget.orderDetails['desiredPickupTime'])}, ${HourFormatter(widget.orderDetails['desiredPickupTime'])}', style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.black),),
+                    Text("Pickup Location: ",
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                            color: Colors.grey[500]
+                        )
+                    ),
+                    Text('Location: 5-G-1, Promenade, Jalan Mahsuri, 11900 Bayan Baru, Pulau Pinang',
+                      style: GoogleFonts.lato(
+                        fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                        fontWeight: FontWeight.bold, // Adjust font weight
+                        color: selectedButtonColor, // Adjust text color
+                      ),
+                    ),
                     Divider(
                       color: Colors.grey,
                       thickness: 1,
                     ),
-                    Text("Pickup Location: ", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
-                    Text('Location: 5-G-1, Promenade, Jalan Mahsuri, 11900 Bayan Baru, Pulau Pinang', style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.black),),
+                    Text("Order ID: ",
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                            color: Colors.grey[500]
+                        ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: widget.orderDetails['orderID'].toString()));
+
+                        // Optionally show a message/snackbar to indicate the copy action
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Order ID copied to clipboard'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Text('${widget.orderDetails['orderID']}',
+                              style: GoogleFonts.lato(
+                                fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                fontWeight: FontWeight.bold, // Adjust font weight
+                                color: selectedButtonColor, // Adjust text color
+                              ),
+                          ),
+                          SizedBox(width: MediaQuery.of(context).size.width * 0.005),
+                          Icon(
+                            Icons.copy,
+                            color: selectedButtonColor,
+                            size: MediaQuery.of(context).size.width * 0.04,
+                          )
+                        ],
+                      ),
+                    ),
                     Divider(
                       color: Colors.grey,
                       thickness: 1,
                     ),
-                    Text("Order ID: ", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
-                    Text('${widget.orderDetails['orderID']}', style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.black),),
-                    Divider(
-                      color: Colors.grey,
-                      thickness: 1,
-                    ),
-                    Text("Cart: ", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
+                    Text("Cart: ",
+                      style: TextStyle(
+                          fontSize: MediaQuery.of(context).size.width * 0.035,
+                          color: Colors.grey[500]
+                      ),),
                     for (var item in widget.orderDetails['orderHistory'])
                       Column(
                         children: [
                           Container(
                             width: MediaQuery.of(context).size.width * 0.95,
-                            height: MediaQuery.of(context).size.height * 0.25,
+                            height: MediaQuery.of(context).size.height * 0.1,
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey),
                               borderRadius: BorderRadius.circular(10)
@@ -351,10 +563,22 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text("${item['name']}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.02, fontWeight: FontWeight.bold)),
-                                      Text("RM ${item['price']}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.02, fontWeight: FontWeight.bold)),
-                                      SizedBox(height: MediaQuery.of(context).size.height * 0.1),
-                                      Text("Quantity: ${item['quantity']}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
+                                      Text("${item['name']}",
+                                        style: GoogleFonts.lato(
+                                          fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                          fontWeight: FontWeight.bold, // Adjust font weight
+                                          color: selectedButtonColor, // Adjust text color
+                                        ),),
+                                      Text("RM ${item['price']}", style: GoogleFonts.lato(
+                                        fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                        fontWeight: FontWeight.bold, // Adjust font weight
+                                        color: Colors.green, // Adjust text color
+                                      ),),
+                                      Text("Quantity: ${item['quantity']}",
+                                        style: TextStyle(
+                                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                                            color: Colors.grey[500]
+                                        ),),
                                     ],
                                   ),
                                 )
@@ -368,21 +592,48 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                       color: Colors.grey,
                       thickness: 1,
                     ),
-                    Text("Payment Method: ", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
-                    Text('${widget.orderDetails['paymentMethod']}', style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.black),),
+                    Text("Payment Method: ",
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                            color: Colors.grey[500]
+                        ),
+                    ),
+                    Text('${widget.orderDetails['paymentMethod']}',
+                        style: GoogleFonts.lato(
+                      fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                      fontWeight: FontWeight.bold, // Adjust font weight
+                      color: selectedButtonColor, // Adjust text color
+                    ),),
                     Divider(
                       color: Colors.grey,
                       thickness: 1,
                     ),
-                    Text("Special Remarks: ", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
+                    Text("Special Remarks: ",
+                        style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                            color: Colors.grey[500]
+                        ),
+                    ),
                     Text(widget.orderDetails['specialRemarks'] == "" ?
                     "No Remarks" :
-                    '${widget.orderDetails['specialRemarks']}', style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.black),),
+                    '${widget.orderDetails['specialRemarks']}',
+                        style: GoogleFonts.lato(
+                          fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                          fontWeight: FontWeight.bold, // Adjust font weight
+                          color: selectedButtonColor, // Adjust text color
+                        ),
+                    ),
                     Divider(
                       color: Colors.grey,
                       thickness: 1,
                     ),
-                    Text("Payment Summary", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.02, fontWeight: FontWeight.bold)),
+                    Text("Payment Summary",
+                      style: GoogleFonts.lato(
+                        fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                        fontWeight: FontWeight.bold, // Adjust font weight
+                        color: selectedButtonColor, // Adjust text color
+                      ),
+                    ),
                     Divider(
                       color: Colors.grey,
                       thickness: 1,
@@ -390,22 +641,40 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Amount", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
-                        Text("RM ${total}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
+                        Text("Amount", style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                            color: Colors.grey[500]
+                        )),
+                        Text("RM ${total}", style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                            color: Colors.grey[500]
+                        )),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Discount", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
-                        Text("- RM $discount", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
+                        Text("Discount", style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                            color: Colors.grey[500]
+                        )),
+                        Text("- RM $discount", style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                            color: Colors.grey[500]
+                        )),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Points Gained", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
-                        Text("${pointGained} pts", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.015, color: Colors.grey)),
+                        Text("Points Gained", style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                            color: Colors.grey[500]
+                        )),
+                        Text("${pointGained} pts", style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width * 0.035,
+                            color: Colors.grey[500]
+                        )),
                       ],
                     ),
                     Align(
@@ -421,8 +690,19 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Grand Total", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.025, color: Colors.black)),
-                        Text("RM ${widget.orderDetails['total']}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.025, color: Colors.black)),
+                        Text("Grand Total",
+                          style: GoogleFonts.lato(
+                            fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                            fontWeight: FontWeight.bold, // Adjust font weight
+                            color: selectedButtonColor, // Adjust text color
+                          ),
+                        ),
+                        Text("RM ${widget.orderDetails['total']}",
+                          style: GoogleFonts.lato(
+                            fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                            fontWeight: FontWeight.bold, // Adjust font weight
+                            color: Colors.black, // Adjust text color
+                          ),),
                       ],
                     ),
                   ],
@@ -430,7 +710,7 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
               ),
             ),
             Divider(
-              color: Colors.grey[200],
+              color: Colors.grey[350],
               thickness: 7,
             ),
           ],
@@ -447,7 +727,7 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                width: MediaQuery.of(context).size.width * 0.95,
+                width: MediaQuery.of(context).size.width * 0.85,
                 height: MediaQuery.of(context).size.height * 0.9,
                 child: ElevatedButton(
                   onPressed: () async {
@@ -598,7 +878,7 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
+                    backgroundColor: selectedButtonColor,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

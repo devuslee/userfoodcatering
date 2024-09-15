@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
-
+import 'package:google_fonts/google_fonts.dart';
+import '../reusableWidgets/reusableColor.dart';
 import 'CartPage.dart';
 
 class RedeemDiscountPage extends StatefulWidget {
@@ -70,24 +71,52 @@ class _RedeemDiscountPageState extends State<RedeemDiscountPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Points'),
+                        Text('Points', style: GoogleFonts.lato(
+                          fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                          fontWeight: FontWeight.bold, // Adjust font weight
+                          color: selectedButtonColor, // Adjust text color
+                        ),),
                         SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                        Text("${widget.points} pts", style: TextStyle(color: Colors.grey)),
+                        Text("${widget.points} pts",
+                            style: TextStyle(color: Colors.grey[550],
+                            fontSize: MediaQuery.of(context).size.width * 0.04)
+                        ),
                         SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                        Text('Discount'),
+                        Text('Discount', style: GoogleFonts.lato(
+                          fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                          fontWeight: FontWeight.bold, // Adjust font weight
+                          color: selectedButtonColor, // Adjust text color
+                        ),),
                         SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                        Text("RM ${widget.discount}", style: TextStyle(color: Colors.grey)),
+                        Text("RM ${widget.discount}", style: TextStyle(color: Colors.grey[550],
+                            fontSize: MediaQuery.of(context).size.width * 0.04)),
                         SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                        Text("Valid until"),
-                        Text(DayMonthYearFormatter(validUntil.toString()), style: TextStyle(color: Colors.grey)),
+                        Text("Valid until", style: GoogleFonts.lato(
+                          fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                          fontWeight: FontWeight.bold, // Adjust font weight
+                          color: selectedButtonColor, // Adjust text color
+                        ),),
+                        Text(DayMonthYearFormatter(validUntil.toString()), style: TextStyle(color: Colors.grey[550],
+                            fontSize: MediaQuery.of(context).size.width * 0.04)),
                         SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                        Text("Delivery Method"),
+                        Text("Delivery Method", style: GoogleFonts.lato(
+                          fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                          fontWeight: FontWeight.bold, // Adjust font weight
+                          color: selectedButtonColor, // Adjust text color
+                        ),),
                         SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                        Text("Self-Pickup", style: TextStyle(color: Colors.grey)),
+                        Text("Self-Pickup", style: TextStyle(color: Colors.grey[550],
+                            fontSize: MediaQuery.of(context).size.width * 0.04)),
                         SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                        Text("Terms & Conditions"),
+                        Text("Terms & Conditions", style: GoogleFonts.lato(
+                          fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                          fontWeight: FontWeight.bold, // Adjust font weight
+                          color: selectedButtonColor, // Adjust text color
+                        ),),
                         SizedBox(height: MediaQuery.of(context).size.height * 0.005),
-                        Text("1. This discount is only valid for one-time use."),
+                        Text("1. This discount is only valid for one-time use.",
+                            style: TextStyle(color: Colors.grey[550],
+                                fontSize: MediaQuery.of(context).size.width * 0.04)),
                       ],
                     ),
                   ),
@@ -154,7 +183,17 @@ class _RedeemDiscountPageState extends State<RedeemDiscountPage> {
                         ),
                     );
                   },
-                  child: Text("Redeem Now"),
+                  child: Text("Redeem Now",
+                    style: TextStyle(
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: selectedButtonColor,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                    ),
+                  ),
                 ),
               ),
             ),

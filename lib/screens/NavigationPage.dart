@@ -9,6 +9,9 @@ import 'package:userfoodcatering/screens/CartPage.dart';
 import 'package:icon_badge/icon_badge.dart';
 import 'package:userfoodcatering/screens/HistoryPage.dart';
 import 'package:userfoodcatering/screens/RedeemPointPage.dart';
+import 'package:circular_bottom_navigation/circular_bottom_navigation.dart';
+import 'package:circular_bottom_navigation/tab_item.dart';
+import '../reusableWidgets/reusableColor.dart';
 
 class NavigationPage extends StatefulWidget {
   final int currentIndex;
@@ -53,94 +56,205 @@ class _NavigationPageState extends State<NavigationPage> {
     return [
       HomePage(),
       RedeemPointPage(currentIndex: redeemPageIndex),
+      AddOrderPage(),
       HistoryPage(),
       ProfilePage(),
-      AddOrderPage(),
     ];
   }
 
   final IconList = [
     Icons.home,
     Icons.redeem,
+    Icons.add,
     Icons.history,
     Icons.person,
   ];
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[currentPageIndex],
-      floatingActionButton: SizedBox(
-        height: 65,
-        width: 65,
-        child: FloatingActionButton(
-          onPressed: () {
-            setState(() {
-              currentPageIndex = 4;
-            });
-          },
-          shape: const CircleBorder(),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.add, color: currentPageIndex == 4 ? Colors.blue : Colors.grey),
-              const SizedBox(height: 1),
-              Text(
-                  "Order",
-                  maxLines: 1,
-                  style: TextStyle(color: currentPageIndex == 4 ? Colors.blue : Colors.grey),
-                ),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      bottomNavigationBar: AnimatedBottomNavigationBar.builder(
-        height: 80,
-        itemCount: IconList.length,
-        tabBuilder: (index, isActive) {
-          final color = isActive ? Colors.blue : Colors.grey;
-          return Container(
-            height: 80,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    IconBadge(
-                      icon: Icon(IconList[index], color: color, size: 30,),
-                      itemCount: 0,
-                      badgeColor: Colors.red,
-                      right: 6,
-                      top: 0,
-                      hideZero: true,
-                      itemColor: Colors.white,
-                    ),
-                    const SizedBox(height: 4),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Text(
-                        index == 0 ? 'Home' : index == 1 ? 'Redeem' : index == 2 ? 'History' : index == 3 ? 'Profile' : '',
-                        maxLines: 1,
-                        style: TextStyle(color: color),
-                      ),
-                    ),
-                  ],
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            height: 1,  // Thin line
+            decoration: BoxDecoration(
+              color: Colors.grey[300],  // Light grey color for the line
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,  // Light shadow
+                  blurRadius: 6,  // How much the shadow spreads
+                  offset: Offset(0, -3),  // Position of shadow (above the line)
                 ),
               ],
             ),
-          );
-        },
-        activeIndex: currentPageIndex,
-        gapLocation: GapLocation.center,
-        notchSmoothness: NotchSmoothness.defaultEdge,
-        onTap: (index) => setState(() => currentPageIndex = index),
+          ),
+          BottomAppBar(
+            padding: EdgeInsets.symmetric(horizontal: 0),
+            height: MediaQuery.of(context).size.height * 0.1,
+            color: Colors.white,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.1,
+                  width: MediaQuery.of(context).size.width * 0.8 / IconList.length,
+                  child: InkWell(
+                    onTap: () => setState(() => currentPageIndex = 0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.home,
+                          color: currentPageIndex == 0 ? selectedButtonColor : notSelectedButtonColor,
+                          size: MediaQuery.of(context).size.height * 0.04,
+                        ),
+                        Text(
+                          "Home",
+                          maxLines: 1,
+                          style: TextStyle(color: currentPageIndex == 0 ? selectedButtonColor : notSelectedButtonColor,
+                          fontSize: MediaQuery.of(context).size.height * 0.02,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8 / IconList.length,
+                  child: InkWell(
+                    onTap: () => setState(() => currentPageIndex = 1),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.redeem,
+                          color: currentPageIndex == 1 ? selectedButtonColor : notSelectedButtonColor,
+                          size: MediaQuery.of(context).size.height * 0.04,
+                        ),
+                        Text(
+                          "Redeem",
+                          maxLines: 1,
+                          style: TextStyle(color: currentPageIndex == 1 ? selectedButtonColor : notSelectedButtonColor,
+                          fontSize: MediaQuery.of(context).size.height * 0.02,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8 / IconList.length,
+                  child: InkWell(
+                    onTap: () => setState(() => currentPageIndex = 2),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.add,
+                          color: currentPageIndex == 2 ? selectedButtonColor : notSelectedButtonColor,
+                          size: MediaQuery.of(context).size.height * 0.04,
+                        ),
+                        Text(
+                          "Order",
+                          maxLines: 1,
+                          style: TextStyle(color: currentPageIndex == 2 ? selectedButtonColor : notSelectedButtonColor,
+                          fontSize: MediaQuery.of(context).size.height * 0.02,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8 / IconList.length,
+                  child: InkWell(
+                    onTap: () => setState(() => currentPageIndex = 3),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.history,
+                          color: currentPageIndex == 3 ? selectedButtonColor : notSelectedButtonColor,
+                          size: MediaQuery.of(context).size.height * 0.04,
+                        ),
+                        Text(
+                          "History",
+                          maxLines: 1,
+                          style: TextStyle(color: currentPageIndex == 3 ? selectedButtonColor : notSelectedButtonColor,
+                          fontSize: MediaQuery.of(context).size.height * 0.02,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8 / IconList.length,
+                  child: InkWell(
+                    onTap: () => setState(() => currentPageIndex = 4),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.person,
+                          color: currentPageIndex == 4 ? selectedButtonColor : notSelectedButtonColor,
+                          size: MediaQuery.of(context).size.height * 0.04,
+                        ),
+                        Text(
+                          "Profile",
+                          maxLines: 1,
+                          style: TextStyle(color: currentPageIndex == 4 ? selectedButtonColor : notSelectedButtonColor,
+                          fontSize: MediaQuery.of(context).size.height * 0.02,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
 }
-
+  // bottomNavigationBar: AnimatedBottomNavigationBar.builder(
+      //   backgroundColor: navigationBarColor,
+      //   height: MediaQuery.of(context).size.height * 0.1,
+      //   itemCount: IconList.length,
+      //   tabBuilder: (index, isActive) {
+      //     final color = isActive ? selectedButtonColor : Colors.grey;
+      //     return Container(
+      //       child: Stack(
+      //         alignment: Alignment.center,
+      //         children: [
+      //           Column(
+      //             mainAxisSize: MainAxisSize.min,
+      //             mainAxisAlignment: MainAxisAlignment.center,
+      //             children: [
+      //               IconBadge(
+      //                 icon: Icon(IconList[index], color: color, size: 30,),
+      //                 itemCount: 0,
+      //                 badgeColor: Colors.red,
+      //                 right: 6,
+      //                 top: 0,
+      //                 hideZero: true,
+      //                 itemColor: Colors.white,
+      //               ),
+      //               Text(
+      //                 index == 0 ? 'Home' : index == 1 ? 'Redeem' : index == 2 ? 'Order' : index == 3 ? 'History' : index == 4 ? 'Profile' : '',
+      //                 maxLines: 1,
+      //                 style: TextStyle(color: color),
+      //               ),
+      //             ],
+      //           ),
+      //         ],
+      //       ),
+      //     );
+      //   },
+      //   activeIndex: currentPageIndex,
+      //   onTap: (index) => setState(() => currentPageIndex = index),
+      // ),

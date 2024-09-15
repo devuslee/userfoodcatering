@@ -61,8 +61,8 @@ class _AddOrderPageState extends State<AddOrderPage> {
           }
         }
       }
-
-      _itemKeys = List.generate(categoryList.length, (index) => GlobalKey());
+      _itemKeys = List.generate(filteredMenuData.keys.length, (index) => GlobalKey());
+      print(_itemKeys);
       if (mounted) {
         setState(() {
           // Update the UI after fetching data
@@ -74,17 +74,22 @@ class _AddOrderPageState extends State<AddOrderPage> {
   }
 
   void scrollToMenu(int index) {
-    if (index < 0 || index >= _itemKeys.length) return; // Guard against out-of-bounds
+    if (index < 0 || index >= _itemKeys.length) return;
 
-    if (_itemKeys[index].currentContext != null) {
-      final RenderBox renderBox = _itemKeys[index].currentContext!.findRenderObject() as RenderBox;
+    final key = _itemKeys[index];
+    if (key.currentContext != null) {
+      final RenderBox renderBox = key.currentContext!.findRenderObject() as RenderBox;
       final position = renderBox.localToGlobal(Offset.zero, ancestor: context.findRenderObject());
 
       _scrollController.animateTo(
         position.dy + _scrollController.offset - MediaQuery.of(context).size.height * 0.125,
         duration: Duration(seconds: 1),
         curve: Curves.easeInOut,
-      ).then((_) => _scrollController.addListener(_onScroll));
+      ).then((_) {
+        setState(() {
+          currentCategoryIndex = index;  // Update category index after scrolling
+        });
+      });
     }
   }
 
@@ -121,40 +126,53 @@ class _AddOrderPageState extends State<AddOrderPage> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.1), // Adjust height as needed
-        child: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: lightCyan,
-          flexibleSpace: Center( // Center vertically within the AppBar
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0), // Add padding to the sides
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.9, // Adjust width of the search bar
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search',
-                    hintStyle: TextStyle(color: lightGrey),
-                    prefixIcon: Icon(Icons.search, color: Colors.black),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(50.0),
-                      borderSide: BorderSide.none,
+        child: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.0075,),
+            child: AppBar(
+              automaticallyImplyLeading: false,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              backgroundColor: backGroundColor,
+              flexibleSpace: Center( // Center vertically within the AppBar
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.001,
+                  ),// Add padding to the sides
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.9, // Adjust width of the search bar
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search',
+                        hintStyle: TextStyle(color: Colors.black.withOpacity(0.5)),
+                        prefixIcon: Icon(Icons.search, color: Colors.black),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50.0),
+                          borderSide: BorderSide.none,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[300]?.withOpacity(0.9),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          searchQuery = value;
+                        });
+                      },
                     ),
-                    filled: true,
-                    fillColor: Colors.grey[300]?.withOpacity(0.9),
                   ),
-                  onChanged: (value) {
-                    setState(() {
-                      searchQuery = value;
-                    });
-                  },
                 ),
               ),
-            ),
-          ),
-          bottom: PreferredSize(
-            preferredSize: Size.fromHeight(1.0), // Height of the bottom line
-            child: Container(
-              color: Colors.grey, // Line color
-              height: 1.0, // Line thickness
+              bottom: PreferredSize(
+                preferredSize: Size.fromHeight(10), // Height of the bottom line
+                child: Column(
+                  children: [
+                    Container(
+                      color: Colors.grey, // Line color
+                      height: 1.0, // Line thickness
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -168,9 +186,9 @@ class _AddOrderPageState extends State<AddOrderPage> {
                 child: Row(
                   children: [
                     Container(
-                      width: MediaQuery.of(context).size.width * 0.1,
+                      width: MediaQuery.of(context).size.width * 0.2,
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
+                        color: notSelectedButtonColor,
                         border: Border(
                           right: BorderSide(
                             color: Colors.grey,
@@ -186,25 +204,31 @@ class _AddOrderPageState extends State<AddOrderPage> {
                         children: filteredMenuData.keys.map((category) {
                           int categoryIndex = filteredMenuData.keys.toList().indexOf(category);
                           return Container(
+                            height: MediaQuery.of(context).size.height * 0.05,
                             decoration: BoxDecoration(
-                              border: Border(
-                                top: BorderSide(
-                                  color: Colors.grey,
-                                  width: (filteredMenuData.keys.first == category) ? 0.0 : 2.0,
-                                ),
-                                bottom: BorderSide(
-                                  color: Colors.grey,
-                                  width: (filteredMenuData.keys.last == category) ? 2.0 : 0.0,
-                                ),
-                              ),
+                              color: notSelectedButtonColor,
+                              // border: Border(
+                              //   top: BorderSide(
+                              //     color: Colors.grey,
+                              //     width: (filteredMenuData.keys.first == category) ? 0.0 : 2.0,
+                              //   ),
+                              //   bottom: BorderSide(
+                              //     color: Colors.grey,
+                              //     width: (filteredMenuData.keys.last == category) ? 2.0 : 0.0,
+                              //   ),
+                              // ),
                             ),
                             child: InkWell(
                               onTap: () {
                                 int index = 0;
-                                for (String key in filteredMenuData.keys) {
-                                  if (key == category) break;
-                                  index += filteredMenuData[key]!.length;
+
+                                for (var key in filteredMenuData.keys) {
+                                  if (key == category) {
+                                    break;
+                                  }
+                                  index++;
                                 }
+
                                 currentCategoryIndex = index;
 
                                 _scrollController.removeListener(_onScroll);
@@ -216,10 +240,10 @@ class _AddOrderPageState extends State<AddOrderPage> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
                                   category,
-                                  style: TextStyle(
-                                    fontSize: 16,
+                                  style: GoogleFonts.lato(
+                                    fontSize: MediaQuery.of(context).size.width * 0.03,
                                     fontWeight: FontWeight.bold,
-                                    color: (currentCategoryIndex == categoryIndex) ? Colors.red : Colors.black,
+                                    color: (currentCategoryIndex == categoryIndex) ? selectedButtonColor : Colors.grey[500],
                                   ),
                                 ),
                               ),
@@ -242,22 +266,26 @@ class _AddOrderPageState extends State<AddOrderPage> {
                                 if (filteredMenuData[category]!.isNotEmpty)
                                 Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
-                                  child: Text(
-                                    category,
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
+                                  child: Center(
+                                    child: Text(
+                                      category,
+                                      style: GoogleFonts.lato(
+                                        fontSize: MediaQuery.of(context).size.width * 0.05,
+                                        fontWeight: FontWeight.bold,
+                                        // decoration:TextDecoration.underline,
+                                        color: selectedButtonColor,
+                                      ),
                                     ),
                                   ),
                                 ),
                                 GridView.builder(
                                   shrinkWrap: true,
                                   physics: NeverScrollableScrollPhysics(),
-                                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                                  padding: const EdgeInsets.symmetric(horizontal: 0),
                                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2,
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
+                                    crossAxisSpacing: 0,
+                                    mainAxisSpacing: 15,
                                     childAspectRatio: 1,
                                   ),
                                   itemCount: filteredMenuData[category]?.length ?? 0,
@@ -308,15 +336,15 @@ class _AddOrderPageState extends State<AddOrderPage> {
                                             Text(
                                               menuItem?.name ?? '',
                                               style: GoogleFonts.lato(
-                                                fontSize: MediaQuery.of(context).size.width * 0.02,
+                                                fontSize: MediaQuery.of(context).size.width * 0.05,
                                                 fontWeight: FontWeight.bold,
+                                                color: selectedButtonColor,
                                               ),
                                             ),
                                             Text(
                                               "RM${menuItem?.price.toString()}" ?? '',
                                               style: GoogleFonts.lato(
-                                                fontSize: MediaQuery.of(context).size.width * 0.015,
-                                                fontWeight: FontWeight.bold,
+                                                fontSize: MediaQuery.of(context).size.width * 0.04,
                                               ),
                                             ),
                                           ],
@@ -325,6 +353,11 @@ class _AddOrderPageState extends State<AddOrderPage> {
                                     );
                                   },
                                 ),
+                                // Divider(
+                                //   color: Colors.grey[350],
+                                //   thickness: 7.0,
+                                // ),
+
                               ],
                             );
                           }).toList(),
@@ -336,46 +369,42 @@ class _AddOrderPageState extends State<AddOrderPage> {
               ),
             ],
           ),
-          Positioned(
-            bottom: MediaQuery.of(context).size.width * 0.01, // Adjust the position from the bottom
-            right: MediaQuery.of(context).size.width * 0.05, // Adjust the position from the right
-            child: InkWell(
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.25,
-                height: MediaQuery.of(context).size.height * 0.1,
-                decoration: BoxDecoration(
-                  color: aquamarine,
-                  borderRadius: BorderRadius.circular(50.0),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Text("Total Price: RM${cartTotal}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.02, fontWeight: FontWeight.bold)),
-                      Spacer(),
-                      IconBadge(
-                        icon: Icon(Icons.shopping_cart, color: powderBlue, size: MediaQuery.of(context).size.width * 0.05,),
-                        itemCount: cartCount,
-                        badgeColor: Colors.red,
-                        right: 6,
-                        top: 0,
-                        hideZero: true,
-                        itemColor: Colors.white,
-                        onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
+      bottomNavigationBar: BottomAppBar(
+        color: backGroundColor,
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.1,
+          width: MediaQuery.of(context).size.width,
+          child: Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(cartCount == 1 ? "${cartCount} item" : "${cartCount} items", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04, color: Colors.grey)),
+                  Text("RM${cartTotal}", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.06, fontWeight: FontWeight.bold, color: selectedButtonColor)),
+                ],
+              ),
+              Spacer(),
+              IconBadge(
+                icon: Icon(
+                  Icons.shopping_cart,
+                  color: powderBlue,
+                  size: MediaQuery.of(context).size.width * 0.12,),
+                itemCount: cartCount,
+                badgeColor: Colors.red,
+                right: 6,
+                top: 0,
+                hideZero: true,
+                itemColor: Colors.white,
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => CartPage()));
+                },
+              ),
+            ],
+          ),
+        ),
+      )
     );
   }
 }

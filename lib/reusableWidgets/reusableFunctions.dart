@@ -60,7 +60,7 @@ final _firebaseMessaging = FirebaseMessaging.instance;
 
 Future<void> sendNotification(String title, String body, String fcmToken) async {
   final url = 'https://fcm.googleapis.com/v1/projects/foodcatering-6bb02/messages:send';
-  final accessToken = "ya29.c.c0ASRK0GaVhww5A329efOIqOziCyv6zKpYdtlIOBoCdNjJxGsZjvDjy0cEMzEwkn0TaqlXrAxm1mBbXb1JYCrpe5gsLtTgMxAQS-AvocCZqfV0ZPX6Qrb7glgZSObYJm8fOIi-ogw9ptC8dPAKyPqSV0iPEHI9muLuUn99vkFtgReXLLRGxnyJZZF20Agoh-o8CFC9d_kZ3yS2PFwIVciBCf6ii9M-d9lqxf6NdSVLffmZ2Ug2j8wlW2wHAdwSqy8nSaNcQRMEX8gUdX7dlSNrFe_8gjLjE1H_IAPIuzxkbrPQNl6pSgj8VBYlgMgsooc6MjkLS5sQhr-_nZMIfQU-QFPvhuZM99ipZpQ2VqzSw2fTpV2fuwcsJTwL384KweFplr_zipwyglz0ehb243J3mz2MokeyRRsM1Zy0Jdv5rJa5g05o9c0Mb4kwRfdkwzsO5hlhhS-z0-Ra4w6tFafvdYs6U9bnXWpSXVaWYSyVsW973-OO3hi77S2JOy8_aO8eSa0UYSI_ZXozjfoWlYg2j4xuYwweydptk5w6htezj2oBWpr3Xe0S_i5tbJfWQn7sFUrSWYjkutrVBxRF8aOWdmMXjybO7-jxFooO9YsxjlwuxiUl9lw0YbJ9buy7Z5wg99da09si-w44eI81ityVaSb6bFI7UshWwolg2p1XiIOmRXSOUJSg3guy9V390MSZeBJzBaezniqdFM0xyYk2pBefrj7olqj_X8vWj69ir-nord2Ute4s40lg1FXgvJxds1iIfV3nIm4o2b5heStf-FvtWOe1WxxjB5ZxIXWX2IaMwRvSIuqOh65qgrYFu14s8eb_fOxd5woRd3f_5IapaMMeUQlXV_m14fta6iguSR9whoiOqIkMYY5vkYofJ68o2XWgk0eBW0jnkwwpflqfROpnij28fgMJq4kyvZbckvF5QcRr4ai8cQlx9nxtot16clsIyZbxS0ROYu9dW6sBSuVkybvmfs9RgFjV2t4oQxVvmhxBU5p8wO7";
+  final accessToken = "ya29.c.c0ASRK0GYqNNqljZfiqbS6gOFwxXhWaiQFwAVaOBevjJJDWGzvYEr5VMOGlnTGEvaF-wxjUmMKcOUN3q2gbFzqKw12p-5GdbWDwDud3JLJ4TIC4P2zNWJXl61eCwCwR52LfRtVNrc_4qkK3fQQelwPl0zzLQcliVcp29tvKSPB5vc2OEYET-ZOHpyfHsoySDMNxzlvFCw5n_9Cz1YY9ncVIl6R4h-PWtBiHo_DKrJeX7vlduilUZR7Hu6U8VuWfuU_VRBYppkcaATdRPUzsJmVx1itzOERmiRjnOOBdMJhgpg9IVJeRaLdY7ny18X8Et5ld-C89kayvx_JUugCgtXeyu6hTi8RuFBkUBtHCurfFoWuYLrkc5I0xyuYtwT387KtOMyllr2gziiZBxb_y3vVfYvRamZoq56hpnF7-SJ0f3bnmpxmIwqt50jf9kdIXlMUpfRb8sO8zU05jk4qSjWJmO6m3VfqXM9UcVQepYdcvMUXsgob4nm2p1Rx79boO3kqVybxnt3lb5niRjdb6_6coiMoUfj8x86wcXVqwrX95W3U9VdFkYxOemisOnW46Iryk-mM2f5xzUlBa9uzXlpjzbMOQiv05pJRgY0so2gaZSgMBOUlWQSzimwvcjptVnvj7t-1kaX0qQXX10vvZxWhJ_g1s4M9uUWwd1wYuu1l0t2uqIS1yIisrusZ4FRlV6Sln88wRYhQYdUmU_01VRewxqO9t1tMmic7vb3yb3zJfVe-see-96wXbOrnteRqbjU6iduhYh3ogyo26277X5hhaVF9svbmVd0wn43i9u2oskMecV1qi7247VQQUFlyzRRZXJRiiz4Jw-J7kXus3Q1d6IxsWmvMkez6ib225qvhVtq4tUM-YywXe9be1inv_6mr2fOlWfpZ4R6wSO3zflJggfcqfJoq1hgR8Raram_xaOsxkmxdQWW97RgOlwg-Rx6SSoR1isM9bYQJb5g8M2MuYxizscR2yBtmR5qtxBBSQ20i6UhaB_XpFwo";
 
   final headers = {
     'Content-Type': 'application/json',
@@ -352,7 +352,7 @@ Future<List<Map<String, dynamic>>> getAllDiscounts() async {
 }
 
 
-void addToCart(String foodName, double price, int quantity, double total, String imageURL) async {
+void addToCart(String foodName, num price, int quantity, num total, String imageURL) async {
 
   final foodDocumentRef = FirebaseFirestore.instance
       .collection('users')
@@ -803,6 +803,119 @@ Future<List> returnAllOrderHistory() async{
   }
 }
 
+Future<List> returnAllFilteredOrderHistory(String selectedCategory) async{
+  final orderCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('history');
+
+  try {
+    final orderCollectionSnapshot = await orderCollectionRef.get();
+    List expenseorderList = [];
+    List refundorderList = [];
+    List topuporderlist = [];
+
+    List orderList = [];
+
+
+    if (selectedCategory == 'All') {
+      orderCollectionSnapshot.docs.forEach((doc) {
+        final order = ((
+        id: doc.get('id'),
+        orderHistory: doc.get('orderHistory'),
+        status: doc.get('status'),
+        createdAt: doc.get('createdAt'),
+        specialRemarks: doc.get('specialRemarks'),
+        desiredPickupTime: doc.get('desiredPickupTime'),
+        total: doc.get('total'),
+        paymentMethod: doc.get('paymentMethod'),
+        type: doc.get('type'),
+        ));
+
+        if (order.type == 'Expense') {
+          expenseorderList.add(order);
+        } else if (order.type == "Refund") {
+          refundorderList.add(order);
+        } else {
+          topuporderlist.add(order);
+        }
+      });
+    }
+
+    if (selectedCategory == 'Refund') {
+      orderCollectionSnapshot.docs.forEach((doc) {
+        final order = ((
+        id: doc.get('id'),
+        orderHistory: doc.get('orderHistory'),
+        status: doc.get('status'),
+        createdAt: doc.get('createdAt'),
+        specialRemarks: doc.get('specialRemarks'),
+        desiredPickupTime: doc.get('desiredPickupTime'),
+        total: doc.get('total'),
+        paymentMethod: doc.get('paymentMethod'),
+        type: doc.get('type'),
+        ));
+
+        if (order.type == 'Refund') {
+          refundorderList.add(order);
+        }
+      });
+    }
+
+    if (selectedCategory == 'Topup') {
+      orderCollectionSnapshot.docs.forEach((doc) {
+        final order = ((
+        id: doc.get('id'),
+        orderHistory: doc.get('orderHistory'),
+        status: doc.get('status'),
+        createdAt: doc.get('createdAt'),
+        specialRemarks: doc.get('specialRemarks'),
+        desiredPickupTime: doc.get('desiredPickupTime'),
+        total: doc.get('total'),
+        paymentMethod: doc.get('paymentMethod'),
+        type: doc.get('type'),
+        ));
+
+        if (order.type == 'Topup') {
+          topuporderlist.add(order);
+        }
+      });
+    }
+
+    if (selectedCategory == 'Expense') {
+      orderCollectionSnapshot.docs.forEach((doc) {
+        final order = ((
+        id: doc.get('id'),
+        orderHistory: doc.get('orderHistory'),
+        status: doc.get('status'),
+        createdAt: doc.get('createdAt'),
+        specialRemarks: doc.get('specialRemarks'),
+        desiredPickupTime: doc.get('desiredPickupTime'),
+        total: doc.get('total'),
+        paymentMethod: doc.get('paymentMethod'),
+        type: doc.get('type'),
+        ));
+
+        if (order.type == 'Expense') {
+          expenseorderList.add(order);
+        }
+      });
+    }
+
+
+    //sort from latest to oldest
+    expenseorderList.sort((b, a) => a.createdAt.compareTo(b.createdAt));
+    refundorderList.sort((b, a) => a.createdAt.compareTo(b.createdAt));
+    topuporderlist.sort((b, a) => a.createdAt.compareTo(b.createdAt));
+
+    orderList = expenseorderList + refundorderList + topuporderlist;
+    return orderList.toList();
+  } catch (error) {
+    print('Error fetching order history: $error');
+    return [];
+  }
+}
+
 Future<List> returnActiveOrderHistory() async{
   final orderCollectionRef = FirebaseFirestore.instance
       .collection('users')
@@ -850,6 +963,19 @@ Future<List> returnActiveOrderHistory() async{
     print('Error fetching order history: $error');
     return [];
   }
+}
+
+void updateSpecificCart(String foodName, int quantity, double total) async {
+  final foodDocumentRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('cart')
+      .doc(foodName);
+
+  await foodDocumentRef.update({
+    'quantity': quantity,
+    'total': total,
+  });
 }
 
 Future<List> returnPastOrderHistory() async{
@@ -940,7 +1066,7 @@ Future<List> returnOrderHistory(String selectedTime) async{
   }
 }
 
-Future<Map<String, dynamic>> convertOrderHistoryToMap(String createdAt, String desiredPickupTime, int id, List<dynamic> orderHistory, String paymentMethod, String specialRemarks, String status, double total, String type) async {
+Future<Map<String, dynamic>> convertOrderHistoryToMap(String createdAt, String desiredPickupTime, int id, List<dynamic> orderHistory, String paymentMethod, String specialRemarks, String status, num total, String type) async {
   Map<String, dynamic> orderHistoryMap = {};
 
 
@@ -1082,7 +1208,7 @@ Future<int> getcheckinCounter() async {
   String lastCheckedIn = "";
 
   DocumentSnapshot value = await userDocumentRef.get();
-  checkinCounter = value.get('checkinCounter');
+  checkinCounter = value.get('checkinCounter').toInt();
   lastCheckedIn = value.get('lastcheckedinTime');
 
   DateTime lastCheckedInTime = DateTime.parse(lastCheckedIn);
@@ -1167,6 +1293,7 @@ Future<double> incrementcheckinCounter() async {
     currentPoints = currentPoints + pointsObtained;
     lastCheckedIn = DateTime.now().toString();
   }
+
   userDocumentRef.update({'checkinCounter': checkinCounter});
   userDocumentRef.update({'points': currentPoints});
   userDocumentRef.update({'lastcheckedinTime': lastCheckedIn});
@@ -1486,6 +1613,12 @@ String HourFormatter(String timestamp) {
 
 String DayMonthYearFormatter(String timestamp) {
   DateTime dateTime = DateTime.parse(timestamp);
+  String formattedDate = DateFormat('dd MMMM yyyy').format(dateTime);
+  return formattedDate;
+}
+
+String TimeStampToDayMonthYearFormatter(Timestamp timestamp) {
+  DateTime dateTime = timestamp.toDate();
   String formattedDate = DateFormat('dd MMMM yyyy').format(dateTime);
   return formattedDate;
 }

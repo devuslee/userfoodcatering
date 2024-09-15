@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:userfoodcatering/reusableWidgets/reusableColor.dart';
 
 import '../reusableWidgets/reusableFunctions.dart';
 import '../reusableWidgets/reusableWidgets.dart';
 import 'NavigationPage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class RankPage extends StatefulWidget {
   const RankPage({super.key});
@@ -82,6 +84,7 @@ class _RankPageState extends State<RankPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: Container (
                     decoration: BoxDecoration(
+                      color: lightGrey,
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
@@ -94,26 +97,44 @@ class _RankPageState extends State<RankPage> {
                               radius: 50,
                               backgroundImage: CachedNetworkImageProvider(downloadURL),
                             ),
-                            Text(rank, style: TextStyle(fontSize: 20)),
+                            Text(rank,
+                              style: GoogleFonts.lato(
+                                fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                fontWeight: FontWeight.bold, // Adjust font weight
+                                color: selectedButtonColor, // Adjust text color
+                              ),
+                            ),
                             SizedBox(height: MediaQuery.of(context).size.height * 0.015),
                             LinearProgressIndicator(
                               value: progressbarValue,
-                              backgroundColor: Colors.grey[200],
+                              backgroundColor: Colors.grey[350],
                               valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue),
                             ),
                             Row(
                               children: [
-                                Text("Rank Progression"),
+                                Text("Rank Progression",
+                                  style: GoogleFonts.lato(
+                                    fontSize: MediaQuery.of(context).size.width * 0.045, // Adjust font size
+                                    fontWeight: FontWeight.bold, // Adjust font weight
+                                    color: selectedButtonColor, // Adjust text color
+                                  ),
+                                ),
                                 SizedBox(width: MediaQuery.of(context).size.width * 0.005),
                                 Tooltip(
                                   message: 'Next Rank: ${rank == "Beginner" ? "Intermediate" : rank == "Intermediate" ? "Advanced" : rank == "Advanced" ? "Expert" : "Expert"}',
                                   child: Icon(
                                     Icons.info_outline,
-                                    size: 20,
+                                    size: MediaQuery.of(context).size.width * 0.05,
+                                    color: selectedButtonColor,
                                   ),
                                 ),
                                 Spacer(),
-                                Text("${(progressDenominator - (double.parse(pointstoNextRank)))}/${progressDenominator}", style: TextStyle(fontSize: 20))
+                                Text("${(progressDenominator - (double.parse(pointstoNextRank)))}/${progressDenominator}",
+                                  style: GoogleFonts.lato(
+                                    fontSize: MediaQuery.of(context).size.width * 0.045, // Adjust font size
+                                    fontWeight: FontWeight.bold, // Adjust font weight
+                                    color: selectedButtonColor, // Adjust text color
+                                  ),)
                               ],
                             ),
                             Row(
@@ -133,6 +154,7 @@ class _RankPageState extends State<RankPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: Container (
                     decoration: BoxDecoration(
+                      color: lightGrey,
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
@@ -145,7 +167,11 @@ class _RankPageState extends State<RankPage> {
                               radius: 50,
                               backgroundImage: CachedNetworkImageProvider(downloadURL),
                             ),
-                            Text(rank, style: TextStyle(fontSize: 20)),
+                            Text(rank, style: GoogleFonts.lato(
+                              fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                              fontWeight: FontWeight.bold, // Adjust font weight
+                              color: selectedButtonColor, // Adjust text color
+                            ),),
                             SizedBox(height: MediaQuery.of(context).size.height * 0.015),
                             LinearProgressIndicator(
                               value: 1,
@@ -153,10 +179,23 @@ class _RankPageState extends State<RankPage> {
                               valueColor: AlwaysStoppedAnimation<Color>(Colors.lightBlue),
                             ),
                             Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("Rank Progression"),
-                                Text("Highest Possible Rank", style: TextStyle(fontSize: 20))
+                                Text("Rank Progression",
+                                  style: GoogleFonts.lato(
+                                    fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                    fontWeight: FontWeight.bold, // Adjust font weight
+                                    color: selectedButtonColor, // Adjust text color
+                                  ),
+                                ),
+                                SizedBox(width: MediaQuery.of(context).size.width * 0.005),
+                                Tooltip(
+                                  message: 'Highest Possible Rank',
+                                  child: Icon(
+                                    Icons.info_outline,
+                                    size: MediaQuery.of(context).size.width * 0.05,
+                                    color: selectedButtonColor,
+                                  ),
+                                ),
                               ],
                             )
                           ],
@@ -171,7 +210,8 @@ class _RankPageState extends State<RankPage> {
                   children: [
                     Row(
                       children: [
-                        Expanded(
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.25,
                           child: ElevatedButton(
                               onPressed: () {
                                 setState(() {
@@ -180,21 +220,25 @@ class _RankPageState extends State<RankPage> {
                               },
                               child: Text(
                                 'Beginner',
-                                style: TextStyle(
-                                  color: currentButtonIndex == 0 ? Colors.white : Colors.blue,
+                                style: GoogleFonts.lato(
+                                  color: currentButtonIndex == 0 ? notSelectedButtonColor : selectedButtonColor,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,// Adjust font size
+                                  fontWeight: FontWeight.bold, // Adjust font weight// Adjust text color
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: currentButtonIndex == 0 ? Colors.blue : Colors.white,
+                                backgroundColor: currentButtonIndex == 0 ? selectedButtonColor : notSelectedButtonColor,
                                 side: BorderSide(
                                   color: Colors.grey,
                                 ),
+                                padding: EdgeInsets.zero, // Remove padding around the text
                                 shape: RoundedRectangleBorder(),
-                          
+
                               )
                           ),
                         ),
-                        Expanded(
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.25,
                           child: ElevatedButton(
                               onPressed: () {
                                 setState(() {
@@ -203,21 +247,25 @@ class _RankPageState extends State<RankPage> {
                               },
                               child: Text(
                                 'Intermediate',
-                                style: TextStyle(
-                                  color: currentButtonIndex == 1 ? Colors.white : Colors.blue,
+                                style: GoogleFonts.lato(
+                                  color: currentButtonIndex == 1 ? notSelectedButtonColor : selectedButtonColor,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,// Adjust font size
+                                  fontWeight: FontWeight.bold, // Adjust font weight// Adjust text color
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: currentButtonIndex == 1 ? Colors.blue : Colors.white,
+                                backgroundColor: currentButtonIndex == 1 ? selectedButtonColor : notSelectedButtonColor,
                                 side: BorderSide(
                                   color: Colors.grey,
                                 ),
+                                padding: EdgeInsets.zero, // Remove padding around the text
                                 shape: RoundedRectangleBorder(),
-                          
+
                               )
                           ),
                         ),
-                        Expanded(
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.25,
                           child: ElevatedButton(
                               onPressed: () {
                                 setState(() {
@@ -226,20 +274,24 @@ class _RankPageState extends State<RankPage> {
                               },
                               child: Text(
                                 'Advanced',
-                                style: TextStyle(
-                                  color: currentButtonIndex == 2 ? Colors.white : Colors.blue,
+                                style: GoogleFonts.lato(
+                                  color: currentButtonIndex == 2 ? notSelectedButtonColor : selectedButtonColor,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,// Adjust font size
+                                  fontWeight: FontWeight.bold, // Adjust font weight// Adjust text color
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: currentButtonIndex == 2 ? Colors.blue : Colors.white,
+                                backgroundColor: currentButtonIndex == 2 ? selectedButtonColor : notSelectedButtonColor,
                                 side: BorderSide(
                                   color: Colors.grey,
                                 ),
+                                padding: EdgeInsets.zero, // Remove padding around the text
                                 shape: RoundedRectangleBorder(),
                               )
                           ),
                         ),
-                        Expanded(
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.25,
                           child: ElevatedButton(
                               onPressed: () {
                                 setState(() {
@@ -248,15 +300,18 @@ class _RankPageState extends State<RankPage> {
                               },
                               child: Text(
                                 'Expert',
-                                style: TextStyle(
-                                  color: currentButtonIndex == 3 ? Colors.white : Colors.blue,
+                                style: GoogleFonts.lato(
+                                  color: currentButtonIndex == 3 ? notSelectedButtonColor : selectedButtonColor,
+                                  fontSize: MediaQuery.of(context).size.width * 0.03,// Adjust font size
+                                  fontWeight: FontWeight.bold, // Adjust font weight// Adjust text color
                                 ),
                               ),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: currentButtonIndex == 3 ? Colors.blue : Colors.white,
+                                backgroundColor: currentButtonIndex == 3 ? selectedButtonColor : notSelectedButtonColor,
                                 side: BorderSide(
                                   color: Colors.grey,
                                 ),
+                                padding: EdgeInsets.zero, // Remove padding around the text
                                 shape: RoundedRectangleBorder(),
                               )
                           ),
@@ -272,17 +327,33 @@ class _RankPageState extends State<RankPage> {
                               children: [
                                 if (rank == "Beginner" )
                                   Align(
-                                    alignment: Alignment.bottomLeft,
+                                    alignment: Alignment.center,
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
-                                        Text("You are currently a Beginner"),
-                                        Text("Become an Intermediate by ordering more!"),
+                                        Text("You are currently a Beginner",
+                                          style: GoogleFonts.lato(
+                                            fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                            fontWeight: FontWeight.bold, // Adjust font weight
+                                            color: selectedButtonColor, // Adjust text color
+                                          ),),
+                                        Text("Become an Intermediate by ordering more!",
+                                          style: GoogleFonts.lato(
+                                            fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                            fontWeight: FontWeight.bold, // Adjust font weight
+                                            color: selectedButtonColor, // Adjust text color
+                                          ),),
                                       ],
                                     ),
                                   ),
 
-                                Text("Perks"),
+                                Text("Perks",
+                                  style: GoogleFonts.lato(
+                                    fontSize: MediaQuery.of(context).size.width * 0.06, // Adjust font size
+                                    fontWeight: FontWeight.bold, // Adjust font weight
+                                    color: selectedButtonColor, // Adjust text color
+                                  ),
+                                ),
                                 Divider(
                                   color: Colors.grey[500],
                                 ),
@@ -291,14 +362,19 @@ class _RankPageState extends State<RankPage> {
                                       children: [
                                         CircleAvatar(
                                           radius: 20,
-                                          backgroundColor: Colors.grey[200],
+                                          backgroundColor: Colors.grey[350],
                                           child: Icon(Icons.add, color: Colors.green),
                                         ),
                                         SizedBox(width: MediaQuery.of(context).size.width * 0.015),
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text("Points per RM"),
+                                            Text("Points per RM",
+                                              style: GoogleFonts.lato(
+                                                fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                                fontWeight: FontWeight.bold, // Adjust font weight
+                                                color: selectedButtonColor, // Adjust text color
+                                              ),),
                                             Text("Earn 1x Point for every RM1 spent")
                                           ],
                                         )
@@ -313,17 +389,34 @@ class _RankPageState extends State<RankPage> {
                               children: [
                                 if (rank == "Intermediate")
                                   Align(
-                                    alignment: Alignment.bottomLeft,
+                                    alignment: Alignment.center,
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
-                                        Text("You are currently an Intermediate"),
-                                        Text("Become an Advance by ordering more!"),
+                                        Text("You are currently an Intermediate",
+                                          style: GoogleFonts.lato(
+                                            fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                            fontWeight: FontWeight.bold, // Adjust font weight
+                                            color: selectedButtonColor, // Adjust text color
+                                          ),
+                                        ),
+                                        Text("Become an Advance by ordering more!",
+                                          style: GoogleFonts.lato(
+                                            fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                            fontWeight: FontWeight.bold, // Adjust font weight
+                                            color: selectedButtonColor, // Adjust text color
+                                          ),),
                                       ],
                                     ),
                                   ),
 
-                                Text("Perks"),
+                                Text("Perks",
+                                  style: GoogleFonts.lato(
+                                    fontSize: MediaQuery.of(context).size.width * 0.06, // Adjust font size
+                                    fontWeight: FontWeight.bold, // Adjust font weight
+                                    color: selectedButtonColor, // Adjust text color
+                                  ),
+                                ),
                                 Divider(
                                   color: Colors.grey[500],
                                 ),
@@ -332,14 +425,19 @@ class _RankPageState extends State<RankPage> {
                                       children: [
                                         CircleAvatar(
                                           radius: 20,
-                                          backgroundColor: Colors.grey[200],
+                                          backgroundColor: Colors.grey[350],
                                           child: Icon(Icons.add, color: Colors.green),
                                         ),
                                         SizedBox(width: MediaQuery.of(context).size.width * 0.015),
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text("Points per RM"),
+                                            Text("Points per RM",
+                                              style: GoogleFonts.lato(
+                                                fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                                fontWeight: FontWeight.bold, // Adjust font weight
+                                                color: selectedButtonColor, // Adjust text color
+                                              ),),
                                             Text("Earn 1.5x Point for every RM1 spent")
                                           ],
                                         )
@@ -355,17 +453,33 @@ class _RankPageState extends State<RankPage> {
                               children: [
                                 if (rank == "Advanced")
                                   Align(
-                                    alignment: Alignment.bottomLeft,
+                                    alignment: Alignment.center,
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
-                                        Text("You are currently an Advanced"),
-                                        Text("Become an Expert by ordering more!"),
+                                        Text("You are currently an Advanced",
+                                          style: GoogleFonts.lato(
+                                            fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                            fontWeight: FontWeight.bold, // Adjust font weight
+                                            color: selectedButtonColor, // Adjust text color
+                                          ),),
+                                        Text("Become an Expert by ordering more!",
+                                          style: GoogleFonts.lato(
+                                            fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                            fontWeight: FontWeight.bold, // Adjust font weight
+                                            color: selectedButtonColor, // Adjust text color
+                                          ),),
                                       ],
                                     ),
                                   ),
 
-                                Text("Perks"),
+                                Text("Perks",
+                                  style: GoogleFonts.lato(
+                                    fontSize: MediaQuery.of(context).size.width * 0.06, // Adjust font size
+                                    fontWeight: FontWeight.bold, // Adjust font weight
+                                    color: selectedButtonColor, // Adjust text color
+                                  ),
+                                ),
                                 Divider(
                                   color: Colors.grey[500],
                                 ),
@@ -374,14 +488,19 @@ class _RankPageState extends State<RankPage> {
                                       children: [
                                         CircleAvatar(
                                           radius: 20,
-                                          backgroundColor: Colors.grey[200],
+                                          backgroundColor: Colors.grey[350],
                                           child: Icon(Icons.add, color: Colors.green),
                                         ),
                                         SizedBox(width: MediaQuery.of(context).size.width * 0.015),
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text("Points per RM"),
+                                            Text("Points per RM",
+                                              style: GoogleFonts.lato(
+                                                fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                                fontWeight: FontWeight.bold, // Adjust font weight
+                                                color: selectedButtonColor, // Adjust text color
+                                              ),),
                                             Text("Earn 2x Point for every RM1 spent")
                                           ],
                                         )
@@ -398,17 +517,33 @@ class _RankPageState extends State<RankPage> {
                               children: [
                                 if (rank == "Expert")
                                   Align(
-                                    alignment: Alignment.bottomLeft,
+                                    alignment: Alignment.center,
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.center,
                                       children: [
-                                        Text("You are currently an Expert"),
-                                        Text("Enjoy the best benefits when ordering!"),
+                                        Text("You are currently an Expert,",
+                                          style: GoogleFonts.lato(
+                                            fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                            fontWeight: FontWeight.bold, // Adjust font weight
+                                            color: selectedButtonColor, // Adjust text color
+                                          ),),
+                                        Text("Enjoy the best benefits when ordering!",
+                                          style: GoogleFonts.lato(
+                                            fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                            fontWeight: FontWeight.bold, // Adjust font weight
+                                            color: selectedButtonColor, // Adjust text color
+                                          ),),
                                       ],
                                     ),
                                   ),
 
-                                Text("Perks"),
+                                Text("Perks",
+                                  style: GoogleFonts.lato(
+                                    fontSize: MediaQuery.of(context).size.width * 0.06, // Adjust font size
+                                    fontWeight: FontWeight.bold, // Adjust font weight
+                                    color: selectedButtonColor, // Adjust text color
+                                  ),
+                                ),
                                 Divider(
                                   color: Colors.grey[500],
                                 ),
@@ -417,14 +552,19 @@ class _RankPageState extends State<RankPage> {
                                       children: [
                                         CircleAvatar(
                                           radius: 20,
-                                          backgroundColor: Colors.grey[200],
+                                          backgroundColor: Colors.grey[350],
                                           child: Icon(Icons.add, color: Colors.green),
                                         ),
                                         SizedBox(width: MediaQuery.of(context).size.width * 0.015),
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text("Points per RM"),
+                                            Text("Points per RM",
+                                              style: GoogleFonts.lato(
+                                                fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size
+                                                fontWeight: FontWeight.bold, // Adjust font weight
+                                                color: selectedButtonColor, // Adjust text color
+                                              ),),
                                             Text("Earn 3x Point for every RM1 spent")
                                           ],
                                         )

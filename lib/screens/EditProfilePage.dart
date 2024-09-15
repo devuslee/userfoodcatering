@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../reusableWidgets/reusableColor.dart';
 import '../reusableWidgets/reusableFunctions.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -100,8 +101,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     setState(() {
       profileURL = url;
     });
-
-    updateProfile(usernameController.text, currentUser);
   }
 
   @override
@@ -178,11 +177,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
           ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.01),
           ElevatedButton(
-            onPressed: () {
-              uploadFile();
+            onPressed: () async {
+              await uploadFile();
+              await updateProfile(usernameController.text, currentUser);
               Navigator.pop(context,true);
               },
-            child: const Text("Save Changes"),
+            child: Text("Save Changes",
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: selectedButtonColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32),
+              ),
+            ),
           ),
         ],
       ),

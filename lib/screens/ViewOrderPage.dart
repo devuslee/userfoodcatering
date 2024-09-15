@@ -4,6 +4,7 @@ import 'package:userfoodcatering/class/menuClass.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:userfoodcatering/reusableWidgets/reusableColor.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:floating_snackbar/floating_snackbar.dart';
 
@@ -271,15 +272,13 @@ class _ViewOrderPageState extends State<ViewOrderPage> {
                       addToCart(widget.menuData.name, widget.menuData.price, counter, total, widget.menuData.imageURL);
                       Navigator.pop(context, true);
 
-                      floatingSnackBar(
-                        message: "Item added to cart",
-                        context: context,
-                        textColor: Colors.white,
-                        backgroundColor: Colors.grey,
-                        duration: Duration(seconds: 2),
-                        textStyle: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text("Item added to cart"),
+                          behavior: SnackBarBehavior.floating,
+                          margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.11, left: 20.0, right: 20.0), // Adjust the bottom margin
+                          duration: Duration(seconds: 2),
+                          backgroundColor: Colors.grey,
                         ),
                       );
                     },
@@ -289,7 +288,7 @@ class _ViewOrderPageState extends State<ViewOrderPage> {
                           fontSize: 20,
                           color: Colors.white,)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.black,
+                      backgroundColor: selectedButtonColor,
                       padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       textStyle: TextStyle(
                         fontSize: 20,

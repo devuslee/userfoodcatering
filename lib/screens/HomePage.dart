@@ -14,6 +14,7 @@ import '../reusableWidgets/reusableColor.dart';
 import 'MoreOrderDetailsPage.dart';
 import 'PointPage.dart';
 import 'ReviewPage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -43,7 +44,8 @@ class _HomePageState extends State<HomePage> {
   double currentPointprogress = 0;
   List<MenuClass> allMenuItems = [];
 
-  String selectedDateTime = DateTime.now().toString().split(" ")[0];
+  // String selectedDateTime = DateTime.now().toString().split(" ")[0];
+  String selectedDateTime = DateTime(2024, 9, 13).toString().split(" ")[0];
 
   DateTime selectedDate = DateTime.now();
 
@@ -59,14 +61,8 @@ class _HomePageState extends State<HomePage> {
     try {
       Map<String, String> tempUserDetails = await getUserDetails();
       List<MenuClass> tempAllMenuItems = await getMenuData();
+      print("selected date ${selectedDate}");
       todayHistory = await returnOrderHistory(selectedDateTime);
-
-
-      for (var event in todayHistory) {
-        print(await convertOrderHistoryToMap(event.createdAt, event.desiredPickupTime, event.id, event.orderHistory, event.paymentMethod, event.specialRemarks, event.status, event.total, event.type).runtimeType);
-      }
-
-
 
 
       if (mounted) {
@@ -74,7 +70,6 @@ class _HomePageState extends State<HomePage> {
           userDetails = tempUserDetails;
           balance = userDetails['balance']!;
           points = (double.parse(userDetails['points']!).toStringAsFixed(2)).toString();
-
           rank = userDetails['rank']!;
 
 
@@ -137,16 +132,28 @@ class _HomePageState extends State<HomePage> {
               future: _getImageUrls(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return Center(child: Column(
+                    children: [
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                      CircularProgressIndicator(),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.01)
+                    ],
+                  ));
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return CircularProgressIndicator();
+                  return Center(child: Column(
+                    children: [
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                      CircularProgressIndicator(),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.01)
+                    ],
+                  ));
                 } else {
                   Map<String, String> imageUrls = snapshot.data!;
                   return FlutterCarousel(
                     options: CarouselOptions(
-                      height: 400.0,
+                      height: MediaQuery.of(context).size.height * 0.3,
                       aspectRatio: 2.0,
                       viewportFraction: 1.0,
                       enlargeCenterPage: true,
@@ -159,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                       return Builder(
                         builder: (BuildContext context) {
                           return Container(
-                            width: 500,
+                            height: MediaQuery.of(context).size.height * 0.3,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
@@ -195,89 +202,89 @@ class _HomePageState extends State<HomePage> {
                 }
               },
             ),
-            Divider(),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
+            Divider(
+              color: Colors.grey,
+              height: 1,
+              thickness: 1,
+            ),
+            Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: Text(
-                          welcomeText, style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.025)
+                          welcomeText,
+                        style: GoogleFonts.lato(
+                          fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                          fontWeight: FontWeight.bold, // Adjust font weight
+                          color: selectedButtonColor, // Adjust text color
+                        ),
+                                        ),
+                    ),
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ReusableContainer(text: "Wallet", textvalue: "RM ${balance}", onPressed: () async {
+                            bool isRefresh = await Navigator.push(context, MaterialPageRoute(builder: (context) => WalletPage()),);
+
+                            if (isRefresh) {
+                              setState(() {
+                                fetchData();
+                              });
+                            }
+                          }),
+                          ReusableContainer(text: "Points", textvalue: "${points} pts", onPressed: () async {
+                            bool isRefresh = await Navigator.push(context, MaterialPageRoute(builder: (context) => PointPage()),);
+
+                            if (isRefresh) {
+                              setState(() {
+                                fetchData();
+                              });
+                            }
+                          },),
+
+                          ReusableContainer(text: "Rank", textvalue: rank, onPressed: () async {
+                            bool isRefresh = await Navigator.push(context, MaterialPageRoute(builder: (context) => RankPage()),);
+
+                            if (isRefresh) {
+                              setState(() {
+                                fetchData();
+                              });
+                            }
+                          },),
+                        ],
                       )
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                  Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey), // Add border
-                          borderRadius: BorderRadius.circular(8.0), // Add border radius for rounded corners
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ReusableContainer(text: "Wallet", textvalue: "RM ${balance}", onPressed: () async {
-                              bool isRefresh = await Navigator.push(context, MaterialPageRoute(builder: (context) => WalletPage()),);
-
-                              if (isRefresh) {
-                                setState(() {
-                                  fetchData();
-                                });
-                              }
-                            }),
-                            ReusableContainer(text: "Points", textvalue: "${points} pts", onPressed: () async {
-                              bool isRefresh = await Navigator.push(context, MaterialPageRoute(builder: (context) => PointPage()),);
-
-                              if (isRefresh) {
-                                setState(() {
-                                  fetchData();
-                                });
-                              }
-                            },),
-
-                            if (rank == "Expert")
-                            ReusableContainer(text: rank, textvalue: "Highest Rank", onPressed: () async {
-                              bool isRefresh = await Navigator.push(context, MaterialPageRoute(builder: (context) => RankPage()),);
-
-                              if (isRefresh) {
-                                setState(() {
-                                  fetchData();
-                                });
-                              }
-                            },),
-
-                            if (rank != "Expert")
-                            ReusableContainer(text: rank, textvalue: progressBarText, onPressed: () async {
-                              bool isRefresh = await Navigator.push(context, MaterialPageRoute(builder: (context) => RankPage()),);
-
-                              if (isRefresh) {
-                                setState(() {
-                                  fetchData();
-                                });
-                              }
-                            },),
-                          ],
-                        )
-                    ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                  Row(
+                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
                     children: [
                       Text(
-                        "Heres the orders you have for today",
-                        style: TextStyle(
-                          fontSize: MediaQuery.of(context).size.width * 0.03,
-                          fontWeight: FontWeight.bold,
+                        "Today's Orders",
+                        style: GoogleFonts.lato(
+                          fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                          fontWeight: FontWeight.bold, // Adjust font weight
+                          color: selectedButtonColor, // Adjust text color
                         ),
                       ),
                       Spacer(),
                       IconButton(
-                        icon: Icon(Icons.calendar_today_outlined),
+                        icon: Icon(
+                          Icons.calendar_month_outlined,
+                          size: MediaQuery.of(context).size.width * 0.065,
+                        color: selectedButtonColor),
                         onPressed: () {
                           setState(() async {
                             bool isRefresh = await Navigator.push(
                                 context,
                                 MaterialPageRoute(builder: (context) => CalendarPage())
                             );
-
+                  
                             if (isRefresh) {
                               setState(() {
                                 fetchData();
@@ -288,28 +295,37 @@ class _HomePageState extends State<HomePage> {
                       )
                     ],
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                ),
+                Divider(
+                  color: Colors.grey,
+                  height: 1,
+                  thickness: 1,
+                ),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
 
-                  if (todayHistory.isEmpty)
-                    Column(
-                      children: [
-                        Icon(Icons.error_outline, size: 50.0, color: Colors.red),
-                        Text(
-                          "No orders for today",
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            color: Colors.grey,
-                          ),
+                if (todayHistory.isEmpty)
+                  Column(
+                    children: [
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                      Icon(Icons.error_outline, size: 50.0, color: Colors.red),
+                      Text(
+                        "No orders for today",
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          color: Colors.grey,
                         ),
-                        SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                      ]
-                    ),
+                      ),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                    ]
+                  ),
 
 
-                  if (todayHistory.isNotEmpty)
-                    for (var history in todayHistory)
-                      if (history.type == 'Expense')
-                          Column(
+                if (todayHistory.isNotEmpty)
+                  for (var history in todayHistory)
+                    if (history.type == 'Expense')
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
                             children: [
                               InkWell(
                                 onTap: () async {
@@ -396,7 +412,7 @@ class _HomePageState extends State<HomePage> {
                                                     ),
                                                   ],
                                                 ),
-                                                Text('Pickup Date: ${DayMonthYearFormatter(history.desiredPickupTime)} (Today)'),
+                                                Text('Pickup Date: ${DayMonthYearFormatter(history.desiredPickupTime)}'),
                                                 Text(history.specialRemarks == "" ? 'Special Remarks: None' : 'Special Remarks: ${history.specialRemarks}'),
                                                 Row(
                                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -404,24 +420,31 @@ class _HomePageState extends State<HomePage> {
                                                     Text('Payment Method: ${history.paymentMethod}'),
                                                     Spacer(),
                                                     Row(
+                                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                                      mainAxisAlignment: MainAxisAlignment.start,
                                                       children: [
                                                         Text('Status: '),
-                                                        Container(
-                                                            decoration: BoxDecoration(
-                                                                color:
+                                                        Baseline(
+                                                          baseline: 0,
+                                                          baselineType: TextBaseline.alphabetic,
+                                                          child: Container(
+                                                              height: MediaQuery.of(context).size.height * 0.045,
+                                                              decoration: BoxDecoration(
+                                                                  color:
                                                                   history.status == 'Pending' ? darkYellow :
                                                                   history.status == "Cancelled" ? Colors.red :
                                                                   Colors.green,
-                                                                borderRadius: BorderRadius.circular(5)
-                                                            ),
-                                                            child: Padding(
-                                                              padding: const EdgeInsets.all(8.0),
-                                                              child: Text(
-                                                                history.status,
-                                                                style: TextStyle(
-                                                                    color: Colors.white),
+                                                                  borderRadius: BorderRadius.circular(5)
                                                               ),
-                                                            )
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.all(8.0),
+                                                                child: Text(
+                                                                  (history.status == "Completed and Reviewed") ? "Reviewed" : history.status,
+                                                                  style: TextStyle(
+                                                                      color: Colors.white),
+                                                                ),
+                                                              )
+                                                          ),
                                                         ),
                                                       ],
                                                     ),
@@ -528,9 +551,9 @@ class _HomePageState extends State<HomePage> {
                               SizedBox(height: MediaQuery.of(context).size.height * 0.04),
                             ],
                           ),
-                  
-                ],
-              ),
+                        ),
+
+              ],
             ),
 
           ],

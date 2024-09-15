@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../reusableWidgets/reusableColor.dart';
 import 'SendingOrderPage.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CartPage extends StatefulWidget {
   const CartPage({super.key});
@@ -115,7 +116,7 @@ class _CartPageState extends State<CartPage> {
             if (cartTotal > double.parse(discountAmount)) {
               discountedcartTotal = cartTotal - double.parse(discountAmount);
               discounted = true;
-            } else if (cartTotal < double.parse(discountAmount)) {
+            } else if (cartTotal <= double.parse(discountAmount)) {
               discountedcartTotal = 0;
               discounted = true;
             } else {
@@ -134,7 +135,6 @@ class _CartPageState extends State<CartPage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -153,7 +153,7 @@ class _CartPageState extends State<CartPage> {
                           child: IconButton(
                             onPressed: () {
                               //instead of pop use push to navigate to the navigation page
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationPage(currentIndex: 4,)));
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => NavigationPage(currentIndex: 2,)));
                             },
                             icon: Icon(Icons.arrow_back_ios),
                           ),
@@ -161,11 +161,12 @@ class _CartPageState extends State<CartPage> {
                       Center(
                         child: Text(
                           "Cart",
-                          style: TextStyle(
-                            fontSize: 24.0,
-                            fontWeight: FontWeight.bold,
+                          style: GoogleFonts.lato(
+                            fontSize: MediaQuery.of(context).size.width * 0.065, // Adjust font size
+                            fontWeight: FontWeight.bold, // Adjust font weight
+                            color: selectedButtonColor, // Adjust text color
                           ),
-                          textAlign: TextAlign.center,
+                          textAlign: TextAlign.center, // Ensure text is centered
                         ),
                       ),
                     ],
@@ -174,9 +175,12 @@ class _CartPageState extends State<CartPage> {
               ),
             ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
                 child: Container(
-                    height: 50,
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.08,
                     width: MediaQuery
                         .of(context)
                         .size
@@ -200,9 +204,10 @@ class _CartPageState extends State<CartPage> {
                         children: [
                           Text(
                             'Self Pickup',
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold
+                            style: GoogleFonts.lato(
+                              fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                              fontWeight: FontWeight.bold, // Adjust font weight
+                              color: selectedButtonColor, // Adjust text color
                             ),
                           ),
                           SizedBox(width: MediaQuery.of(context).size.width * 0.02),
@@ -210,7 +215,7 @@ class _CartPageState extends State<CartPage> {
                             message: 'Currently there are no delivery options available',
                             child: Icon(
                               Icons.info_outline,
-                              size: 20,
+                              size: MediaQuery.of(context).size.width * 0.05,
                             ),
                           )
                         ],
@@ -219,7 +224,11 @@ class _CartPageState extends State<CartPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.only(
+                  left: MediaQuery.of(context).size.width * 0.04,
+                  right: MediaQuery.of(context).size.width * 0.04,
+                  bottom: 0.0,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -239,9 +248,10 @@ class _CartPageState extends State<CartPage> {
                             children: [
                               Text(
                                 'Order Summary',
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold
+                                style: GoogleFonts.lato(
+                                  fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                  fontWeight: FontWeight.bold, // Adjust font weight
+                                  color: selectedButtonColor, // Adjust text color
                                 ),
                               ),
                             ],
@@ -261,21 +271,23 @@ class _CartPageState extends State<CartPage> {
                                 Icon(
                                   Icons.shopping_cart,
                                   size: 100,
-                                  color: Colors.grey,
+                                  color: powderBlue,
                                 ),
                                 Text(
                                   'No items in cart',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                                  style: GoogleFonts.lato(
+                                    fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                    fontWeight: FontWeight.bold, // Adjust font weight
+                                    color: selectedButtonColor, // Adjust text color
                                   ),
                                 ),
+                              SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.75,
                                 child: ElevatedButton(
                                   onPressed: () {
                                     Navigator.push(context, MaterialPageRoute(
-                                      builder: (context) => NavigationPage(currentIndex: 4,),
+                                      builder: (context) => NavigationPage(currentIndex: 2,),
                                     ));
                                   },
                                   child: Row(
@@ -292,7 +304,7 @@ class _CartPageState extends State<CartPage> {
                                     ],
                                   ),
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.black,
+                                      backgroundColor: selectedButtonColor,
                                       padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                                       textStyle: TextStyle(
                                         fontSize: 20,
@@ -301,6 +313,7 @@ class _CartPageState extends State<CartPage> {
                                     ),
                                 ),
                               ),
+                                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                             ],
                             ),
                           );
@@ -314,11 +327,13 @@ class _CartPageState extends State<CartPage> {
                               SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                               Card(
                                 child: Container(
+                                  height: MediaQuery.of(context).size.height * 0.15,
                                   decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.grey,
-                                      width: 1,
-                                    ),
+                                    color: Colors.grey[300],
+                                    // border: Border.all(
+                                    //   color: Colors.grey,
+                                    //   width: 1,
+                                    // ),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Row(
@@ -347,9 +362,10 @@ class _CartPageState extends State<CartPage> {
                                                 Expanded(
                                                   child: Text(
                                                     item.name,
-                                                    style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight: FontWeight.bold,
+                                                    style: GoogleFonts.lato(
+                                                      fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                                      fontWeight: FontWeight.bold, // Adjust font weight
+                                                      color: selectedButtonColor, // Adjust text color
                                                     ),
                                                   ),
                                                 ),
@@ -363,7 +379,12 @@ class _CartPageState extends State<CartPage> {
                                                       ),
                                                     ).then((value) => fetchData());
                                                   },
-                                                  child: Text('EDIT'),
+                                                  child: Text('EDIT',
+                                                    style: GoogleFonts.lato(
+                                                      fontSize: MediaQuery.of(context).size.width * 0.035, // Adjust font size
+                                                      fontWeight: FontWeight.bold, // Adjust font weight
+                                                      color: selectedButtonColor, // Adjust text color
+                                                    ),),
                                                 ),
                                               ],
                                             ),
@@ -375,20 +396,97 @@ class _CartPageState extends State<CartPage> {
                                                 color: Colors.green,
                                               ),
                                             ),
-                                            SizedBox(
-                                              height: MediaQuery.of(context).size.height * 0.11,
-                                            ),
                                             Row(
                                               children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    'Portions: ${item.quantity}',
-                                                    style: TextStyle(
-                                                      fontSize: 16,
+                                                Container(
+                                                  width: MediaQuery.of(context).size.width * 0.075,
+                                                  height: MediaQuery.of(context).size.width * 0.075,
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
                                                       color: Colors.grey,
+                                                      width: 1,
                                                     ),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: IconButton(
+                                                      onPressed: () {
+                                                        if (item.quantity == 1) {
+                                                          showDialog(
+                                                            context: context,
+                                                            builder: (BuildContext context) {
+                                                              return AlertDialog(
+                                                                title: Text('Confirm Deletion'),
+                                                                content: Text('Are you sure you want to delete this item?'),
+                                                                actions: <Widget>[
+                                                                  TextButton(
+                                                                    onPressed: () {
+                                                                      Navigator.of(context).pop(); // Dismiss the dialog
+                                                                    },
+                                                                    child: Text('Cancel'),
+                                                                  ),
+                                                                  TextButton(
+                                                                    onPressed: () {
+                                                                      deleteSpecificCart(item.name);
+                                                                      setState(() {
+                                                                        fetchData();
+                                                                      });
+                                                                      Navigator.of(context).pop(); // Dismiss the dialog after deleting
+                                                                    },
+                                                                    child: Text('Delete'),
+                                                                  ),
+                                                                ],
+                                                              );
+                                                            },
+                                                          );
+
+                                                          return;
+                                                        }
+
+                                                        int quantity = item.quantity - 1;
+                                                        double total = item.price * quantity;
+                                                        updateSpecificCart(item.name, quantity, total);
+                                                        setState(() {
+                                                          fetchData();
+                                                        });
+                                                      },
+                                                      icon: Icon(Icons.remove),
+                                                       iconSize:  MediaQuery.of(context).size.width * 0.03,
                                                   ),
                                                 ),
+                                                SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                                                Text(
+                                                  '${item.quantity}',
+                                                  style: GoogleFonts.lato(
+                                                    fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                                    fontWeight: FontWeight.bold, // Adjust font weight
+                                                    color: selectedButtonColor, // Adjust text color
+                                                  ),
+                                                ),
+                                                SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                                                Container(
+                                                  width: MediaQuery.of(context).size.width * 0.075,
+                                                  height: MediaQuery.of(context).size.width * 0.075,
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color: Colors.grey,
+                                                      width: 1,
+                                                    ),
+                                                    shape: BoxShape.circle,
+                                                  ),
+                                                  child: IconButton(
+                                                    onPressed: () {
+                                                      int quantity = item.quantity + 1;
+                                                      double total = item.price * quantity;
+                                                      updateSpecificCart(item.name, quantity, total);
+                                                      setState(() {
+                                                        fetchData();
+                                                      });
+                                                    },
+                                                    icon: Icon(Icons.add),
+                                                    iconSize:  MediaQuery.of(context).size.width * 0.03,
+                                                  ),
+                                                ),
+                                                Spacer(),
                                                 IconButton(
                                                   onPressed: () {
                                                     showDialog(
@@ -420,6 +518,7 @@ class _CartPageState extends State<CartPage> {
                                                     );
                                                   },
                                                   icon: Icon(Icons.delete),
+                                                  iconSize:  MediaQuery.of(context).size.width * 0.075,
                                                 ),
                                               ],
                                             ),
@@ -439,7 +538,7 @@ class _CartPageState extends State<CartPage> {
                     Container(
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        color: lightCyan,
+                        color: backGroundColor,
                         border: Border(
                           top: BorderSide(
                             color: Colors.grey,
@@ -454,10 +553,10 @@ class _CartPageState extends State<CartPage> {
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                           Text(
                             "Pickup Time",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                            style: GoogleFonts.lato(
+                              fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                              fontWeight: FontWeight.bold, // Adjust font weight
+                              color: selectedButtonColor, // Adjust text color
                             ),
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
@@ -487,7 +586,7 @@ class _CartPageState extends State<CartPage> {
                     Container(
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        color: lightCyan,
+                        color: backGroundColor,
                         border: Border(
                           top: BorderSide(
                             color: Colors.grey,
@@ -502,10 +601,10 @@ class _CartPageState extends State<CartPage> {
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                           Text(
                             "Pickup Date",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                            style: GoogleFonts.lato(
+                              fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                              fontWeight: FontWeight.bold, // Adjust font weight
+                              color: selectedButtonColor, // Adjust text color
                             ),
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
@@ -522,7 +621,7 @@ class _CartPageState extends State<CartPage> {
                                 child: Row(
                                   children: [
                                     CircleAvatar(
-                                        backgroundColor: Colors.grey[200],
+                                        backgroundColor: Colors.grey[300],
                                         child: _dateController.text == '' ?
                                         Tooltip(
                                           message: 'Select a date',
@@ -539,12 +638,13 @@ class _CartPageState extends State<CartPage> {
                                           ),
                                         )
                                     ),
-                                    SizedBox(width: MediaQuery.of(context).size.width * 0.005),
+                                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
                                     Text(
                                       _dateController.text == '' ? 'Select a date' : _dateController.text,
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
+                                      style: GoogleFonts.lato(
+                                        fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                        fontWeight: FontWeight.bold, // Adjust font weight
+                                        color: selectedButtonColor, // Adjust text color
                                       ),
                                     ),
                                     Spacer(),
@@ -586,7 +686,7 @@ class _CartPageState extends State<CartPage> {
                     Container(
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        color: lightCyan,
+                        color: backGroundColor,
                         border: Border(
                           top: BorderSide(
                             color: Colors.grey,
@@ -601,17 +701,16 @@ class _CartPageState extends State<CartPage> {
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                           Text(
                             "Special Request",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                            style: GoogleFonts.lato(
+                              fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                              fontWeight: FontWeight.bold, // Adjust font weight
+                              color: selectedButtonColor, // Adjust text color
                             ),
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                           TextField(
                             decoration: InputDecoration(
-                              hintText: 'Have any special request? Let us know!'
-                                  ' (e.g. no onions, extra spicy, etc.)',
+                              hintText: 'Have any special request?',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -628,7 +727,7 @@ class _CartPageState extends State<CartPage> {
                     Container(
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        color: lightCyan,
+                        color: backGroundColor,
                         border: Border(
                           top: BorderSide(
                             color: Colors.grey,
@@ -643,10 +742,10 @@ class _CartPageState extends State<CartPage> {
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                           Text(
                             "Select Payment Method",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                            style: GoogleFonts.lato(
+                              fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                              fontWeight: FontWeight.bold, // Adjust font weight
+                              color: selectedButtonColor, // Adjust text color
                             ),
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
@@ -676,7 +775,7 @@ class _CartPageState extends State<CartPage> {
                     Container(
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        color: lightCyan,
+                        color: backGroundColor,
                         border: Border(
                           top: BorderSide(
                             color: Colors.grey,
@@ -691,10 +790,10 @@ class _CartPageState extends State<CartPage> {
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                           Text(
                             "Select Discount",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+                            style: GoogleFonts.lato(
+                              fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                              fontWeight: FontWeight.bold, // Adjust font weight
+                              color: selectedButtonColor, // Adjust text color
                             ),
                           ),
                           SizedBox(height: MediaQuery.of(context).size.height * 0.02),
@@ -706,15 +805,17 @@ class _CartPageState extends State<CartPage> {
                                   Icon(
                                     Icons.discount,
                                     size: 100,
-                                    color: Colors.grey,
+                                    color: powderBlue,
                                   ),
                                   Text(
                                     'No Discounts Selected',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
+                                    style: GoogleFonts.lato(
+                                      fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                      fontWeight: FontWeight.bold, // Adjust font weight
+                                      color: selectedButtonColor, // Adjust text color
                                     ),
                                   ),
+                                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                                   Container(
                                     width: MediaQuery.of(context).size.width * 0.75,
                                     child: ElevatedButton(
@@ -736,7 +837,7 @@ class _CartPageState extends State<CartPage> {
                                         ],
                                       ),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.black,
+                                        backgroundColor: selectedButtonColor,
                                         padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                                         textStyle: TextStyle(
                                           fontSize: 20,
@@ -763,7 +864,7 @@ class _CartPageState extends State<CartPage> {
                                 child: Row(
                                   children: [
                                     CircleAvatar(
-                                      backgroundColor: Colors.grey[200],
+                                      backgroundColor: Colors.grey[300],
                                       child: cartTotal == 0 ?
                                       Tooltip(
                                         message: 'Discount cannot be applied as there are items in cart',
@@ -783,9 +884,10 @@ class _CartPageState extends State<CartPage> {
                                     SizedBox(width: MediaQuery.of(context).size.width * 0.005),
                                     Text(
                                       'RM ${discountAmount} Discount Applied',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
+                                      style: GoogleFonts.lato(
+                                        fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                        fontWeight: FontWeight.bold, // Adjust font weight
+                                        color: selectedButtonColor, // Adjust text color
                                       ),
                                     ),
                                     Spacer(),
@@ -812,7 +914,7 @@ class _CartPageState extends State<CartPage> {
                         child: Container(
                           width: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
-                            color: lightCyan,
+                            color: backGroundColor,
                             border: Border(
                               top: BorderSide(
                                 color: Colors.grey,
@@ -829,7 +931,7 @@ class _CartPageState extends State<CartPage> {
                                 children: [
                                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
                                   Text(
-                                    "Total Portions: ${cartQuantity.toString()}",
+                                    cartQuantity == 1 ? "${cartQuantity.toInt()} item" : "${cartQuantity.toInt()} items",
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.bold,
@@ -885,7 +987,7 @@ class _CartPageState extends State<CartPage> {
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                          title: Text('Error'),
+                                          title: Text('Empty Cart'),
                                           content: Text('No items in cart'),
                                           actions: <Widget>[
                                             TextButton(
@@ -1034,9 +1136,10 @@ class _CartPageState extends State<CartPage> {
                                     "Order Now",
                                     style: TextStyle(
                                       fontSize: 20,
-                                      color: Colors.white,)),
+                                      color: Colors.white,)
+                                ),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
+                                  backgroundColor: selectedButtonColor,
                                   padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                                   textStyle: TextStyle(
                                     fontSize: 20,

@@ -8,7 +8,9 @@ import 'package:userfoodcatering/screens/RankPage.dart';
 import 'package:userfoodcatering/screens/TopupPage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:userfoodcatering/screens/WalletPage.dart';
+import '../reusableWidgets/reusableColor.dart';
 import 'EditProfilePage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'LoginPage.dart';
 import 'package:timezone/timezone.dart' as tz;
 
@@ -80,11 +82,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     Container(
                       width: MediaQuery.of(context).size.width * 0.9,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
+                        color: lightGrey,
+                        border: Border.all(color: Colors.black,),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.all(0.0),
                         child: Column(
                           children: [
                             Row(
@@ -101,15 +104,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                                 Column(
                                   children: [
+                                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                                     Text(
                                       "Balance",
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold,
+                                        color: Colors.grey,
                                       ),
                                     ),
                                     Text(
                                         'RM ${balance}',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        )
                                     ),
                                     ElevatedButton(
                                         onPressed: () async {
@@ -124,14 +133,26 @@ class _ProfilePageState extends State<ProfilePage> {
                                             });
                                           }
                                         },
-                                        child: Text("View Wallet")
-                                    )
+                                      child: Text("View Points",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: selectedButtonColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(32),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                                   ],
                                 ),
                               ],
                             ),
                             Divider(
                               thickness: 1,
+                              height: 1,
                               color: Colors.grey,
                             ),
                             Row(
@@ -139,6 +160,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               children: [
                                 Column(
                                   children: [
+                                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                                     Text(
                                       "Points",
                                       style: TextStyle(
@@ -167,18 +189,30 @@ class _ProfilePageState extends State<ProfilePage> {
                                             });
                                           }
                                         },
-                                        child: Text("View Points")
-                                    )
+                                        child: Text("View Points",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: selectedButtonColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(32),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                                   ],
                                 ),
                                 //vertical divider
                                 Container(
                                   width: 1.0,
-                                  height: 50.0,
+                                  height: MediaQuery.of(context).size.height * 0.14,
                                   color: Colors.grey,
                                 ),
                                 Column(
                                   children: [
+                                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                                     Text(
                                       "Rank",
                                       style: TextStyle(
@@ -207,8 +241,19 @@ class _ProfilePageState extends State<ProfilePage> {
                                             });
                                           }
                                         },
-                                        child: Text("View Rank")
+                                      child: Text("View Points",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: selectedButtonColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(32),
+                                        ),
+                                      ),
                                     ),
+                                    SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                                   ],
                                 ),
                               ],
@@ -220,10 +265,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     SizedBox(height: MediaQuery.of(context).size.height * 0.05),
                     Text(
                         "Settings",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      style: GoogleFonts.lato(
+                        fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                        fontWeight: FontWeight.bold, // Adjust font weight
+                        color: selectedButtonColor, // Adjust text color
+                      ),
                       ),
                     Divider(
                       color: Colors.grey.withOpacity(0.5),
@@ -263,9 +309,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           }
                         },
                     ),
-                    ReuseableSettingContainer(title: "Delete Account", icon: Icons.delete, onTap: () {
-
-                    }),
                     ReuseableSettingContainer(
                         title: "Logout",
                         icon: Icons.logout,

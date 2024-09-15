@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:userfoodcatering/reusableWidgets/reusableColor.dart';
 
 import '../screens/CartPage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 import '../screens/RedeemDiscountPage.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:icon_badge/icon_badge.dart';
 
 class ReusableTextField extends StatefulWidget {
@@ -79,38 +81,37 @@ class _ReusableContainerState extends State<ReusableContainer> {
         widget.onPressed();
       },
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.25, // Adjust width as needed
-        margin: EdgeInsets.all(8.0), // Adjust margin as needed
-        padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // Adjust padding as needed
+        width: MediaQuery.of(context).size.width * 0.25,
+        height: MediaQuery.of(context).size.height * 0.08,
+        margin: EdgeInsets.all(0.0), // Adjust margin as needed
+        padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0), // Adjust padding as needed
         decoration: BoxDecoration(
+          color: lightGrey, // Add color
           border: Border.all(color: Colors.grey), // Add border
           borderRadius: BorderRadius.circular(8.0), // Add border radius for rounded corners
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                widget.text,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width * 0.015, // Adjust font size
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey// Adjust font weight
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              widget.text,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.lato(
+                fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                fontWeight: FontWeight.bold, // Adjust font weight
+                color: selectedButtonColor, // Adjust text color
               ),
-              Text(
-                widget.textvalue,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: MediaQuery.of(context).size.width * 0.02, // Adjust font size
-                  fontWeight: FontWeight.bold, // Adjust font weight
-                ),
+            ),
+            Text(
+              widget.textvalue,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: MediaQuery.of(context).size.width * 0.03, // Adjust font size
+                fontWeight: FontWeight.bold, // Adjust font weight
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -152,9 +153,10 @@ class ReusableAppBar extends StatelessWidget {
                 Center(
                   child: Text(
                     title,
-                    style: TextStyle(
-                      fontSize: 24.0, // Adjust font size
+                    style: GoogleFonts.lato(
+                      fontSize: MediaQuery.of(context).size.width * 0.065, // Adjust font size
                       fontWeight: FontWeight.bold, // Adjust font weight
+                      color: selectedButtonColor, // Adjust text color
                     ),
                     textAlign: TextAlign.center, // Ensure text is centered
                   ),
@@ -303,18 +305,20 @@ class _ReusableDiscountState extends State<ReusableDiscount> {
       child: Container(
         width: MediaQuery.of(context).size.width * 0.95,
         decoration: BoxDecoration(
+          color: lightGrey,
           border: Border.all(color: Colors.grey),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Center(child: widget.downloadURL == "" ? Text("No Image") : CachedNetworkImage(imageUrl: widget.downloadURL)),
+              Center(child: widget.downloadURL == "" ? Text("No Image") :
+                CachedNetworkImage(imageUrl: widget.downloadURL)),
               Divider(
                 color: Colors.grey,
+                height: 1,
+                thickness: 1,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -336,7 +340,6 @@ class _ReusableDiscountState extends State<ReusableDiscount> {
             ],
           ),
         ),
-      ),
     );
   }
 }

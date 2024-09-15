@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../reusableWidgets/reusableColor.dart';
 import '../reusableWidgets/reusableFunctions.dart';
 import '../reusableWidgets/reusableWidgets.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -54,6 +56,7 @@ class _PointPageState extends State<PointPage> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container (
                   decoration: BoxDecoration(
+                    color: lightGrey,
                     border: Border.all(color: Colors.grey),
                     borderRadius: BorderRadius.circular(8.0),
                   ),
@@ -63,19 +66,27 @@ class _PointPageState extends State<PointPage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         CircleAvatar(
-                          radius: MediaQuery.of(context).size.width * 0.03,
+                          radius: MediaQuery.of(context).size.width * 0.07,
                           backgroundColor: Colors.blue,
                           child: Icon(
                             Icons.point_of_sale,
                             color: Colors.white,
-                            size: MediaQuery.of(context).size.width * 0.05,),
+                            size: MediaQuery.of(context).size.width * 0.12,),
                         ),
                         SizedBox(width: MediaQuery.of(context).size.width * 0.02),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Points", style: TextStyle(fontSize: 20)),
-                            Text(points, style: TextStyle(fontSize: 20))
+                            Text("Points", style: GoogleFonts.lato(
+                              fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                              fontWeight: FontWeight.bold, // Adjust font weight
+                              color: selectedButtonColor, // Adjust text color
+                            ),),
+                            Text(points, style: GoogleFonts.lato(
+                              fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                              fontWeight: FontWeight.bold, // Adjust font weight
+                              color: selectedButtonColor, // Adjust text color
+                            ),)
                           ],
                         ),
                         Spacer(),
@@ -90,9 +101,9 @@ class _PointPageState extends State<PointPage> {
                                 Icon(
                                   Icons.redeem,
                                   color: Colors.redAccent,
-                                  size: MediaQuery.of(context).size.width * 0.05,
+                                  size: MediaQuery.of(context).size.width * 0.1,
                                 ),
-                                Text("Redeem", style: TextStyle(fontSize: 12))
+                                Text("Redeem", style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.04)),
                               ],
                             )
                         ),
@@ -101,18 +112,25 @@ class _PointPageState extends State<PointPage> {
                   ),
                 ),
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.01),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.only(
+                  left: 16,
+                  right: 16,
+                ),
                 child: Row(
                   children: [
-                    Text("Transaction History", style: TextStyle(fontSize: 20)),
+                    Text("Point History", style: GoogleFonts.lato(
+                      fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                      fontWeight: FontWeight.bold, // Adjust font weight
+                      color: selectedButtonColor, // Adjust text color
+                    ),),
                     SizedBox(width: MediaQuery.of(context).size.width * 0.0075),
                     Tooltip(
                       message: 'Shows the recent 20 transactions',
                       child: Icon(
                         Icons.info_outline,
-                        size: 20,
+                        size: MediaQuery.of(context).size.width * 0.05,
+                        color: selectedButtonColor,
                       ),
                     )
                   ],
@@ -126,23 +144,27 @@ class _PointPageState extends State<PointPage> {
                     child: Row(
                       children: [
                         if (transaction.type == "Expense") CircleAvatar(
-                          radius: MediaQuery.of(context).size.width * 0.03,
+                          radius: MediaQuery.of(context).size.width * 0.05,
                           backgroundColor: Colors.white,
                           child: Icon(
                             Icons.remove,
                             color: Colors.red,
-                            size: MediaQuery.of(context).size.width * 0.05,),
+                            size: MediaQuery.of(context).size.width * 0.07,),
                         ),
 
                         if (transaction.type == "Income") CircleAvatar(
-                          radius: MediaQuery.of(context).size.width * 0.03,
+                          radius: MediaQuery.of(context).size.width * 0.05,
                           backgroundColor: Colors.white,
                           child: Icon(
                             Icons.add,
                             color: Colors.green,
-                            size: MediaQuery.of(context).size.width * 0.05,),
+                            size: MediaQuery.of(context).size.width * 0.07,),
                         ),
 
+                        SizedBox(width: MediaQuery
+                            .of(context)
+                            .size
+                            .width * 0.02),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           mainAxisAlignment: MainAxisAlignment.start,

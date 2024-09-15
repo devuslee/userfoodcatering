@@ -74,6 +74,7 @@ class _CalendarPageState extends State<CalendarPage> {
               padding: EdgeInsets.all(MediaQuery.of(context).size.height * 0.02),
               child: Container(
                 decoration: BoxDecoration(
+                  color: lightGrey,
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -97,7 +98,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       availableCalendarFormats: const {
                         CalendarFormat.month: 'Month',
                       },
-                      // Optionally, you can uncomment the CalendarBuilders for custom styling.
+                      // CalendarBuilders for custom styling.
                       // calendarBuilders: CalendarBuilders(
                       //   selectedBuilder: (context, date, events) => Container(
                       //     margin: const EdgeInsets.all(4.0),
@@ -127,6 +128,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     Container(
                       width: MediaQuery.of(context).size.width * 1,
                       decoration: BoxDecoration(
+                        color: lightPeach,
                         border: Border.all(
                           color: Colors.black,
                           width: 2.0,
@@ -139,7 +141,7 @@ class _CalendarPageState extends State<CalendarPage> {
                           Container(
                             width: MediaQuery.of(context).size.width * 1,
                             decoration: BoxDecoration(
-                              color: Colors.grey[200],
+                              color: darkPeach,
                               borderRadius: BorderRadius.only(
                                 topLeft: Radius.circular(10),
                                 topRight: Radius.circular(10),
@@ -185,7 +187,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                     Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text('Location: 5-G-1, Promenade, Jalan Mahsuri, 11900 Bayan Baru, Pulau Pinang'),
+                                        Text('5-G-1, Promenade,'),
                                         Text('Pickup Time: ${HourFormatter(event['desiredPickupTime'])}'),
                                       ],
                                     ),
@@ -205,25 +207,33 @@ class _CalendarPageState extends State<CalendarPage> {
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('Payment Method: ${event['paymentMethod']}'),
+                                    Text('Payment Method: ${event["paymentMethod"]}'),
                                     Spacer(),
                                     Row(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      mainAxisAlignment: MainAxisAlignment.start,
                                       children: [
                                         Text('Status: '),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color:
-                                            event['status'] == 'Pending' ? darkYellow :
-                                            event['status'] == "Cancelled" ? Colors.red :
-                                            Colors.green,
-                                            borderRadius: BorderRadius.circular(5),
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              event['status'],
-                                              style: TextStyle(color: Colors.white),
-                                            ),
+                                        Baseline(
+                                          baseline: 0,
+                                          baselineType: TextBaseline.alphabetic,
+                                          child: Container(
+                                              height: MediaQuery.of(context).size.height * 0.045,
+                                              decoration: BoxDecoration(
+                                                  color:
+                                                  event['status'] == 'Pending' ? darkYellow :
+                                                  event['status'] == "Cancelled" ? Colors.red :
+                                                  Colors.green,
+                                                  borderRadius: BorderRadius.circular(5)
+                                              ),
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(8.0),
+                                                child: Text(
+                                                  (event['status'] == "Completed and Reviewed") ? "Reviewed" : event['status'],
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              )
                                           ),
                                         ),
                                       ],

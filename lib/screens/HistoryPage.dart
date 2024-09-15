@@ -72,11 +72,11 @@ class _HistoryPageState extends State<HistoryPage> {
                     child: Text(
                       'All',
                       style: TextStyle(
-                        color: currentButtonIndex == 0 ? Colors.white : Colors.blue,
+                        color: currentButtonIndex == 0 ? notSelectedButtonColor : selectedButtonColor,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: currentButtonIndex == 0 ? Colors.blue : Colors.white,
+                      backgroundColor: currentButtonIndex == 0 ? selectedButtonColor : notSelectedButtonColor,
                       side: BorderSide(
                         color: Colors.grey,
                       ),
@@ -92,11 +92,11 @@ class _HistoryPageState extends State<HistoryPage> {
                     child: Text(
                       'Active',
                       style: TextStyle(
-                        color: currentButtonIndex == 1 ? Colors.white : Colors.blue,
+                        color: currentButtonIndex == 1 ? notSelectedButtonColor : selectedButtonColor,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: currentButtonIndex == 1 ? Colors.blue : Colors.white,
+                      backgroundColor: currentButtonIndex == 1 ?  selectedButtonColor : notSelectedButtonColor,
                       side: BorderSide(
                         color: Colors.grey,
                       ),
@@ -111,11 +111,11 @@ class _HistoryPageState extends State<HistoryPage> {
                     child: Text(
                       'Past',
                       style: TextStyle(
-                        color: currentButtonIndex == 2 ? Colors.white : Colors.blue,
+                        color: currentButtonIndex == 2 ? notSelectedButtonColor : selectedButtonColor,
                       ),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: currentButtonIndex == 2 ? Colors.blue : Colors.white,
+                      backgroundColor: currentButtonIndex == 2 ?  selectedButtonColor : notSelectedButtonColor,
                       side: BorderSide(
                         color: Colors.grey,
                       ),
@@ -158,8 +158,9 @@ class _HistoryPageState extends State<HistoryPage> {
                             );
                           },
                           child: Container(
-                            width: MediaQuery.of(context).size.width * 0.8,
+                            width: MediaQuery.of(context).size.width * 0.9,
                             decoration: BoxDecoration(
+                              color: lightPeach,
                               border: Border.all(
                                 color: Colors.black,
                                 width: 2.0,
@@ -170,9 +171,9 @@ class _HistoryPageState extends State<HistoryPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
-                                      width: MediaQuery.of(context).size.width * 0.81,
+                                      width: MediaQuery.of(context).size.width * 0.9,
                                       decoration: BoxDecoration(
-                                        color: Colors.grey[200],
+                                          color: darkPeach,
                                         borderRadius: BorderRadius.only(
                                           topLeft: Radius.circular(10),
                                           topRight: Radius.circular(10),
@@ -203,7 +204,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Text('ID: ${history.id}'),
-                                                    Text('Created at: ${TimestampFormatter(history.createdAt)}'),
+                                                    Text('Created: ${TimestampFormatter(history.createdAt)}'),
                                                   ],
                                                 ),
                                                 Column(
@@ -226,24 +227,31 @@ class _HistoryPageState extends State<HistoryPage> {
                                                 Text('Payment Method: ${history.paymentMethod}'),
                                                 Spacer(),
                                                 Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  mainAxisAlignment: MainAxisAlignment.start,
                                                   children: [
                                                     Text('Status: '),
-                                                    Container(
-                                                        decoration: BoxDecoration(
-                                                            color:
-                                                            history.status == 'Pending' ? darkYellow :
-                                                            history.status == "Cancelled" ? Colors.red :
-                                                            Colors.green,
-                                                            borderRadius: BorderRadius.circular(5)
-                                                        ),
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.all(8.0),
-                                                          child: Text(
-                                                            history.status,
-                                                            style: TextStyle(
-                                                                color: Colors.white),
+                                                    Baseline(
+                                                      baseline: 0,
+                                                      baselineType: TextBaseline.alphabetic,
+                                                      child: Container(
+                                                        height: MediaQuery.of(context).size.height * 0.045,
+                                                          decoration: BoxDecoration(
+                                                              color:
+                                                              history.status == 'Pending' ? darkYellow :
+                                                              history.status == "Cancelled" ? Colors.red :
+                                                              Colors.green,
+                                                              borderRadius: BorderRadius.circular(5)
                                                           ),
-                                                        )
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.all(8.0),
+                                                            child: Text(
+                                                              (history.status == "Completed and Reviewed") ? "Reviewed" : history.status,
+                                                              style: TextStyle(
+                                                                  color: Colors.white),
+                                                            ),
+                                                          )
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -311,8 +319,9 @@ class _HistoryPageState extends State<HistoryPage> {
                               );
                             },
                             child: Container(
-                              width: MediaQuery.of(context).size.width * 0.8,
+                              width: MediaQuery.of(context).size.width * 0.9,
                               decoration: BoxDecoration(
+                                color: lightPeach,
                                 border: Border.all(
                                   color: Colors.black,
                                   width: 2.0,
@@ -323,9 +332,9 @@ class _HistoryPageState extends State<HistoryPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
-                                      width: MediaQuery.of(context).size.width * 0.81,
+                                      width: MediaQuery.of(context).size.width * 0.9,
                                       decoration: BoxDecoration(
-                                          color: Colors.grey[200],
+                                          color: darkPeach,
                                           borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(10),
                                             topRight: Radius.circular(10),
@@ -356,7 +365,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Text('ID: ${history.id}'),
-                                                    Text('Created at: ${TimestampFormatter(history.createdAt)}'),
+                                                    Text('Created: ${TimestampFormatter(history.createdAt)}'),
                                                   ],
                                                 ),
                                                 Column(
@@ -379,24 +388,31 @@ class _HistoryPageState extends State<HistoryPage> {
                                                 Text('Payment Method: ${history.paymentMethod}'),
                                                 Spacer(),
                                                 Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  mainAxisAlignment: MainAxisAlignment.start,
                                                   children: [
                                                     Text('Status: '),
-                                                    Container(
-                                                        decoration: BoxDecoration(
-                                                            color:
-                                                            history.status == 'Pending' ? darkYellow :
-                                                            history.status == "Cancelled" ? Colors.red :
-                                                            Colors.green,
-                                                            borderRadius: BorderRadius.circular(5)
-                                                        ),
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.all(8.0),
-                                                          child: Text(
-                                                            history.status,
-                                                            style: TextStyle(
-                                                                color: Colors.white),
+                                                    Baseline(
+                                                      baseline: 0,
+                                                      baselineType: TextBaseline.alphabetic,
+                                                      child: Container(
+                                                          height: MediaQuery.of(context).size.height * 0.045,
+                                                          decoration: BoxDecoration(
+                                                              color:
+                                                              history.status == 'Pending' ? darkYellow :
+                                                              history.status == "Cancelled" ? Colors.red :
+                                                              Colors.green,
+                                                              borderRadius: BorderRadius.circular(5)
                                                           ),
-                                                        )
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.all(8.0),
+                                                            child: Text(
+                                                              (history.status == "Completed and Reviewed") ? "Reviewed" : history.status,
+                                                              style: TextStyle(
+                                                                  color: Colors.white),
+                                                            ),
+                                                          )
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
@@ -464,8 +480,9 @@ class _HistoryPageState extends State<HistoryPage> {
                               );
                             },
                             child: Container(
-                              width: MediaQuery.of(context).size.width * 0.8,
+                              width: MediaQuery.of(context).size.width * 0.9,
                               decoration: BoxDecoration(
+                                color: lightPeach,
                                 border: Border.all(
                                   color: Colors.black,
                                   width: 2.0,
@@ -476,9 +493,9 @@ class _HistoryPageState extends State<HistoryPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
-                                      width: MediaQuery.of(context).size.width * 0.81,
+                                      width: MediaQuery.of(context).size.width * 0.9,
                                       decoration: BoxDecoration(
-                                          color: Colors.grey[200],
+                                          color: darkPeach,
                                           borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(10),
                                             topRight: Radius.circular(10),
@@ -509,7 +526,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                                   crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Text('ID: ${history.id}'),
-                                                    Text('Created at: ${TimestampFormatter(history.createdAt)}'),
+                                                    Text('Created: ${TimestampFormatter(history.createdAt)}'),
                                                   ],
                                                 ),
                                                 Column(
@@ -532,24 +549,31 @@ class _HistoryPageState extends State<HistoryPage> {
                                                 Text('Payment Method: ${history.paymentMethod}'),
                                                 Spacer(),
                                                 Row(
+                                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                                  mainAxisAlignment: MainAxisAlignment.start,
                                                   children: [
                                                     Text('Status: '),
-                                                    Container(
-                                                        decoration: BoxDecoration(
-                                                            color:
-                                                            history.status == 'Pending' ? darkYellow :
-                                                            history.status == "Cancelled" ? Colors.red :
-                                                            Colors.green,
-                                                            borderRadius: BorderRadius.circular(5)
-                                                        ),
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.all(8.0),
-                                                          child: Text(
-                                                            history.status,
-                                                            style: TextStyle(
-                                                                color: Colors.white),
+                                                    Baseline(
+                                                      baseline: 0,
+                                                      baselineType: TextBaseline.alphabetic,
+                                                      child: Container(
+                                                          height: MediaQuery.of(context).size.height * 0.045,
+                                                          decoration: BoxDecoration(
+                                                              color:
+                                                              history.status == 'Pending' ? darkYellow :
+                                                              history.status == "Cancelled" ? Colors.red :
+                                                              Colors.green,
+                                                              borderRadius: BorderRadius.circular(5)
                                                           ),
-                                                        )
+                                                          child: Padding(
+                                                            padding: const EdgeInsets.all(8.0),
+                                                            child: Text(
+                                                              (history.status == "Completed and Reviewed") ? "Reviewed" : history.status,
+                                                              style: TextStyle(
+                                                                  color: Colors.white),
+                                                            ),
+                                                          )
+                                                      ),
                                                     ),
                                                   ],
                                                 ),

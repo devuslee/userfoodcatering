@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../reusableWidgets/reusableColor.dart';
+
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
 
@@ -42,7 +44,17 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Incorrect Old Password')));
                 });
               },
-              child: Text('Change Password'),
+            child: Text("Change Password",
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: selectedButtonColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(32),
+              ),
+            ),
           ),
         ],
       )

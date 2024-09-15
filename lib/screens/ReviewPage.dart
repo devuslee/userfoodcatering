@@ -2,11 +2,15 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:userfoodcatering/reusableWidgets/reusableColor.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+
 
 class ReviewPage extends StatefulWidget {
   final List<dynamic> orderHistory;
@@ -59,13 +63,30 @@ class _ReviewPageState extends State<ReviewPage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             ReusableAppBar(title: "Review", backButton: true),
             SizedBox(height: MediaQuery.of(context).size.height * 0.01,),
-            Text("Please rate and leave a comment for each item in your order",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text("Please rate and leave a comment",
+                style: GoogleFonts.lato(
+                  fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                  fontWeight: FontWeight.bold, // Adjust font weight
+                  color: selectedButtonColor, // Adjust text color
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text("Points will be awarded for leaving comments",
+                style: GoogleFonts.lato(
+                  fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                  fontWeight: FontWeight.bold, // Adjust font weight
+                  color: selectedButtonColor, // Adjust text color
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
             ListView.builder(
@@ -79,6 +100,7 @@ class _ReviewPageState extends State<ReviewPage> {
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.height * 0.30,
                         decoration: BoxDecoration(
+                          color: lightGrey,
                           border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -104,9 +126,10 @@ class _ReviewPageState extends State<ReviewPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(" ${widget.orderHistory[index]['name']}",
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
+                                    style: GoogleFonts.lato(
+                                      fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                      fontWeight: FontWeight.bold, // Adjust font weight
+                                      color: selectedButtonColor, // Adjust text color
                                     ),
                                   ),
                                   RatingBar.builder(
@@ -126,7 +149,7 @@ class _ReviewPageState extends State<ReviewPage> {
                                       });
                                     },
                                   ),
-                                    SizedBox(height: MediaQuery.of(context).size.height * 0.04,),
+                                    SizedBox(height: MediaQuery.of(context).size.height * 0.07,),
                                     Stack(
                                       children: [
                                         TextField(
@@ -197,7 +220,17 @@ class _ReviewPageState extends State<ReviewPage> {
                   Navigator.pop(context, true);
                 });
               },
-              child: Text("Submit Review"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: selectedButtonColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text("Submit Review",
+                style: GoogleFonts.lato(
+                  fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size// Adjust font weight
+                  color: Colors.white, // Adjust text color
+                ),),
             ),
             SizedBox(height: MediaQuery.of(context).size.height * 0.01,),
           ],
