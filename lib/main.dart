@@ -30,6 +30,7 @@ void main() async {
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Asia/Kuala_Lumpur'));
 
+
   User? user = FirebaseAuth.instance.currentUser;
   if (user != null) {
     // User is signed in

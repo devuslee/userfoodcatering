@@ -256,7 +256,17 @@ class _CalendarPageState extends State<CalendarPage> {
                                       Divider(color: Colors.grey[300]),
                                       Text("Thanks for ordering with us! Please leave a review!"),
                                       ElevatedButton(
-                                        child: Text("Leave a Review"),
+                                        child: Text("Leave a review",
+                                          style: TextStyle(
+                                            color: selectedButtonColor,
+                                          ),
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: backGroundColor,
+                                          side: BorderSide(
+                                            color: Colors.grey,
+                                          ),
+                                        ),
                                         onPressed: () async {
                                           bool isRefresh = await Navigator.push(
                                             context,
@@ -264,6 +274,7 @@ class _CalendarPageState extends State<CalendarPage> {
                                               builder: (context) => ReviewPage(
                                                 orderHistory: event['orderHistory'],
                                                 id: event['orderID'],
+                                                desiredPickupTime: event['desiredPickupTime'],
                                               ),
                                             ),
                                           );
@@ -273,9 +284,6 @@ class _CalendarPageState extends State<CalendarPage> {
                                             });
                                           }
                                         },
-                                        style: ElevatedButton.styleFrom(
-                                          side: BorderSide(color: Colors.grey),
-                                        ),
                                       ),
                                     ],
                                   ),

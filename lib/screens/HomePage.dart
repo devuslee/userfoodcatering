@@ -45,7 +45,7 @@ class _HomePageState extends State<HomePage> {
   List<MenuClass> allMenuItems = [];
 
   // String selectedDateTime = DateTime.now().toString().split(" ")[0];
-  String selectedDateTime = DateTime(2024, 9, 13).toString().split(" ")[0];
+  String selectedDateTime = DateTime.now().toString().split(" ")[0];
 
   DateTime selectedDate = DateTime.now();
 
@@ -307,12 +307,13 @@ class _HomePageState extends State<HomePage> {
                   Column(
                     children: [
                       SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                      Icon(Icons.error_outline, size: 50.0, color: Colors.red),
+                      Icon(Icons.error_outline, size: 50.0, color: selectedButtonColor),
                       Text(
                         "No orders for today",
-                        style: TextStyle(
-                          fontSize: 20.0,
-                          color: Colors.grey,
+                        style: GoogleFonts.lato(
+                          fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                          fontWeight: FontWeight.bold, // Adjust font weight
+                          color: Colors.grey, // Adjust text color
                         ),
                       ),
                       SizedBox(height: MediaQuery.of(context).size.height * 0.02),
@@ -515,6 +516,7 @@ class _HomePageState extends State<HomePage> {
                                                               builder: (context) => ReviewPage(
                                                                 orderHistory: history.orderHistory,
                                                                 id: history.id,
+                                                                desiredPickupTime: history.desiredPickupTime,
                                                               )
                                                             ),
                                                           );

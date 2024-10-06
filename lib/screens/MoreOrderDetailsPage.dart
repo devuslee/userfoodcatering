@@ -32,6 +32,7 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
   double discount = 0.0;
   double total = 0.0;
   double pointGained = 0.0;
+  double pointsGainedThroughRank = 0.0;
 
   String uniqueIdentifier = DateTime.now().millisecondsSinceEpoch.toString();
 
@@ -39,8 +40,6 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
   void initState() {
     super.initState();
     fetchData();
-
-    print(widget.orderDetails);
 
     FirebaseFirestore.instance
         .collection('qrCodes')
@@ -55,8 +54,6 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
 
   void fetchData() async {
     try {
-      print(widget.orderDetails.runtimeType);
-      print(widget.orderDetails);
 
       total = 0;
 
@@ -64,6 +61,8 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
         total = total + item['total'];
       }
       pointGained = await getPointsGained(widget.orderDetails['orderID'].toString());
+
+      pointsGainedThroughRank = await calculatePointsGained(total);
       discount = total - widget.orderDetails['total'];
 
       if (mounted) {
@@ -126,7 +125,7 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("You've been awarded $pointGained points!"),
+              Text("You've been awarded $pointsGainedThroughRank points!"),
               SizedBox(height: MediaQuery.of(context).size.height * 0.01),
               Text("Please leave a review to gain more points!"),
             ],
@@ -139,6 +138,7 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                     builder: (context) => ReviewPage(
                       orderHistory: widget.orderDetails['orderHistory'],
                       id: widget.orderDetails["orderID"],
+                      desiredPickupTime: widget.orderDetails['desiredPickupTime']
                     )
                 ),
                 );
@@ -806,6 +806,7 @@ class _MoreOrderDetailsPageState extends State<MoreOrderDetailsPage> {
                           builder: (context) => ReviewPage(
                             orderHistory: widget.orderDetails['orderHistory'],
                             id: widget.orderDetails["orderID"],
+                            desiredPickupTime: widget.orderDetails['desiredPickupTime']
                           )
                         ),
                       );

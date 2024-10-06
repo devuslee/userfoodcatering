@@ -16,8 +16,9 @@ class FirebaseApi {
   void handleMessage(RemoteMessage? message) {
     if (message ==null) return;
 
-    navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => LoginPage()));
+    print("hi");
 
+    navigatorKey.currentState?.push(MaterialPageRoute(builder: (context) => LoginPage()));
 
     Future initPushNotifications() async {
       await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
@@ -35,8 +36,10 @@ class FirebaseApi {
     await _firebaseMessaging.requestPermission();
     final fCMToken = await _firebaseMessaging.getToken();
     print('FCM Token: $fCMToken');
-    
+
     FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen(handleMessage);
+    print("Notification initialized");
   }
 
   Future<void> saveFCMtoken() async {

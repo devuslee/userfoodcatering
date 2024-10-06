@@ -15,11 +15,13 @@ import 'package:google_fonts/google_fonts.dart';
 class ReviewPage extends StatefulWidget {
   final List<dynamic> orderHistory;
   final int id;
+  final String desiredPickupTime;
 
   const ReviewPage({
     Key? key,
     required this.orderHistory,
     required this.id,
+    required this.desiredPickupTime,
   }) : super(key: key);
 
   @override
@@ -35,7 +37,7 @@ class _ReviewPageState extends State<ReviewPage> {
 
   void fetchData() async {
     try {
-      print(widget.orderHistory);
+      print(widget.desiredPickupTime);
 
       if (mounted) {
         setState(() {});
@@ -70,23 +72,124 @@ class _ReviewPageState extends State<ReviewPage> {
             SizedBox(height: MediaQuery.of(context).size.height * 0.01,),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text("Please rate and leave a comment",
-                style: GoogleFonts.lato(
-                  fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
-                  fontWeight: FontWeight.bold, // Adjust font weight
-                  color: selectedButtonColor, // Adjust text color
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text("Points will be awarded for leaving comments",
-                style: GoogleFonts.lato(
-                  fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
-                  fontWeight: FontWeight.bold, // Adjust font weight
-                  color: selectedButtonColor, // Adjust text color
-                ),
-                textAlign: TextAlign.center,
+              child: Row(
+                children: [
+                  Stack(
+                    clipBehavior: Clip.none, // Allow positioning the circle outside the container
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.45,
+                        height: MediaQuery.of(context).size.height * 0.2,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              SizedBox(height: MediaQuery.of(context).size.height * 0.03,),
+                              Text(
+                                "Comment",
+                                style: GoogleFonts.lato(
+                                  fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                  fontWeight: FontWeight.bold, // Adjust font weight
+                                  color: Colors.black, // Adjust text color
+                                ),
+                              ),
+                              Text(
+                                "Leave a comment and let us know how we did!",
+                                style: GoogleFonts.lato(
+                                  fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                  color: Colors.black, // Adjust text color
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: -25,
+                        left: (MediaQuery.of(context).size.width * 0.45) / 2 - 20,
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: selectedButtonColor, // Circle color
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              "1", // The number you want to display
+                              style: GoogleFonts.lato(
+                                fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size for the number
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(width: MediaQuery.of(context).size.width * 0.05,),
+                  Stack(
+                    clipBehavior: Clip.none, // Allow positioning the circle outside the container
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.45,
+                        height: MediaQuery.of(context).size.height * 0.2,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              SizedBox(height: MediaQuery.of(context).size.height * 0.03,),
+                              Text(
+                                "Earn Points",
+                                style: GoogleFonts.lato(
+                                  fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                  fontWeight: FontWeight.bold, // Adjust font weight
+                                  color: Colors.black, // Adjust text color
+                                ),
+                              ),
+                              Text(
+                                "Earn 10 points for each review submitted!",
+                                style: GoogleFonts.lato(
+                                  fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                  color: Colors.black, // Adjust text color
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: -25,
+                        left: (MediaQuery.of(context).size.width * 0.45) / 2 - 20,
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: selectedButtonColor, // Circle color
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              "2", // The number you want to display
+                              style: GoogleFonts.lato(
+                                fontSize: MediaQuery.of(context).size.width * 0.04, // Adjust font size for the number
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
             ListView.builder(
@@ -98,85 +201,86 @@ class _ReviewPageState extends State<ReviewPage> {
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
                         width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height * 0.30,
+                        height: MediaQuery.of(context).size.height * 0.32,
                         decoration: BoxDecoration(
                           color: lightGrey,
                           border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Column(
                         children: [
-                          ClipRRect(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                bottomLeft: Radius.circular(10),
-                              ),
-                              child: Image.network(
-                                widget.orderHistory[index]['imageURL'],
-                                width: MediaQuery.of(context).size.width * 0.30,
-                                height: MediaQuery.of(context).size.height * 0.30,
-                                fit: BoxFit.cover,
-                              ),
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(" ${widget.orderHistory[index]['name']}",
-                                    style: GoogleFonts.lato(
-                                      fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
-                                      fontWeight: FontWeight.bold, // Adjust font weight
-                                      color: selectedButtonColor, // Adjust text color
-                                    ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(10),
                                   ),
-                                  RatingBar.builder(
-                                    initialRating: (0 as num).toDouble(),
-                                    direction: Axis.horizontal,
-                                    allowHalfRating: false,
-                                    itemCount: 5,
-                                    itemSize: 30.0,
-                                    itemPadding: EdgeInsets.symmetric(horizontal: 1.0),
-                                    itemBuilder: (context, _) => Icon(
-                                      Icons.star,
-                                      color: Colors.amber,
-                                    ),
-                                    onRatingUpdate: (rating) {
-                                      setState(() {
-                                        widget.orderHistory[index]['rating'] = rating;
-                                      });
-                                    },
+                                  child: Image.network(
+                                    widget.orderHistory[index]['imageURL'],
+                                    width: MediaQuery.of(context).size.width * 0.30,
+                                    height: MediaQuery.of(context).size.height * 0.15,
+                                    fit: BoxFit.cover,
                                   ),
-                                    SizedBox(height: MediaQuery.of(context).size.height * 0.07,),
-                                    Stack(
-                                      children: [
-                                        TextField(
-                                        maxLines: 2,
-                                        maxLength: 100,
-                                        decoration: InputDecoration(
-                                          hintText: 'Leave comments here...',
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                          ),
-                                          contentPadding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(" ${widget.orderHistory[index]['name']}",
+                                        style: GoogleFonts.lato(
+                                          fontSize: MediaQuery.of(context).size.width * 0.05, // Adjust font size
+                                          fontWeight: FontWeight.bold, // Adjust font weight
+                                          color: selectedButtonColor, // Adjust text color
                                         ),
-
-                                        onChanged: (value) {
+                                      ),
+                                      RatingBar.builder(
+                                        initialRating: (0 as num).toDouble(),
+                                        direction: Axis.horizontal,
+                                        allowHalfRating: false,
+                                        itemCount: 5,
+                                        itemSize: 30.0,
+                                        itemPadding: EdgeInsets.symmetric(horizontal: 1.0),
+                                        itemBuilder: (context, _) => Icon(
+                                          Icons.star,
+                                          color: Colors.amber,
+                                        ),
+                                        onRatingUpdate: (rating) {
                                           setState(() {
-                                            widget.orderHistory[index]['comment'] = value;
+                                            widget.orderHistory[index]['rating'] = rating;
                                           });
                                         },
                                       ),
-                                      ],
-                                    ),
-
-                                ],
+                                        SizedBox(height: MediaQuery.of(context).size.height * 0.07,),
+                                    ],
+                                  ),
+                                ),
                               ),
+                            ]
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              maxLines: 2,
+                              maxLength: 100,
+                              decoration: InputDecoration(
+                                hintText: 'Leave comments here...',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
+                              ),
+
+                              onChanged: (value) {
+                                setState(() {
+                                  widget.orderHistory[index]['comment'] = value;
+                                });
+                              },
                             ),
                           ),
-                        ]
+                        ],
                       )
                     ),
                   );
@@ -188,7 +292,8 @@ class _ReviewPageState extends State<ReviewPage> {
 
                 _showLoadingDialog();
 
-                await createReview(widget.orderHistory, widget.id);
+                await createReview(widget.orderHistory, widget.id, widget.desiredPickupTime);
+                await updateAdminHistoryStatus(widget.desiredPickupTime, widget.id, "Completed and Reviewed");
 
                 Navigator.pop(context);
 

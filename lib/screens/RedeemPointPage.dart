@@ -564,7 +564,7 @@ class _RedeemPointPageState extends State<RedeemPointPage> {
                           side: BorderSide(
                             color: Colors.grey,
                           ),
-                        )
+                        ),
                     ),
                     SizedBox(height: MediaQuery.of(context).size.height * 0.1,),
                   ],

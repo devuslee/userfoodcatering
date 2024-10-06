@@ -1177,7 +1177,6 @@ Future<void> updateProfile(String username, String profileImage) async {
 
 Future<double> getPointsGained(String orderID) async {
   double points = 0.0;
-  print(orderID.toString());
 
   try {
     final userDocumentRef = FirebaseFirestore.instance
@@ -1201,6 +1200,27 @@ Future<double> getPointsGained(String orderID) async {
   return points;
 }
 
+Future<double> calculatePointsGained(double total) async {
+  String rank = await getUserRank();
+  double points = 0;
+  double multiplier = 0;
+
+  if (rank == 'Beginner') {
+    multiplier = 1.0;
+  } else if (rank == 'Intermediate') {
+    multiplier = 1.5;
+  } else if (rank == 'Advanced') {
+    multiplier = 2.0;
+  } else if (rank == 'Expert') {
+    multiplier = 3.0;
+  } else {
+    multiplier = 0.0;
+  }
+
+  points = multiplier * total;
+
+  return points;
+}
 
 Future<int> getcheckinCounter() async {
   final userDocumentRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
@@ -1357,7 +1377,7 @@ Future<Map<String, dynamic>> getOrderDetails(String uniqueID) async {
 }
 
 
-Future<void> createReview(List<dynamic> orderHistory, int id) async {
+Future<void> createReview(List<dynamic> orderHistory, int id, String desiredPickupTime) async {
   String category = "";
 
   for (var history in orderHistory) {
@@ -1405,6 +1425,7 @@ Future<void> createReview(List<dynamic> orderHistory, int id) async {
       sentiment = await analyzeComment(comment);
     }
 
+
     // Add review to the reviews collection
     await reviewCollectionRef.doc(id.toString()).set({
       'id': id,
@@ -1412,7 +1433,7 @@ Future<void> createReview(List<dynamic> orderHistory, int id) async {
       'comment': history['comment'],
       'rating': history['rating'],
       'quantity': history['quantity'],
-      'createdAt': DateTime.now().toString(),
+      'createdAt': desiredPickupTime,
       'positive': sentiment[0]['score'],
       'neutral': sentiment[1]['score'],
       'negative': sentiment[2]['score'],
@@ -1497,6 +1518,7 @@ Future<void> updateHistoryStatus(int id, String status) async {
 
   orderCollectionRef.update({'status': status});
 }
+
 
 //used to test database
 void TempCreateMenu() {
@@ -1658,4 +1680,16 @@ String PickupTimestampFormatter(String timestamp, String desiredPickupTime) {
 
 int getHashCode(DateTime key) {
   return key.day * 1000000 + key.month * 10000 + key.year;
+}
+
+Future<void> updateAdminHistoryStatus(String desiredPickupTime, int orderID, String status) async {
+  final adminHistoryRef = FirebaseFirestore.instance
+      .collection('admin')
+      .doc('orders')
+      .collection(desiredPickupTime.split(' ')[0]).doc(orderID.toString());
+
+  adminHistoryRef.update({
+    'status': status,
+    'completedAt': DateTime.now().toString(),
+  });
 }

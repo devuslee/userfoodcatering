@@ -68,21 +68,21 @@ class _SendingOrderPageState extends State<SendingOrderPage> {
 
     if (mounted) {
       setState(() async {
-        // if (widget.paymentMethod == "E-Wallet") {
-        //   deductWalletBalance(widget.cartTotal);
-        // }
-        //
-        // if (discountID != "") {
-        //   deleteSpecificDiscount(discountID);
-        // }
-        //
-        // sendOrder(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal, randomNumber, widget.paymentMethod);
-        // createOrderHistory(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal, randomNumber, widget.paymentMethod, "Expense");
-        // deleteWholeCart();
-        // SharedPreferences prefs = await SharedPreferences.getInstance();
-        // await prefs.clear();
-        // Navigator.pop(context);
-        // Navigator.pop(context);
+        if (widget.paymentMethod == "E-Wallet") {
+          deductWalletBalance(widget.cartTotal);
+        }
+
+        if (discountID != "") {
+          deleteSpecificDiscount(discountID);
+        }
+
+        sendOrder(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal, randomNumber, widget.paymentMethod);
+        createOrderHistory(widget.cartList, widget.specialRemark, widget.desiredPickupTime, widget.cartTotal, randomNumber, widget.paymentMethod, "Expense");
+        deleteWholeCart();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.clear();
+        Navigator.pop(context);
+        Navigator.pop(context);
       });
     }
   }
