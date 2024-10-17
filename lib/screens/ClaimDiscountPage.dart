@@ -123,7 +123,7 @@ class _ClaimDiscountPageState extends State<ClaimDiscountPage> {
                       ),
                     );
                   },
-                  child: Text("Redeem Now",
+                  child: Text("Claim Now",
                     style: TextStyle(
                       color: Colors.white,
                     ),

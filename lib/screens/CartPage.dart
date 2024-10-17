@@ -258,6 +258,7 @@ class _CartPageState extends State<CartPage> {
                           ),
                         ),
                     ListView.builder(
+                      padding: EdgeInsets.all(0),
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
                       itemCount: _cartItems.length == 0 ? 1 : _cartItems.length,
@@ -283,7 +284,7 @@ class _CartPageState extends State<CartPage> {
                                 ),
                               SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                               Container(
-                                width: MediaQuery.of(context).size.width * 0.75,
+                                width: MediaQuery.of(context).size.width * 0.85,
                                 child: ElevatedButton(
                                   onPressed: () {
                                     Navigator.push(context, MaterialPageRoute(

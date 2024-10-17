@@ -37,8 +37,6 @@ class _ReviewPageState extends State<ReviewPage> {
 
   void fetchData() async {
     try {
-      print(widget.desiredPickupTime);
-
       if (mounted) {
         setState(() {});
       }
@@ -320,8 +318,8 @@ class _ReviewPageState extends State<ReviewPage> {
                       ],
                     );
                   },
-                ).then((_) {
-                  // After dialog is closed, pop the parent page with true to indicate success
+                ).then((_) async {
+                  await createUserReview(widget.orderHistory, widget.id, widget.desiredPickupTime);
                   Navigator.pop(context, true);
                 });
               },

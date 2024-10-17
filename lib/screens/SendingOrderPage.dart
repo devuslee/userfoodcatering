@@ -42,8 +42,6 @@ class _SendingOrderPageState extends State<SendingOrderPage> {
   }
 
   void processOrder() async {
-
-
     discountID = await getUserDiscountID();
 
     if (mounted) {

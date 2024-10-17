@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableWidgets.dart';
 import 'package:userfoodcatering/reusableWidgets/reusableFunctions.dart';
 import 'package:userfoodcatering/screens/ChangePasswordPage.dart';
+import 'package:userfoodcatering/screens/CheckReviews.dart';
 import 'package:userfoodcatering/screens/PointPage.dart';
 import 'package:userfoodcatering/screens/RankPage.dart';
 import 'package:userfoodcatering/screens/TopupPage.dart';
@@ -133,7 +134,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             });
                                           }
                                         },
-                                      child: Text("View Points",
+                                      child: Text("View Balance",
                                         style: TextStyle(
                                           color: Colors.white,
                                         ),
@@ -241,7 +242,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             });
                                           }
                                         },
-                                      child: Text("View Points",
+                                      child: Text("View Rank",
                                         style: TextStyle(
                                           color: Colors.white,
                                         ),
@@ -291,6 +292,23 @@ class _ProfilePageState extends State<ProfilePage> {
                             });
                           }
                         },
+                    ),
+                    ReuseableSettingContainer(
+                      title: "Reviews",
+                      icon: Icons.rate_review,
+                      onTap: () async {
+                        bool shouldRefresh = await Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => CheckReviews()
+                            )
+                        );
+
+                        if (shouldRefresh) {
+                          setState(() {
+                            fetchData();
+                          });
+                        }
+                      },
                     ),
                     ReuseableSettingContainer(
                         title: "Change Password",

@@ -25,6 +25,8 @@ class _AddOrderPageState extends State<AddOrderPage> {
   int cartCount = 0;
   double cartTotal = 0;
   String searchQuery = ""; // Search query variable
+  String selectedCategory = 'Option 1'; // Dropdown value variable
+  List<String> categoryList = ['Option 1']; // Dropdown list
 
   int currentCategoryIndex = 0;
 
@@ -45,7 +47,8 @@ class _AddOrderPageState extends State<AddOrderPage> {
   void fetchData() async {
     try {
       List<MenuClass> allMenuItems = await getMenuData();
-      List categoryList = await getAllCategories();
+      categoryList = await getAllCategories();
+      selectedCategory = categoryList[0];
       cartCount = await getCartQuantity();
       cartTotal = await getCartTotal();
 
@@ -62,7 +65,6 @@ class _AddOrderPageState extends State<AddOrderPage> {
         }
       }
       _itemKeys = List.generate(filteredMenuData.keys.length, (index) => GlobalKey());
-      print(_itemKeys);
       if (mounted) {
         setState(() {
           // Update the UI after fetching data
@@ -100,6 +102,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
         final position = renderBox.localToGlobal(Offset.zero, ancestor: context.findRenderObject());
         if (position.dy > 0 && position.dy < MediaQuery.of(context).size.height * 0.5) {
           setState(() {
+            selectedCategory = categoryList[i];
             currentCategoryIndex = i;
           });
           break;
@@ -124,59 +127,98 @@ class _AddOrderPageState extends State<AddOrderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.1), // Adjust height as needed
-        child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.0075,),
-            child: AppBar(
-              automaticallyImplyLeading: false,
-              elevation: 0,
-              scrolledUnderElevation: 0,
-              backgroundColor: backGroundColor,
-              flexibleSpace: Center( // Center vertically within the AppBar
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width * 0.001,
-                  ),// Add padding to the sides
-                  child: Container(
-                    width: MediaQuery.of(context).size.width * 0.9, // Adjust width of the search bar
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search',
-                        hintStyle: TextStyle(color: Colors.black.withOpacity(0.5)),
-                        prefixIcon: Icon(Icons.search, color: Colors.black),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50.0),
-                          borderSide: BorderSide.none,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.1), // Adjust height as needed
+          child: SafeArea(
+            child: Padding(
+              padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.0075),
+              child: AppBar(
+                automaticallyImplyLeading: false,
+                elevation: 0,
+                scrolledUnderElevation: 0,
+                backgroundColor: backGroundColor,
+                flexibleSpace: Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.001),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center, // Center the row contents
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.65, // Adjust width for the search bar
+                          child: TextField(
+                            decoration: InputDecoration(
+                              hintText: 'Search',
+                              hintStyle: TextStyle(color: Colors.black.withOpacity(0.5)),
+                              prefixIcon: Icon(Icons.search, color: Colors.black),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(50.0),
+                                borderSide: BorderSide.none,
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[300]?.withOpacity(0.9),
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                searchQuery = value;
+                              });
+                            },
+                          ),
                         ),
-                        filled: true,
-                        fillColor: Colors.grey[300]?.withOpacity(0.9),
-                      ),
-                      onChanged: (value) {
-                        setState(() {
-                          searchQuery = value;
-                        });
-                      },
+                        SizedBox(width: 10), // Add some space between the search bar and dropdown
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.2, // Adjust width for dropdown
+                          child: DropdownButton<String>(
+                            isExpanded: true,
+                            value: selectedCategory,
+                            underline: Container(),
+                            items: categoryList.map((String value) {
+                              String displayText = value.length > 15 ? value.substring(0, 15) + '...' : value;
+
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  displayText,
+                                  overflow: TextOverflow.ellipsis, // Ensures that the text doesn't overflow
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (newValue) {
+                              if (newValue != null && newValue != selectedCategory) {
+                                int index = filteredMenuData.keys.toList().indexOf(newValue);
+
+
+                                scrollToMenu(index);
+
+                                setState(() {
+                                  selectedCategory = newValue;
+                                  currentCategoryIndex = index;
+                                });
+
+                                _scrollController.addListener(_onScroll);
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ),
-              bottom: PreferredSize(
-                preferredSize: Size.fromHeight(10), // Height of the bottom line
-                child: Column(
-                  children: [
-                    Container(
-                      color: Colors.grey, // Line color
-                      height: 1.0, // Line thickness
-                    ),
-                  ],
+                bottom: PreferredSize(
+                  preferredSize: Size.fromHeight(10), // Height of the bottom line
+                  child: Column(
+                    children: [
+                      Container(
+                        color: Colors.grey, // Line color
+                        height: 1.0, // Line thickness
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ),
+
       body: Stack(
         children: [
           Column(
@@ -185,73 +227,6 @@ class _AddOrderPageState extends State<AddOrderPage> {
               Expanded(
                 child: Row(
                   children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.2,
-                      decoration: BoxDecoration(
-                        color: notSelectedButtonColor,
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey,
-                            width: 2.0,
-                          ),
-                          left: BorderSide(
-                            color: Colors.grey,
-                            width: 2.0,
-                          ),
-                        ),
-                      ),
-                      child: ListView(
-                        children: filteredMenuData.keys.map((category) {
-                          int categoryIndex = filteredMenuData.keys.toList().indexOf(category);
-                          return Container(
-                            height: MediaQuery.of(context).size.height * 0.05,
-                            decoration: BoxDecoration(
-                              color: notSelectedButtonColor,
-                              // border: Border(
-                              //   top: BorderSide(
-                              //     color: Colors.grey,
-                              //     width: (filteredMenuData.keys.first == category) ? 0.0 : 2.0,
-                              //   ),
-                              //   bottom: BorderSide(
-                              //     color: Colors.grey,
-                              //     width: (filteredMenuData.keys.last == category) ? 2.0 : 0.0,
-                              //   ),
-                              // ),
-                            ),
-                            child: InkWell(
-                              onTap: () {
-                                int index = 0;
-
-                                for (var key in filteredMenuData.keys) {
-                                  if (key == category) {
-                                    break;
-                                  }
-                                  index++;
-                                }
-
-                                currentCategoryIndex = index;
-
-                                _scrollController.removeListener(_onScroll);
-                                setState(() {
-                                  scrollToMenu(index);
-                                });
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  category,
-                                  style: GoogleFonts.lato(
-                                    fontSize: MediaQuery.of(context).size.width * 0.03,
-                                    fontWeight: FontWeight.bold,
-                                    color: (currentCategoryIndex == categoryIndex) ? selectedButtonColor : Colors.grey[500],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
                     Expanded(
                       child: SingleChildScrollView(
                         controller: _scrollController,
@@ -353,10 +328,12 @@ class _AddOrderPageState extends State<AddOrderPage> {
                                     );
                                   },
                                 ),
-                                // Divider(
-                                //   color: Colors.grey[350],
-                                //   thickness: 7.0,
-                                // ),
+                                SizedBox(height: MediaQuery.of(context).size.height * 0.02),
+                                if (filteredMenuData[category]!.isNotEmpty)
+                                Divider(
+                                  color: Colors.grey[350],
+                                  thickness: 10.0,
+                                ),
 
                               ],
                             );

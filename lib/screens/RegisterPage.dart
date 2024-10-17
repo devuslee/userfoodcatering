@@ -23,7 +23,12 @@ class _RegisterPageState extends State<RegisterPage> {
   bool passwordEmpty = false;
   bool confirmpasswordEmpty = false;
   bool checkPassword = false;
+  bool invalidPasswordFormat = false;
+  bool invalidEmailFormat = false;
 
+  final RegExp emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+
+  final RegExp passwordRegex = RegExp(r'^(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$&*~]).{6,}$');
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Visibility(
                   visible: userEmpty,
                   child: const Text('Please fill in all fields.',
-                    style: TextStyle(color: Colors.red)),
+                      style: TextStyle(color: Colors.red)),
                 ),
               ),
               const SizedBox(height: 10.0,),
@@ -52,7 +57,15 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Visibility(
                   visible: emailEmpty,
                   child: const Text('Please fill in all fields.',
-                    style: TextStyle(color: Colors.red)),
+                      style: TextStyle(color: Colors.red)),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Visibility(
+                  visible: invalidEmailFormat,
+                  child: const Text('Please enter a valid email address.',
+                      style: TextStyle(color: Colors.red)),
                 ),
               ),
               const SizedBox(height: 10.0,),
@@ -62,7 +75,15 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Visibility(
                   visible: passwordEmpty,
                   child: const Text('Please fill in all fields.',
-                    style: TextStyle(color: Colors.red)),
+                      style: TextStyle(color: Colors.red)),
+                ),
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Visibility(
+                  visible: invalidPasswordFormat,
+                  child: const Text('Password must be at least 6 characters long, contain a capital letter, a number, and a special character.',
+                      style: TextStyle(color: Colors.red)),
                 ),
               ),
               const SizedBox(height: 10.0,),
@@ -72,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Visibility(
                   visible: confirmpasswordEmpty,
                   child: const Text('Please fill in all fields.',
-                    style: TextStyle(color: Colors.red)),
+                      style: TextStyle(color: Colors.red)),
                 ),
               ),
               Align(
@@ -80,55 +101,21 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Visibility(
                   visible: checkPassword,
                   child: const Text('Password does not match.',
-                    style: TextStyle(color: Colors.red)),
+                      style: TextStyle(color: Colors.red)),
                 ),
               ),
               const SizedBox(height: 10.0,),
               ElevatedButton(
                 onPressed: () {
-                  if (usernameController.text.isEmpty) {
-                    setState(() {
-                      userEmpty = true;
-                    });
-                  } else {
-                    setState(() {
-                      userEmpty = false;
-                    });
-                  }
-
-                  if (emailController.text.isEmpty) {
-                    setState(() {
-                      emailEmpty = true;
-                    });
-                  } else {
-                    setState(() {
-                      emailEmpty = false;
-                    });
-                  }
-
-                  if (passwordController.text.isEmpty) {
-                    setState(() {
-                      passwordEmpty = true;
-                    });
-                  } else {
-                    setState(() {
-                      passwordEmpty = false;
-                    });
-                  }
-
-                  if (confirmpasswordController.text.isEmpty) {
-                    setState(() {
-                      confirmpasswordEmpty = true;
-                    });
-                  } else {
-                    setState(() {
-                      confirmpasswordEmpty = false;
-                    });
-                  }
+                  setState(() {
+                    userEmpty = usernameController.text.isEmpty;
+                    emailEmpty = emailController.text.isEmpty;
+                    passwordEmpty = passwordController.text.isEmpty;
+                    confirmpasswordEmpty = confirmpasswordController.text.isEmpty;
+                  });
 
                   if (passwordController.text != confirmpasswordController.text) {
                     setState(() {
-                      confirmpasswordEmpty = false;
                       checkPassword = true;
                     });
                   } else {
@@ -137,8 +124,28 @@ class _RegisterPageState extends State<RegisterPage> {
                     });
                   }
 
+                  if (!passwordRegex.hasMatch(passwordController.text)) {
+                    setState(() {
+                      invalidPasswordFormat = true;
+                    });
+                  } else {
+                    setState(() {
+                      invalidPasswordFormat = false;
+                    });
+                  }
 
-                  if (checkPassword == false && userEmpty == false && emailEmpty == false && passwordEmpty == false && confirmpasswordEmpty == false) {
+                  if (!emailRegex.hasMatch(emailController.text)) {
+                    setState(() {
+                      invalidEmailFormat = true;
+                    });
+                  } else {
+                    setState(() {
+                      invalidEmailFormat = false;
+                    });
+                  }
+
+                  // If all conditions are met, proceed with registration
+                  if (!userEmpty && !emailEmpty && !passwordEmpty && !confirmpasswordEmpty && !checkPassword && !invalidPasswordFormat && !invalidEmailFormat) {
                     FirebaseAuth.instance.createUserWithEmailAndPassword(
                         email: emailController.text,
                         password: passwordController.text

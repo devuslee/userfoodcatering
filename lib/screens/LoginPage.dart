@@ -51,8 +51,8 @@ class _LoginPageState extends State<LoginPage> {
 
                   invalidCredentials = false;
                   FirebaseAuth.instance.signInWithEmailAndPassword(
-                      email: "devuslee1@yahoo.com",
-                      password: "123123"
+                      email: emailController.text,
+                      password: passwordController.text
                   ).then((value)  {
                     getCurrentUserId();
                     saveFCMtoken();

@@ -96,7 +96,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final snapshot = await uploadTask!.whenComplete(() {});
 
     final url = await snapshot.ref.getDownloadURL();
-    print('Download-Link: $url');
 
     setState(() {
       profileURL = url;

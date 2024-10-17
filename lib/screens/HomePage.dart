@@ -61,7 +61,6 @@ class _HomePageState extends State<HomePage> {
     try {
       Map<String, String> tempUserDetails = await getUserDetails();
       List<MenuClass> tempAllMenuItems = await getMenuData();
-      print("selected date ${selectedDate}");
       todayHistory = await returnOrderHistory(selectedDateTime);
 
 
@@ -111,8 +110,6 @@ class _HomePageState extends State<HomePage> {
 
   Future<Map<String, String>> _getImageUrls() async {
     Map<String, String> imageUrls = {};
-
-
 
     for (var i = 0; i < allMenuItems.length; i++) {
       imageUrls[allMenuItems[i].name] = allMenuItems[i].imageURL;
@@ -170,13 +167,6 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                // Text(
-                                //   name,
-                                //   style: TextStyle(
-                                //     fontSize: 20.0,
-                                //     fontWeight: FontWeight.bold,
-                                //   ),
-                                // ),
                                 Expanded(
                                   child: CachedNetworkImage(
                                     imageUrl: url,

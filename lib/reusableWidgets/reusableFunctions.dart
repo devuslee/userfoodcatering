@@ -306,12 +306,12 @@ Future<List<MenuClass>> getMenuData() async {
   }
 }
 
-Future<List> getAllCategories() async {
+Future<List<String>> getAllCategories() async {
   CollectionReference categoryCollection = FirebaseFirestore.instance.collection('category');
 
   try {
     QuerySnapshot querySnapshot = await categoryCollection.get();
-    List menuList = [];
+    List<String> menuList = [];
 
     await Future.wait(querySnapshot.docs.map((doc) async {
       menuList.add(doc['type']);
@@ -1066,6 +1066,35 @@ Future<List> returnOrderHistory(String selectedTime) async{
   }
 }
 
+Future<List> returnSpecificListOrderHistory(String orderID) async{
+  final orderCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('history')
+      .doc(orderID);
+
+  try {
+    final orderCollectionSnapshot = await orderCollectionRef.get();
+    List orderList = [];
+    orderList.add((
+      id: orderCollectionSnapshot.get('id'),
+      orderHistory: orderCollectionSnapshot.get('orderHistory'),
+      status: orderCollectionSnapshot.get('status'),
+      createdAt: orderCollectionSnapshot.get('createdAt'),
+      specialRemarks: orderCollectionSnapshot.get('specialRemarks'),
+      desiredPickupTime: orderCollectionSnapshot.get('desiredPickupTime'),
+      total: orderCollectionSnapshot.get('total'),
+      paymentMethod: orderCollectionSnapshot.get('paymentMethod'),
+      type: orderCollectionSnapshot.get('type'),
+    ));
+
+    return orderList;
+  } catch (error) {
+    print('Error fetching order history: $error');
+    return [];
+  }
+}
+
 Future<Map<String, dynamic>> convertOrderHistoryToMap(String createdAt, String desiredPickupTime, int id, List<dynamic> orderHistory, String paymentMethod, String specialRemarks, String status, num total, String type) async {
   Map<String, dynamic> orderHistoryMap = {};
 
@@ -1160,6 +1189,59 @@ Future<Map<String, String>> getUserDetails() async {
   }
 
   return userDetails;
+}
+
+Future<String> returnProfileImage() async {
+  final userDocumentRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+
+  String profileImage = "";
+  String downloadURL = "";
+
+  try {
+    DocumentSnapshot value = await userDocumentRef.get();
+    profileImage = value.get('profileImage');
+    String tempProfile = value.get('profileImage');
+    downloadURL = await _storage.ref('users/$tempProfile.jpeg').getDownloadURL();
+  } catch (e) {
+    print('Error fetching user details: $e');
+  }
+
+  return downloadURL;
+}
+
+Future<String> returnUsername() async {
+  final userDocumentRef = FirebaseFirestore.instance.collection('users').doc(currentUser);
+
+  String username = "";
+
+  try {
+    DocumentSnapshot value = await userDocumentRef.get();
+    username = value.get('username');
+    } catch (e) {
+    print('Error fetching user details: $e');
+  }
+
+  return username;
+}
+
+Future<List<dynamic>> returnSpecificOrderHistory(String orderId) async {
+  final orderCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('history')
+      .doc(orderId);
+
+  List<dynamic> orderHistory = [];
+
+  try {
+    DocumentSnapshot value = await orderCollectionRef.get();
+    orderHistory = value.get('orderHistory');
+  } catch (e) {
+    print('Error fetching order history: $e');
+  }
+
+  return orderHistory;
+
 }
 
 Future<void> updateProfile(String username, String profileImage) async {
@@ -1277,8 +1359,9 @@ Future<double> incrementcheckinCounter() async {
   String lastCheckedIn = "";
 
   DocumentSnapshot value = await userDocumentRef.get();
-  checkinCounter = value.get('checkinCounter');
-  currentPoints = value.get('points');
+  checkinCounter = (value.get('checkinCounter') as num).toDouble();
+  currentPoints = (value.get('points') as num).toDouble();
+
 
 
   checkinCounter++;
@@ -1456,6 +1539,55 @@ Future<void> createReview(List<dynamic> orderHistory, int id, String desiredPick
     body: 'Testing',
     scheduledNotificationDateTime: DateTime.now().add(Duration(seconds: 10)),
   );
+}
+
+Future<void> createUserReview(List<dynamic> orderHistory, int id, String desiredPickupTime) async {
+  final reviewCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('reviews');
+
+
+  for (var history in orderHistory) {
+    await reviewCollectionRef.doc(id.toString()).set({
+      'id': id,
+      'userID': currentUser,
+      'comment': history['comment'],
+      'rating': history['rating'],
+      'desiredPickupTime': desiredPickupTime,
+      'createdAt': DateTime.now().toString(),
+    });
+  }
+}
+
+Future<List<Map<String, dynamic>>> returnAllReviews() async {
+  List<Map<String, dynamic>> allData = [];
+
+  final reviewCollectionRef = FirebaseFirestore.instance
+      .collection('users')
+      .doc(currentUser)
+      .collection('reviews');
+
+  try {
+    final reviewSnapshot = await reviewCollectionRef.get();
+
+    for (var doc in reviewSnapshot.docs) {
+      final docData = doc.data() as Map<String, dynamic>;
+      allData.add({
+        'id': docData['id'],
+        'userID': docData['userID'],
+        'comment': docData['comment'],
+        'rating': docData['rating'],
+        'desiredPickupTime': docData['desiredPickupTime'],
+        'createdAt': docData['createdAt'],
+      });
+    }
+  } catch (error) {
+    print('Error fetching reviews: $error');
+  }
+
+
+  return allData;
 }
 
 Future<String> returnCategorywithName(String name) async {
